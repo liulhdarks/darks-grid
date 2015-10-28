@@ -7,3 +7,6 @@ bin
 *.txt
 *.exe
 /target/
+.settings
+.classpath
+.project
