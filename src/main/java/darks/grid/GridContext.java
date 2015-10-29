@@ -1,5 +1,6 @@
 package darks.grid;
 
+import darks.grid.beans.GridRuntime;
 import darks.grid.network.GridNetworkCenter;
 
 public final class GridContext
@@ -11,6 +12,8 @@ public final class GridContext
 	
 	static GridNodesManager nodesManager;
 	
+	static GridRuntime runtime;
+	
 	private GridContext()
 	{
 		
@@ -18,6 +21,7 @@ public final class GridContext
 	
 	public static void initialize()
 	{
+		runtime = new GridRuntime();
 		config = new GridConfiguration();
 		network = new GridNetworkCenter();
 		nodesManager = new GridNodesManager();
