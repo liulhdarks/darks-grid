@@ -55,4 +55,16 @@ public class GridNodesManager
 			return getNode(nodeId);
 		return null;
 	}
+
+	public Map<String, GridNode> getNodesMap()
+	{
+		return nodesMap;
+	}
+
+	public Map<SocketAddress, String> getAddressMap()
+	{
+		return addressMap;
+	}
+	
+	
 }

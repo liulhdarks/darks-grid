@@ -84,5 +84,13 @@ public class GridMessage implements Serializable, Cloneable
 	{
 		this.success = success;
 	}
+
+
+	@Override
+	public String toString()
+	{
+		return "GridMessage [id=" + id + ", data=" + data + ", type=" + type + ", success="
+				+ success + "]";
+	}
 	
 }

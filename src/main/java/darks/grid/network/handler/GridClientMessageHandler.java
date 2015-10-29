@@ -1,9 +1,10 @@
 package darks.grid.network.handler;
 
-import darks.grid.beans.GridMessage;
+import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import darks.grid.beans.GridMessage;
 
-public class GridClientMessageHandler extends GridMessageHandler
+public class GridClientMessageHandler extends ChannelHandlerAdapter
 {
 
 	@Override

@@ -7,7 +7,7 @@ import java.util.Map;
 import darks.grid.GridContext;
 import darks.grid.GridNodesManager;
 import darks.grid.network.GridMessageClient;
-import darks.grid.utils.NetworkUtils;
+import darks.grid.utils.ParamsUtils;
 
 public class TCPPING extends GridDiscovery
 {
@@ -46,7 +46,7 @@ public class TCPPING extends GridDiscovery
 		String hosts = params.get(HOSTS);
 		if (hosts != null)
 		{
-			tryAddressList = NetworkUtils.parseAddress(hosts);
+			tryAddressList = ParamsUtils.parseAddress(hosts);
 		}
 	}
 	
