@@ -2,6 +2,7 @@ package darks.grid.network;
 
 import io.netty.channel.Channel;
 
+import java.net.InetSocketAddress;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -47,4 +48,10 @@ public class GridNetworkCenter
 		return waitChannel;
 	}
 	
+	public InetSocketAddress getBindAddress()
+	{
+		if (messageServer == null)
+			return null;
+		return (InetSocketAddress) messageServer.getAddress();
+	}
 }

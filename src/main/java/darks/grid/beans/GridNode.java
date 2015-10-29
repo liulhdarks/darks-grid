@@ -3,6 +3,9 @@ package darks.grid.beans;
 import io.netty.channel.Channel;
 
 import java.io.Serializable;
+import java.net.InetSocketAddress;
+
+import darks.grid.utils.NetworkUtils;
 
 public class GridNode implements Serializable
 {
@@ -18,16 +21,28 @@ public class GridNode implements Serializable
 	
 	private boolean localNode;
 	
+	private InetSocketAddress ipAddress;
+	
 	public GridNode()
 	{
 		
 	}
 	
-	public GridNode(Channel channel, boolean localNode)
+	public GridNode(String id, Channel channel, boolean localNode)
 	{
-		this.id = channel.id().asShortText();
+		this.id = id;
 		this.channel = channel;
 		this.localNode = localNode;
+		if (localNode)
+		{
+			String ipHost = NetworkUtils.getIpAddress();
+			InetSocketAddress ipAddr = (InetSocketAddress) channel.localAddress();
+			ipAddress = new InetSocketAddress(ipHost, ipAddr.getPort());
+		}
+		else
+		{
+			ipAddress = (InetSocketAddress)channel.remoteAddress();
+		}
 	}
 
 
@@ -60,6 +75,22 @@ public class GridNode implements Serializable
 	public void setLocalNode(boolean localNode)
 	{
 		this.localNode = localNode;
+	}
+
+	public InetSocketAddress getIpAddress()
+	{
+		return ipAddress;
+	}
+
+	public void setIpAddress(InetSocketAddress ipAddress)
+	{
+		this.ipAddress = ipAddress;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "GridNode [id=" + id + ", localNode=" + localNode + ", ipAddress=" + ipAddress + "]";
 	}
 	
 }

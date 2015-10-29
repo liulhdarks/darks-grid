@@ -7,23 +7,37 @@ import java.net.SocketAddress;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import darks.grid.beans.GridNode;
+import darks.grid.beans.NodeId;
 
 public class GridNodesManager
 {
 
+	private static final Logger log = LoggerFactory.getLogger(GridNodesManager.class);
+	
 	private Map<String, GridNode> nodesMap = new ConcurrentHashMap<String, GridNode>();
 	
 	private Map<SocketAddress, String> addressMap = new ConcurrentHashMap<SocketAddress, String>();
 	
-	private String localNodeId;
+	private String localNodeId = null;
 	
-	public void addLocalNode(Channel channel)
+	public synchronized void initialize()
 	{
-		GridNode node = new GridNode(channel, true);
-		localNodeId = node.getId();
+		if (localNodeId == null)
+			localNodeId = NodeId.localId();
+	}
+	
+	public synchronized void addLocalNode(Channel channel)
+	{
+		if (localNodeId == null)
+			localNodeId = NodeId.localId();
+		GridNode node = new GridNode(localNodeId, channel, true);
 		nodesMap.put(localNodeId, node);
-		addressMap.put(node.getChannel().remoteAddress(), localNodeId);
+		addressMap.put(node.getIpAddress(), localNodeId);
+		log.info("Join local node " + localNodeId + " " + node);
 	}
 	
 	public GridNode getLocalNode()

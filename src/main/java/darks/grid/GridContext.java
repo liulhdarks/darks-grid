@@ -22,7 +22,7 @@ public final class GridContext
 		network = new GridNetworkCenter();
 		nodesManager = new GridNodesManager();
 		network.initialize();
-		
+		nodesManager.initialize();
 	}
 
 	public static GridConfiguration getConfig()

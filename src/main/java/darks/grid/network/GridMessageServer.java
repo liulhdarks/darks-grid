@@ -9,6 +9,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 import java.net.BindException;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -16,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import darks.grid.network.handler.GridServerMessageHandler;
+import darks.grid.utils.NetworkUtils;
 
 public class GridMessageServer extends GridMessageDispatcher
 {
@@ -105,6 +108,15 @@ public class GridMessageServer extends GridMessageDispatcher
 	public boolean isBinded()
 	{
 		return binded;
+	}
+	
+	public SocketAddress getAddress()
+	{
+		if (channel == null)
+			return null;
+		String ipHost = NetworkUtils.getIpAddress();
+		InetSocketAddress ipAddr = (InetSocketAddress) channel.localAddress();
+		return new InetSocketAddress(ipHost, ipAddr.getPort());
 	}
 	
 }
