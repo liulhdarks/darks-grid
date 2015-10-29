@@ -8,11 +8,15 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import darks.grid.network.handler.GridClientMessageHandler;
 
 public class GridMessageClient extends GridMessageDispatcher
 {
@@ -44,7 +48,7 @@ public class GridMessageClient extends GridMessageDispatcher
 					.option(ChannelOption.TCP_NODELAY, true)
 					.option(ChannelOption.SO_KEEPALIVE, true)
 					.option(ChannelOption.ALLOCATOR, new PooledByteBufAllocator(false));
-			bootstrap.handler(new GridMessageChannelInitializer());
+			bootstrap.handler(new GridMessageChannelInitializer(new GridClientMessageHandler()));
 			return true;
 		}
 		catch (Exception e)
@@ -57,11 +61,16 @@ public class GridMessageClient extends GridMessageDispatcher
 
 	public boolean connect(String host, int port)
 	{
+		return connect(new InetSocketAddress(host, port));
+	}
+
+	public boolean connect(SocketAddress address)
+	{
 		if (bootstrap == null)
 			return false;
 		try
 		{
-			ChannelFuture f = bootstrap.connect(host, port).sync();
+			ChannelFuture f = bootstrap.connect(address).sync();
 			channel = f.channel();
 			return true;
 		}

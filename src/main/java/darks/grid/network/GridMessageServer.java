@@ -15,6 +15,8 @@ import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import darks.grid.network.handler.GridServerMessageHandler;
+
 public class GridMessageServer extends GridMessageDispatcher
 {
 	
@@ -31,7 +33,9 @@ public class GridMessageServer extends GridMessageDispatcher
 	EventLoopGroup workerGroup = new NioEventLoopGroup(WORKER_NUMBER, threadExecutor);
 	
 	ServerBootstrap bootstrap = null;
-
+	
+	boolean binded = false;
+	
 	public GridMessageServer()
 	{
 		
@@ -50,10 +54,14 @@ public class GridMessageServer extends GridMessageDispatcher
 				.option(ChannelOption.SO_KEEPALIVE, true)
 				.option(ChannelOption.ALLOCATOR, new PooledByteBufAllocator(false))
 				.option(ChannelOption.SO_REUSEADDR, true)
+				.option(ChannelOption.SO_TIMEOUT, 10000)
+				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 3000)
 				.childOption(ChannelOption.TCP_NODELAY, true)
 				.childOption(ChannelOption.SO_KEEPALIVE, true)
-				.childOption(ChannelOption.ALLOCATOR, new PooledByteBufAllocator(false));
-			bootstrap.childHandler(new GridMessageChannelInitializer());
+				.childOption(ChannelOption.ALLOCATOR, new PooledByteBufAllocator(false))
+				.childOption(ChannelOption.SO_TIMEOUT, 10000)
+				.childOption(ChannelOption.CONNECT_TIMEOUT_MILLIS, 3000);
+			bootstrap.childHandler(new GridMessageChannelInitializer(new GridServerMessageHandler()));
 			return true;
 		}
 		catch (Exception e)
@@ -63,7 +71,7 @@ public class GridMessageServer extends GridMessageDispatcher
 		}
 	}
 	
-	public boolean listen(int port)
+	public boolean listen(int port) throws BindException
 	{
 		if (bootstrap == null)
 			return false;
@@ -71,15 +79,16 @@ public class GridMessageServer extends GridMessageDispatcher
 		{
 			ChannelFuture f = bootstrap.bind(port).sync();
 			channel = f.channel();
+			binded = true;
+			log.info("Grid message server binds address " + channel.localAddress());
 			return true;
 		}
 		catch (Exception e)
 		{
 			if (e instanceof BindException)
-			{
-				
-			}
-			log.error(e.getMessage(), e);
+				throw (BindException)e;
+			else
+				log.error(e.getMessage(), e);
 			return false;
 		}
 	}
@@ -87,8 +96,15 @@ public class GridMessageServer extends GridMessageDispatcher
 	@Override
 	public boolean destroy()
 	{
+		log.info("Destroying grid message server.");
 		bossGroup.shutdownGracefully();
 		workerGroup.shutdownGracefully();
 		return super.destroy();
 	}
+
+	public boolean isBinded()
+	{
+		return binded;
+	}
+	
 }

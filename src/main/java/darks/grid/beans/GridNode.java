@@ -1,5 +1,7 @@
 package darks.grid.beans;
 
+import io.netty.channel.Channel;
+
 import java.io.Serializable;
 
 public class GridNode implements Serializable
@@ -12,10 +14,23 @@ public class GridNode implements Serializable
 
 	private String id;
 	
+	private transient Channel channel;
+	
+	private boolean localNode;
+	
 	public GridNode()
 	{
 		
 	}
+	
+	public GridNode(Channel channel, boolean localNode)
+	{
+		this.id = channel.id().asShortText();
+		this.channel = channel;
+		this.localNode = localNode;
+	}
+
+
 
 	public String getId()
 	{
@@ -26,6 +41,25 @@ public class GridNode implements Serializable
 	{
 		this.id = id;
 	}
-	
+
+	public Channel getChannel()
+	{
+		return channel;
+	}
+
+	public void setChannel(Channel channel)
+	{
+		this.channel = channel;
+	}
+
+	public boolean isLocalNode()
+	{
+		return localNode;
+	}
+
+	public void setLocalNode(boolean localNode)
+	{
+		this.localNode = localNode;
+	}
 	
 }

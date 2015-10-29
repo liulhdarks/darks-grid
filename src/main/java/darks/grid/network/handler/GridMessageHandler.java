@@ -1,4 +1,4 @@
-package darks.grid.network;
+package darks.grid.network.handler;
 
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
