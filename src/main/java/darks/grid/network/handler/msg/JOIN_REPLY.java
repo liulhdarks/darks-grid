@@ -29,7 +29,7 @@ public class JOIN_REPLY implements GridMessageHandler
 		String nodeId = meta.getNodeId();
 		synchronized (nodeId.intern())
 		{
-			Map<SocketAddress, JoinMeta> nodesMap = GridRuntime.getNetwork().getWaitJoin(nodeId);
+			Map<SocketAddress, JoinMeta> nodesMap = GridRuntime.network().getWaitJoin(nodeId);
 			for (Entry<SocketAddress, JoinMeta> entry : nodesMap.entrySet())
 			{
 				try
@@ -45,7 +45,7 @@ public class JOIN_REPLY implements GridMessageHandler
 				}
 			}
 			nodesMap.clear();
-			GridRuntime.getNodesManager().addRemoteNode(meta.getNodeId(), ctx.channel());
+			GridRuntime.nodes().addRemoteNode(meta.getNodeId(), ctx.channel(), meta.context());
 		}
 	}
 }

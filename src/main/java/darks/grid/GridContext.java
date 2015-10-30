@@ -84,7 +84,13 @@ public class GridContext implements Serializable
 	{
 		this.serverAddress = serverAddress;
 	}
-	
-	
+
+	@Override
+	public String toString()
+	{
+		return "GridContext [startupTime=" + startupTime + ", startupNanoTime=" + startupNanoTime
+				+ ", localNodeId=" + localNodeId + ", clusterName=" + clusterName
+				+ ", serverAddress=" + serverAddress + "]";
+	}
 	
 }

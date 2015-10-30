@@ -30,7 +30,7 @@ public class TCPPING extends GridDiscovery
 	@Override
 	public void findNodes()
 	{
-		GridNodesManager nodesManager = GridRuntime.getNodesManager();
+		GridNodesManager nodesManager = GridRuntime.nodes();
 		if (tryAddressList != null)
 		{
 			log.info("TCPPING try to ping address " + tryAddressList.size());
@@ -42,7 +42,7 @@ public class TCPPING extends GridDiscovery
 				client.initialize();
 				if (client.connect(address))
 				{
-					
+					//TODO other thing
 				}
 			}
 		}

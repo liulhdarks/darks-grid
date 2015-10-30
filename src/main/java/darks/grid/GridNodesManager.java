@@ -1,6 +1,7 @@
 package darks.grid;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelId;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -12,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import darks.grid.beans.GridNode;
+import darks.grid.beans.GridNodeType;
 import darks.grid.beans.NodeId;
 import darks.grid.network.NodesMonitorThread;
 import darks.grid.utils.ThreadUtils;
@@ -24,6 +26,8 @@ public class GridNodesManager
 	private Map<String, GridNode> nodesMap = new ConcurrentHashMap<String, GridNode>();
 	
 	private Map<SocketAddress, String> addressMap = new ConcurrentHashMap<SocketAddress, String>();
+	
+	private Map<ChannelId, String> channelIdMap = new ConcurrentHashMap<ChannelId, String>();
 	
 	private NodesMonitorThread monitorThread;
 	
@@ -43,13 +47,14 @@ public class GridNodesManager
 	{
 		String localNodeId = NodeId.localId();
 		GridRuntime.context().setLocalNodeId(localNodeId);
-		GridNode node = new GridNode(localNodeId, channel, true);
+		GridNode node = new GridNode(localNodeId, channel, GridRuntime.context(), GridNodeType.TYPE_LOCAL);
 		nodesMap.put(localNodeId, node);
-		addressMap.put(node.getIpAddress(), localNodeId);
+		addressMap.put(node.context().getServerAddress(), localNodeId);
+		channelIdMap.put(channel.id(), localNodeId);
 		log.info("Join local node " + node.toSimpleString());
 	}
 	
-	public synchronized void addRemoteNode(String nodeId, Channel channel)
+	public synchronized void addRemoteNode(String nodeId, Channel channel, GridContext context)
 	{
 		GridNode oldNode = nodesMap.get(nodeId);
 		if (oldNode != null)
@@ -68,9 +73,10 @@ public class GridNodesManager
 				nodesMap.remove(nodeId);
 			}
 		}
-		GridNode node = new GridNode(nodeId, channel, false);
+		GridNode node = new GridNode(nodeId, channel, context, GridNodeType.TYPE_REMOTE);
 		nodesMap.put(nodeId, node);
-		addressMap.put(node.getIpAddress(), nodeId);
+		addressMap.put(node.context().getServerAddress(), nodeId);
+		channelIdMap.put(channel.id(), nodeId);
 		log.info("Join remote node " + node.toSimpleString());
 	}
 	
@@ -85,7 +91,7 @@ public class GridNodesManager
 	public String getNodesInfo()
 	{
 		StringBuilder buf = new StringBuilder();
-		buf.append("===================================================\n");
+		buf.append("\n===================================================\n");
 		for (Entry<String, GridNode> entry : nodesMap.entrySet())
 		{
 			buf.append(entry.getValue().toSimpleString()).append('\n');
@@ -109,9 +115,40 @@ public class GridNodesManager
 		return nodesMap.get(nodeId);
 	}
 	
-	public void removeNode(String nodeId)
+	public synchronized GridNode removeNode(String nodeId)
 	{
-		nodesMap.remove(nodeId);
+		GridNode node = nodesMap.remove(nodeId);
+		addressMap.remove(node.context().getServerAddress());
+		channelIdMap.remove(node.getChannel().id());
+		return node;
+	}
+	
+	public synchronized GridNode removeNode(GridNode node)
+	{
+		GridNode rNode = GridRuntime.nodes().removeNode(node.getId());
+		rNode = rNode == null ? node : rNode;
+		if (rNode != null)
+		{
+			log.info("Grid node " + rNode.getId() + " " + rNode.context().getServerAddress() + " quit.");
+			rNode.getChannel().close();
+		}
+		return rNode;
+	}
+	
+	public synchronized GridNode removeNode(Channel channel)
+	{
+		GridNode node = null;
+		String nodeId = GridRuntime.nodes().getNodeId(channel.id());
+		if (nodeId != null)
+		{
+			node = GridRuntime.nodes().removeNode(nodeId);
+			if (node != null)
+			{
+				log.info("Grid node " + node.getId() + " " + node.context().getServerAddress() + " quit.");
+				node.getChannel().close();
+			}
+		}
+		return node;
 	}
 	
 	public GridNode getNode(InetSocketAddress address)
@@ -120,6 +157,16 @@ public class GridNodesManager
 		if (nodeId != null)
 			return getNode(nodeId);
 		return null;
+	}
+	
+	public String getNodeId(InetSocketAddress address)
+	{
+		return addressMap.get(address);
+	}
+	
+	public String getNodeId(ChannelId channelId)
+	{
+		return channelIdMap.get(channelId);
 	}
 
 	public Map<String, GridNode> getNodesMap()

@@ -1,5 +1,7 @@
 package darks.grid.beans.meta;
 
+import darks.grid.GridContext;
+
 
 public class JoinNodeMeta extends BaseMeta
 {
@@ -11,7 +13,7 @@ public class JoinNodeMeta extends BaseMeta
 
 	private String nodeId;
 	
-	private long startupTime;
+	private GridContext nodeContext;
 	
 	public JoinNodeMeta()
 	{
@@ -19,13 +21,11 @@ public class JoinNodeMeta extends BaseMeta
 	}
 	
 
-	public JoinNodeMeta(String nodeId, long startupTime)
+	public JoinNodeMeta(String nodeId, GridContext nodeContext)
 	{
-		super();
 		this.nodeId = nodeId;
-		this.startupTime = startupTime;
+		this.nodeContext = nodeContext;
 	}
-
 
 
 	public String getNodeId()
@@ -38,23 +38,23 @@ public class JoinNodeMeta extends BaseMeta
 		this.nodeId = nodeId;
 	}
 
-	
-	
-	public long getStartupTime()
+
+	public GridContext context()
 	{
-		return startupTime;
+		return nodeContext;
 	}
 
-	public void setStartupTime(long startupTime)
+
+	public void setNodeContext(GridContext nodeContext)
 	{
-		this.startupTime = startupTime;
+		this.nodeContext = nodeContext;
 	}
+
 
 	@Override
 	public String toString()
 	{
-		return "JoinNodeMeta [nodeId=" + nodeId + ", startupTime=" + startupTime + "]";
+		return "JoinNodeMeta [nodeId=" + nodeId + ", nodeContext=" + nodeContext + "]";
 	}
 
-	
 }

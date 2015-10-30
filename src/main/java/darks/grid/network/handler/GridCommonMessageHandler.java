@@ -1,13 +1,15 @@
 package darks.grid.network.handler;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import darks.grid.GridRuntime;
 import darks.grid.beans.GridMessage;
+import darks.grid.beans.GridNode;
 import darks.grid.beans.meta.JoinMeta;
 import darks.grid.network.handler.msg.GridMessageHandler;
 import darks.grid.network.handler.msg.MessageHandlerFactory;
@@ -27,9 +29,7 @@ public class GridCommonMessageHandler extends ChannelHandlerAdapter
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception
 	{
-		JoinMeta meta = new JoinMeta(GridRuntime.getLocalId(), 
-				GridRuntime.context().getStartupTime(),
-				GridRuntime.context().getClusterName());
+		JoinMeta meta = new JoinMeta(GridRuntime.getLocalId(), GridRuntime.context());
 		ctx.writeAndFlush(new GridMessage(meta, GridMessage.MSG_JOIN));
 		super.channelActive(ctx);
 	}
@@ -37,7 +37,7 @@ public class GridCommonMessageHandler extends ChannelHandlerAdapter
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception
 	{
-		// TODO Auto-generated method stub
+		GridRuntime.nodes().removeNode(ctx.channel());
 		super.channelInactive(ctx);
 	}
 
@@ -57,7 +57,7 @@ public class GridCommonMessageHandler extends ChannelHandlerAdapter
 	@Override
 	public void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception
 	{
-		// TODO Auto-generated method stub
+		GridRuntime.nodes().removeNode(ctx.channel());
 		super.close(ctx, promise);
 	}
 

@@ -19,13 +19,13 @@ public final class NodeId
 	
 	public static String localId()
 	{
-		if (GridRuntime.getNetwork() == null)
+		if (GridRuntime.network() == null)
 			throw new GridException("Grid network hasn't been inited. Invalid local id.");
 		try
 		{
 			byte[] macBytes = NetworkUtils.getMacBytes();
 			String proccessId = ManagementFactory.getRuntimeMXBean().getName();  
-			InetSocketAddress ipAddress = GridRuntime.getNetwork().getBindAddress();
+			InetSocketAddress ipAddress = GridRuntime.network().getBindAddress();
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			baos.write(macBytes);
 			baos.write(proccessId.getBytes());

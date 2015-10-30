@@ -39,7 +39,8 @@ public class GridNetworkCenter
 		messageServer = GridNetworkBuilder.buildMessageServer(config);
 		if (messageServer == null)
 			return false;
-		GridRuntime.getNodesManager().addLocalNode(messageServer.getChannel());
+		GridRuntime.context().setServerAddress(getBindAddress());
+		GridRuntime.nodes().addLocalNode(messageServer.getChannel());
 		discoveries.add(new TCPPING());
 		for (GridDiscovery discovery : discoveries)
 		{
@@ -91,7 +92,7 @@ public class GridNetworkCenter
 	{
 		if (messageServer == null)
 			return null;
-		return (InetSocketAddress) messageServer.getAddress();
+		return messageServer.getAddress();
 	}
 
 	public LinkedList<GridDiscovery> getDiscoveries()

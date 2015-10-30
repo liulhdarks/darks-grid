@@ -10,7 +10,6 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 import java.net.BindException;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -39,6 +38,8 @@ public class GridMessageServer extends GridMessageDispatcher
 	
 	boolean binded = false;
 	
+	private InetSocketAddress bindAddress;
+	
 	public GridMessageServer()
 	{
 		
@@ -65,6 +66,7 @@ public class GridMessageServer extends GridMessageDispatcher
 				.childOption(ChannelOption.SO_TIMEOUT, 10000)
 				.childOption(ChannelOption.CONNECT_TIMEOUT_MILLIS, 3000);
 			bootstrap.childHandler(new GridMessageChannelInitializer(new GridServerMessageHandler()));
+			bindAddress = null;
 			return true;
 		}
 		catch (Exception e)
@@ -76,6 +78,7 @@ public class GridMessageServer extends GridMessageDispatcher
 	
 	public boolean listen(int port) throws BindException
 	{
+		bindAddress = null;
 		if (bootstrap == null)
 			return false;
 		try
@@ -83,7 +86,7 @@ public class GridMessageServer extends GridMessageDispatcher
 			ChannelFuture f = bootstrap.bind(port).sync();
 			channel = f.channel();
 			binded = true;
-			log.info("Grid message server binds address " + channel.localAddress());
+			log.info("Grid message server binds address " + getAddress());
 			return true;
 		}
 		catch (Exception e)
@@ -110,13 +113,17 @@ public class GridMessageServer extends GridMessageDispatcher
 		return binded;
 	}
 	
-	public SocketAddress getAddress()
+	public synchronized InetSocketAddress getAddress()
 	{
 		if (channel == null)
 			return null;
-		String ipHost = NetworkUtils.getIpAddress();
-		InetSocketAddress ipAddr = (InetSocketAddress) channel.localAddress();
-		return new InetSocketAddress(ipHost, ipAddr.getPort());
+		if (bindAddress == null)
+		{
+			String ipHost = NetworkUtils.getIpAddress();
+			InetSocketAddress ipAddr = (InetSocketAddress) channel.localAddress();
+			bindAddress = new InetSocketAddress(ipHost, ipAddr.getPort());
+		}
+		return bindAddress;
 	}
 	
 }

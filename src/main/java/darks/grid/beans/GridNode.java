@@ -3,9 +3,9 @@ package darks.grid.beans;
 import io.netty.channel.Channel;
 
 import java.io.Serializable;
-import java.net.InetSocketAddress;
+import java.util.concurrent.atomic.AtomicLong;
 
-import darks.grid.utils.NetworkUtils;
+import darks.grid.GridContext;
 import darks.grid.utils.StringUtils;
 
 public class GridNode implements Serializable
@@ -20,34 +20,49 @@ public class GridNode implements Serializable
 	
 	private transient Channel channel;
 	
-	private boolean localNode;
+	private int nodeType;
 	
-	private InetSocketAddress ipAddress;
+	private GridContext context;
+	
+	private AtomicLong heartAliveTime = null;
 	
 	public GridNode()
 	{
-		
+		heartAliveTime = new AtomicLong(System.currentTimeMillis());
 	}
 	
-	public GridNode(String id, Channel channel, boolean localNode)
+	public GridNode(String id, Channel channel, GridContext context, int nodeType)
 	{
 		this.id = id;
 		this.channel = channel;
-		this.localNode = localNode;
-		if (localNode)
+		this.nodeType = nodeType;
+		this.context = context;
+		heartAliveTime = new AtomicLong(System.currentTimeMillis());
+	}
+
+	public boolean isValid()
+	{
+		if (id == null || context == null)
+			return false;
+		return true;
+	}
+	
+	public boolean isAlive()
+	{
+		if (!channel.isActive())
+			return false;
+		if (nodeType == GridNodeType.TYPE_REMOTE)
 		{
-			String ipHost = NetworkUtils.getIpAddress();
-			InetSocketAddress ipAddr = (InetSocketAddress) channel.localAddress();
-			ipAddress = new InetSocketAddress(ipHost, ipAddr.getPort());
+			if (System.currentTimeMillis() - heartAliveTime.get() > 1000 * 60 * 5)
+				return false;
 		}
 		else
 		{
-			ipAddress = (InetSocketAddress)channel.remoteAddress();
+			heartAliveTime.getAndSet(System.currentTimeMillis());
 		}
+		return true;
 	}
-
-
-
+	
 	public String getId()
 	{
 		return id;
@@ -68,37 +83,50 @@ public class GridNode implements Serializable
 		this.channel = channel;
 	}
 
-	public boolean isLocalNode()
+	public int getNodeType()
 	{
-		return localNode;
+		return nodeType;
 	}
 
-	public void setLocalNode(boolean localNode)
+	public void setNodeType(int nodeType)
 	{
-		this.localNode = localNode;
+		this.nodeType = nodeType;
 	}
 
-	public InetSocketAddress getIpAddress()
+	public GridContext context()
 	{
-		return ipAddress;
+		return context;
 	}
 
-	public void setIpAddress(InetSocketAddress ipAddress)
+	public void setContext(GridContext context)
 	{
-		this.ipAddress = ipAddress;
+		this.context = context;
 	}
 	
+	public long getHeartAliveTime()
+	{
+		return heartAliveTime.get();
+	}
+
+	public void setHeartAliveTime(long heartAliveTime)
+	{
+		this.heartAliveTime.getAndSet(heartAliveTime);
+	}
+
 	public String toSimpleString()
 	{
 		return StringUtils.stringBuffer(id, 
-				"\t[", localNode ? "LOCAL" : "REMOTE",']',
-				"\t", ipAddress, "\t", channel.isActive() ? "ACTIVE" : "INACTIVE");
+				"  [", GridNodeType.valueOf(nodeType),']',
+				' ', context.getServerAddress(), 
+				"\t", GridNodeStatus.valueOf(this),
+				' ', System.currentTimeMillis() - heartAliveTime.get());
 	}
 
 	@Override
 	public String toString()
 	{
-		return "GridNode [id=" + id + ", localNode=" + localNode + ", ipAddress=" + ipAddress + "]";
+		return "GridNode [id=" + id + ", nodeType=" + nodeType + ", context=" + context
+				+ ", heartAliveTime=" + heartAliveTime + "]";
 	}
-	
+
 }

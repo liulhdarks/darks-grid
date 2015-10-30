@@ -25,7 +25,7 @@ public class DiscoveryThread extends Thread
 		{
 			while (!stoped && !isInterrupted())
 			{
-				LinkedList<GridDiscovery> discoveries = GridRuntime.getNetwork().getDiscoveries();
+				LinkedList<GridDiscovery> discoveries = GridRuntime.network().getDiscoveries();
 				if (discoveries != null)
 				{
 					for (GridDiscovery discovery : discoveries)

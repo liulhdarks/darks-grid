@@ -20,17 +20,5 @@ public class GridServerTest
 			ThreadUtils.threadSleep(10000);
 		}
 	}
-
-	@Test
-	public void testStartupNode2()
-	{
-		GridConfiguration config = new GridConfiguration();
-		config.setListenPort(7800);
-		GridRuntime.initialize(config);
-		while(true)
-		{
-			ThreadUtils.threadSleep(10000);
-		}
-	}
 	
 }

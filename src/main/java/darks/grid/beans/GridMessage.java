@@ -12,6 +12,10 @@ public class GridMessage implements Serializable, Cloneable
 	
 	public static final int MSG_JOIN_REPLY = 1002;
 	
+	public static final int MSG_HEART_ALIVE = 1003;
+	
+	public static final int MSG_HEART_ALIVE_REPLY = 1004;
+	
 	private String id;
 	
 	private Object data;

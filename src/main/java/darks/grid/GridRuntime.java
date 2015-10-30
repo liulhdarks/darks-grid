@@ -42,17 +42,17 @@ public final class GridRuntime
 		return context().getLocalNodeId();
 	}
 
-	public static GridConfiguration getConfig()
+	public static GridConfiguration config()
 	{
 		return config;
 	}
 
-	public static GridNetworkCenter getNetwork()
+	public static GridNetworkCenter network()
 	{
 		return network;
 	}
 
-	public static GridNodesManager getNodesManager()
+	public static GridNodesManager nodes()
 	{
 		return nodesManager;
 	}

@@ -1,6 +1,7 @@
 package darks.grid.beans.meta;
 
 import io.netty.channel.Channel;
+import darks.grid.GridContext;
 
 public class JoinMeta extends BaseMeta
 {
@@ -12,25 +13,22 @@ public class JoinMeta extends BaseMeta
 
 	private String nodeId;
 	
-	private long startupTime;
+	private GridContext nodeContext;
 	
 	private transient Channel channel;
 	
 	private long joinTime;
-	
-	private String clusterName;
 	
 	public JoinMeta()
 	{
 		
 	}
 
-	public JoinMeta(String nodeId, long startupTime, String clusterName)
+	public JoinMeta(String nodeId, GridContext context)
 	{
 		super();
 		this.nodeId = nodeId;
-		this.startupTime = startupTime;
-		this.clusterName = clusterName;
+		this.nodeContext = context;
 	}
 
 	public String getNodeId()
@@ -43,14 +41,14 @@ public class JoinMeta extends BaseMeta
 		this.nodeId = nodeId;
 	}
 
-	public long getStartupTime()
+	public GridContext context()
 	{
-		return startupTime;
+		return nodeContext;
 	}
 
-	public void setStartupTime(long startupTime)
+	public void setNodeContext(GridContext nodeContext)
 	{
-		this.startupTime = startupTime;
+		this.nodeContext = nodeContext;
 	}
 
 	public Channel getChannel()
@@ -62,7 +60,7 @@ public class JoinMeta extends BaseMeta
 	{
 		this.channel = channel;
 	}
-	
+
 	public long getJoinTime()
 	{
 		return joinTime;
@@ -72,24 +70,12 @@ public class JoinMeta extends BaseMeta
 	{
 		this.joinTime = joinTime;
 	}
-	
-	
-
-	public String getClusterName()
-	{
-		return clusterName;
-	}
-
-	public void setClusterName(String clusterName)
-	{
-		this.clusterName = clusterName;
-	}
 
 	@Override
 	public String toString()
 	{
-		return "JoinMeta [nodeId=" + nodeId + ", startupTime=" + startupTime + ", joinTime="
-				+ joinTime + ", clusterName=" + clusterName + "]";
+		return "JoinMeta [nodeId=" + nodeId + ", nodeContext=" + nodeContext + ", joinTime="
+				+ joinTime + "]";
 	}
 
 	

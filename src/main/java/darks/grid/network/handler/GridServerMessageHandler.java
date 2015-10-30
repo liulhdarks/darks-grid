@@ -1,15 +1,12 @@
 package darks.grid.network.handler;
 
+import io.netty.channel.ChannelHandler.Sharable;
+import io.netty.channel.ChannelHandlerContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.netty.channel.ChannelHandlerAdapter;
-import io.netty.channel.ChannelHandlerContext;
-import darks.grid.GridRuntime;
-import darks.grid.beans.GridMessage;
-import darks.grid.network.handler.msg.GridMessageHandler;
-import darks.grid.network.handler.msg.MessageHandlerFactory;
-
+@Sharable
 public class GridServerMessageHandler extends GridCommonMessageHandler
 {
 	
