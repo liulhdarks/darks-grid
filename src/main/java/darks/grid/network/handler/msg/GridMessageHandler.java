@@ -1,4 +1,4 @@
-package darks.grid.network.handler;
+package darks.grid.network.handler.msg;
 
 import io.netty.channel.ChannelHandlerContext;
 import darks.grid.beans.GridMessage;

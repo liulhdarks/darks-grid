@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import darks.grid.beans.GridMessage;
-import darks.grid.network.handler.GridMessageHandler;
 
 public final class MessageHandlerFactory
 {
@@ -22,6 +21,7 @@ public final class MessageHandlerFactory
 	static
 	{
 		handlersMap.put(GridMessage.MSG_JOIN, new JOIN());
+		handlersMap.put(GridMessage.MSG_JOIN_REPLY, new JOIN_REPLY());
 	}
 	
 	private MessageHandlerFactory()

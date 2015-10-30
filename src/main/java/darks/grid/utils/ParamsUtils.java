@@ -43,7 +43,6 @@ public final class ParamsUtils
 			}
 			for (String ip : ipList)
 			{
-				System.out.println(ip + " ==> " + portList);
 				for (Integer port : portList)
 				{
 					result.add(new InetSocketAddress(ip, port));

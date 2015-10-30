@@ -2,7 +2,9 @@ package darks.grid.test;
 
 import org.junit.Test;
 
+import darks.grid.GridConfiguration;
 import darks.grid.GridContext;
+import darks.grid.utils.ThreadUtils;
 
 public class GridServerTest
 {
@@ -10,17 +12,24 @@ public class GridServerTest
 	@Test
 	public void testStartup()
 	{
-		GridContext.initialize();
+		GridConfiguration config = new GridConfiguration();
+		config.setListenPort(7800);
+		GridContext.initialize(config);
 		while(true)
 		{
-			try
-			{
-				Thread.sleep(10000);
-			}
-			catch (InterruptedException e)
-			{
-				e.printStackTrace();
-			}
+			ThreadUtils.threadSleep(10000);
+		}
+	}
+
+	@Test
+	public void testStartupNode2()
+	{
+		GridConfiguration config = new GridConfiguration();
+		config.setListenPort(7800);
+		GridContext.initialize(config);
+		while(true)
+		{
+			ThreadUtils.threadSleep(10000);
 		}
 	}
 	

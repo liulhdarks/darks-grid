@@ -8,6 +8,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
+import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.concurrent.ExecutorService;
@@ -25,7 +26,7 @@ public class GridMessageClient extends GridMessageDispatcher
 	
 	private static final int WORK_NUMBER = Runtime.getRuntime().availableProcessors() * 2;
 	
-	ExecutorService threadExecutor = Executors.newCachedThreadPool();
+	ExecutorService threadExecutor = null;
 	
 	EventLoopGroup workerGroup = new NioEventLoopGroup(WORK_NUMBER, threadExecutor);
 	
@@ -33,7 +34,12 @@ public class GridMessageClient extends GridMessageDispatcher
 
 	public GridMessageClient()
 	{
+		threadExecutor = Executors.newCachedThreadPool();
+	}
 
+	public GridMessageClient(ExecutorService threadExecutor)
+	{
+		this.threadExecutor = threadExecutor;
 	}
 	
 
@@ -72,11 +78,15 @@ public class GridMessageClient extends GridMessageDispatcher
 		{
 			ChannelFuture f = bootstrap.connect(address).sync();
 			channel = f.channel();
+			log.info("Succeed to connect " + address);
 			return true;
 		}
 		catch (Exception e)
 		{
-			log.error(e.getMessage(), e);
+			if (e instanceof ConnectException)
+				log.error("Fail to connect " + address);
+			else
+				log.error(e.getMessage(), e);
 			return false;
 		}
 	}

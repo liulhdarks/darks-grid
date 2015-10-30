@@ -19,6 +19,10 @@ public class GridMessage implements Serializable, Cloneable
 	private int type;
 	
 	private boolean success;
+	
+	private String sourceId;
+	
+	private int sourceType;
 
 	public GridMessage()
 	{
@@ -34,6 +38,16 @@ public class GridMessage implements Serializable, Cloneable
 	}
 	
 
+	public GridMessage(Object data, int type, GridMessage source)
+	{
+		this.id = UUID.randomUUID().toString();
+		this.data = data;
+		this.type = type;
+		this.sourceId = source.getId();
+		this.sourceType = source.getType();
+	}
+	
+
 	public GridMessage(String id, Object data, int type)
 	{
 		this.id = id;
@@ -42,10 +56,10 @@ public class GridMessage implements Serializable, Cloneable
 	}
 
 
-
-	public Object getData()
+	@SuppressWarnings("unchecked")
+	public <T> T getData()
 	{
-		return data;
+		return (T) data;
 	}
 
 	public void setData(Object data)
@@ -86,11 +100,36 @@ public class GridMessage implements Serializable, Cloneable
 	}
 
 
+	public String getSourceId()
+	{
+		return sourceId;
+	}
+
+
+	public void setSourceId(String sourceId)
+	{
+		this.sourceId = sourceId;
+	}
+
+
+	public int getSourceType()
+	{
+		return sourceType;
+	}
+
+
+	public void setSourceType(int sourceType)
+	{
+		this.sourceType = sourceType;
+	}
+
+
 	@Override
 	public String toString()
 	{
 		return "GridMessage [id=" + id + ", data=" + data + ", type=" + type + ", success="
-				+ success + "]";
+				+ success + ", sourceId=" + sourceId + ", sourceType=" + sourceType + "]";
 	}
+
 	
 }

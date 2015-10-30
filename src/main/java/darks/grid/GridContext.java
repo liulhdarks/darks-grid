@@ -2,6 +2,7 @@ package darks.grid;
 
 import darks.grid.beans.GridRuntime;
 import darks.grid.network.GridNetworkCenter;
+import darks.grid.utils.ThreadUtils;
 
 public final class GridContext
 {
@@ -19,14 +20,27 @@ public final class GridContext
 		
 	}
 	
-	public static void initialize()
+	public static void initialize(GridConfiguration config)
 	{
+		GridContext.config = config;
 		runtime = new GridRuntime();
-		config = new GridConfiguration();
 		network = new GridNetworkCenter();
 		nodesManager = new GridNodesManager();
-		network.initialize();
-		nodesManager.initialize();
+		runtime.initialize(config);
+		nodesManager.initialize(config);
+		network.initialize(config);
+	}
+	
+	public static void destroy()
+	{
+		network.destroy();
+		nodesManager.destroy();
+		ThreadUtils.shutdownAll();
+	}
+	
+	public static String getLocalId()
+	{
+		return getRuntime().getLocalNodeId();
 	}
 
 	public static GridConfiguration getConfig()
@@ -42,6 +56,11 @@ public final class GridContext
 	public static GridNodesManager getNodesManager()
 	{
 		return nodesManager;
+	}
+
+	public static GridRuntime getRuntime()
+	{
+		return runtime;
 	}
 	
 }

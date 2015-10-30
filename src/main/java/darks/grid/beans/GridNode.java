@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.net.InetSocketAddress;
 
 import darks.grid.utils.NetworkUtils;
+import darks.grid.utils.StringUtils;
 
 public class GridNode implements Serializable
 {
@@ -85,6 +86,13 @@ public class GridNode implements Serializable
 	public void setIpAddress(InetSocketAddress ipAddress)
 	{
 		this.ipAddress = ipAddress;
+	}
+	
+	public String toSimpleString()
+	{
+		return StringUtils.stringBuffer(id, 
+				"\t[", localNode ? "LOCAL" : "REMOTE",']',
+				"\t", ipAddress, "\t", channel.isActive() ? "ACTIVE" : "INACTIVE");
 	}
 
 	@Override

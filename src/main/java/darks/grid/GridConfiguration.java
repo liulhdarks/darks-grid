@@ -11,7 +11,7 @@ public class GridConfiguration implements Serializable
 	
 	private int listenTryCount = 10;
 	
-	private String clusterName;
+	private String clusterName = "TEST";
 	
 	public GridConfiguration()
 	{

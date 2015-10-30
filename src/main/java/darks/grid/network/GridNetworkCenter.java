@@ -1,51 +1,90 @@
 package darks.grid.network;
 
-import io.netty.channel.Channel;
-
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import darks.grid.GridConfiguration;
 import darks.grid.GridContext;
+import darks.grid.beans.meta.JoinMeta;
+import darks.grid.network.discovery.DiscoveryThread;
 import darks.grid.network.discovery.GridDiscovery;
+import darks.grid.network.discovery.TCPPING;
+import darks.grid.utils.ThreadUtils;
 
 public class GridNetworkCenter
 {
 
 	
-	private static LinkedList<GridDiscovery> discoveries = new LinkedList<GridDiscovery>();
+	private LinkedList<GridDiscovery> discoveries = new LinkedList<GridDiscovery>();
 	
 	private GridMessageServer messageServer;
 	
-	private Map<String, Channel> waitChannel = new ConcurrentHashMap<String, Channel>();
+	private Map<String, Map<SocketAddress, JoinMeta>> waitJoin = new ConcurrentHashMap<String, Map<SocketAddress, JoinMeta>>();
+	
+	private Object mutex = new Object();
+	
+	private DiscoveryThread discoveryThread;
 	
 	public GridNetworkCenter()
 	{
 		
 	}
 	
-	public boolean initialize()
+	public boolean initialize(GridConfiguration config)
 	{
-		messageServer = GridNetworkBuilder.buildMessageServer(GridContext.getConfig());
+		messageServer = GridNetworkBuilder.buildMessageServer(config);
 		if (messageServer == null)
 			return false;
 		GridContext.getNodesManager().addLocalNode(messageServer.getChannel());
+		discoveries.add(new TCPPING());
+		for (GridDiscovery discovery : discoveries)
+		{
+			discovery.setConfig(new HashMap<String, String>());
+		}
+		discoveryThread = new DiscoveryThread();
+		ThreadUtils.executeThread(discoveryThread);
 		return true;
 	}
-
-	public synchronized void addWaitChannel(Channel channel)
+	
+	public void destroy()
 	{
-		String nodeId = channel.id().asShortText();
-		if (!waitChannel.containsKey(nodeId))
-			waitChannel.put(nodeId, channel);
-		else
-			channel.close();
+		discoveryThread.setStoped(true);
+		discoveryThread.interrupt();
+		messageServer.destroy();
+	}
+
+	public int addWaitJoin(String nodeId, JoinMeta meta)
+	{
+		synchronized (mutex)
+		{
+			Map<SocketAddress, JoinMeta> channelMap = waitJoin.get(nodeId);
+			if (channelMap == null)
+			{
+				channelMap = new ConcurrentHashMap<>();
+				waitJoin.put(nodeId, channelMap);
+			}
+			meta.setJoinTime(System.currentTimeMillis());
+			channelMap.put(meta.getChannel().remoteAddress(), meta);
+			return channelMap.size();
+		}
 	}
 	
-	public Map<String, Channel> getWaitChannel()
+	public synchronized Map<SocketAddress, JoinMeta> getWaitJoin(String nodeId)
 	{
-		return waitChannel;
+		synchronized (mutex)
+		{
+			Map<SocketAddress, JoinMeta> channelMap = waitJoin.get(nodeId);
+			if (channelMap == null)
+			{
+				channelMap = new ConcurrentHashMap<>();
+				waitJoin.put(nodeId, channelMap);
+			}
+			return channelMap;
+		}
 	}
 	
 	public InetSocketAddress getBindAddress()
@@ -54,4 +93,10 @@ public class GridNetworkCenter
 			return null;
 		return (InetSocketAddress) messageServer.getAddress();
 	}
+
+	public LinkedList<GridDiscovery> getDiscoveries()
+	{
+		return discoveries;
+	}
+	
 }
