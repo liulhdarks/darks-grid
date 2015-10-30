@@ -57,7 +57,6 @@ public class GridMessageServer extends GridMessageDispatcher
 				.option(ChannelOption.TCP_NODELAY, true)
 				.option(ChannelOption.SO_KEEPALIVE, true)
 				.option(ChannelOption.ALLOCATOR, new PooledByteBufAllocator(false))
-				.option(ChannelOption.SO_REUSEADDR, true)
 				.option(ChannelOption.SO_TIMEOUT, 10000)
 				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 3000)
 				.childOption(ChannelOption.TCP_NODELAY, true)

@@ -7,11 +7,9 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import darks.grid.GridRuntime;
 import darks.grid.GridNodesManager;
-import darks.grid.network.GridMessageClient;
+import darks.grid.GridRuntime;
 import darks.grid.utils.ParamsUtils;
-import darks.grid.utils.ThreadUtils;
 
 public class TCPPING extends GridDiscovery
 {
@@ -38,12 +36,7 @@ public class TCPPING extends GridDiscovery
 			{
 				if (nodesManager.contains(address))
 					continue;
-				GridMessageClient client = new GridMessageClient(ThreadUtils.getThrealPool());
-				client.initialize();
-				if (client.connect(address))
-				{
-					//TODO other thing
-				}
+				GridRuntime.network().tryJoinAddress(address);
 			}
 		}
 	}

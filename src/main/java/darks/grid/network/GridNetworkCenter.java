@@ -47,6 +47,7 @@ public class GridNetworkCenter
 			discovery.setConfig(new HashMap<String, String>());
 		}
 		discoveryThread = new DiscoveryThread();
+		ThreadUtils.threadSleep(1000);
 		ThreadUtils.executeThread(discoveryThread);
 		return true;
 	}
@@ -56,6 +57,13 @@ public class GridNetworkCenter
 		discoveryThread.setStoped(true);
 		discoveryThread.interrupt();
 		messageServer.destroy();
+	}
+	
+	public boolean tryJoinAddress(InetSocketAddress address)
+	{
+		GridMessageClient client = new GridMessageClient(ThreadUtils.getThrealPool());
+		client.initialize();
+		return client.connect(address);
 	}
 
 	public int addWaitJoin(String nodeId, JoinMeta meta)

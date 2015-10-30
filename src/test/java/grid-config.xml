@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grid>
+
+	<register name="" class=""/>
+
+	<network 
+		bind_host=""
+		bind_port=""
+		bind_port_range=""
+		tcp_nodelay="true"
+		keep_alive="true"
+		reuse_addr="false"
+		recv_timeout="50000"
+		connect_timeout="3000"
+		worker_thread_number="4"
+		server_thread_delta="2"
+		/>
+
+	<alive interval="300000" expire="600000"/>
+	
+	<TCPPING hosts="localhost:[7800-7803]" interval="300000"/>
+</grid>
