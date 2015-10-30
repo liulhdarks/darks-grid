@@ -1,66 +1,90 @@
 package darks.grid;
 
-import darks.grid.beans.GridRuntime;
-import darks.grid.network.GridNetworkCenter;
-import darks.grid.utils.ThreadUtils;
+import java.io.Serializable;
+import java.net.InetSocketAddress;
 
-public final class GridContext
+public class GridContext implements Serializable
 {
 
-	static GridConfiguration config;
+	private static final long serialVersionUID = -4898402719806434910L;
+
+	private long startupTime = 0;
 	
-	static GridNetworkCenter network;
+	private long startupNanoTime = 0;
 	
-	static GridNodesManager nodesManager;
+	private String localNodeId;
 	
-	static GridRuntime runtime;
+	private String clusterName;
 	
-	private GridContext()
+	private InetSocketAddress serverAddress;
+	
+	public GridContext()
 	{
 		
 	}
 	
-	public static void initialize(GridConfiguration config)
+	public void initialize(GridConfiguration config)
 	{
-		GridContext.config = config;
-		runtime = new GridRuntime();
-		network = new GridNetworkCenter();
-		nodesManager = new GridNodesManager();
-		runtime.initialize(config);
-		nodesManager.initialize(config);
-		network.initialize(config);
+		clusterName = config.getClusterName();
+		startupTime = System.currentTimeMillis();
+		startupNanoTime = System.nanoTime();
 	}
 	
-	public static void destroy()
+	public void destroy()
 	{
-		network.destroy();
-		nodesManager.destroy();
-		ThreadUtils.shutdownAll();
+		
+	}
+
+	public long getStartupTime()
+	{
+		return startupTime;
+	}
+
+	public void setStartupTime(long startupTime)
+	{
+		this.startupTime = startupTime;
+	}
+
+	public long getStartupNanoTime()
+	{
+		return startupNanoTime;
+	}
+
+	public void setStartupNanoTime(long startupNanoTime)
+	{
+		this.startupNanoTime = startupNanoTime;
+	}
+
+	public String getLocalNodeId()
+	{
+		return localNodeId;
+	}
+
+	public void setLocalNodeId(String localNodeId)
+	{
+		this.localNodeId = localNodeId;
+	}
+
+	public String getClusterName()
+	{
+		return clusterName;
+	}
+
+	public void setClusterName(String clusterName)
+	{
+		this.clusterName = clusterName;
+	}
+
+	public InetSocketAddress getServerAddress()
+	{
+		return serverAddress;
+	}
+
+	public void setServerAddress(InetSocketAddress serverAddress)
+	{
+		this.serverAddress = serverAddress;
 	}
 	
-	public static String getLocalId()
-	{
-		return getRuntime().getLocalNodeId();
-	}
-
-	public static GridConfiguration getConfig()
-	{
-		return config;
-	}
-
-	public static GridNetworkCenter getNetwork()
-	{
-		return network;
-	}
-
-	public static GridNodesManager getNodesManager()
-	{
-		return nodesManager;
-	}
-
-	public static GridRuntime getRuntime()
-	{
-		return runtime;
-	}
+	
 	
 }

@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
-import darks.grid.GridContext;
+import darks.grid.GridRuntime;
 import darks.grid.beans.GridMessage;
 import darks.grid.network.handler.msg.GridMessageHandler;
 import darks.grid.network.handler.msg.MessageHandlerFactory;

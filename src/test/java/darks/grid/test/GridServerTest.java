@@ -3,7 +3,7 @@ package darks.grid.test;
 import org.junit.Test;
 
 import darks.grid.GridConfiguration;
-import darks.grid.GridContext;
+import darks.grid.GridRuntime;
 import darks.grid.utils.ThreadUtils;
 
 public class GridServerTest
@@ -14,7 +14,7 @@ public class GridServerTest
 	{
 		GridConfiguration config = new GridConfiguration();
 		config.setListenPort(7800);
-		GridContext.initialize(config);
+		GridRuntime.initialize(config);
 		while(true)
 		{
 			ThreadUtils.threadSleep(10000);
@@ -26,7 +26,7 @@ public class GridServerTest
 	{
 		GridConfiguration config = new GridConfiguration();
 		config.setListenPort(7800);
-		GridContext.initialize(config);
+		GridRuntime.initialize(config);
 		while(true)
 		{
 			ThreadUtils.threadSleep(10000);

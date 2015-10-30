@@ -10,7 +10,7 @@ import java.util.Map.Entry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import darks.grid.GridContext;
+import darks.grid.GridRuntime;
 import darks.grid.beans.GridMessage;
 import darks.grid.beans.meta.JoinMeta;
 import darks.grid.beans.meta.JoinNodeMeta;
@@ -29,7 +29,7 @@ public class JOIN_REPLY implements GridMessageHandler
 		String nodeId = meta.getNodeId();
 		synchronized (nodeId.intern())
 		{
-			Map<SocketAddress, JoinMeta> nodesMap = GridContext.getNetwork().getWaitJoin(nodeId);
+			Map<SocketAddress, JoinMeta> nodesMap = GridRuntime.getNetwork().getWaitJoin(nodeId);
 			for (Entry<SocketAddress, JoinMeta> entry : nodesMap.entrySet())
 			{
 				try
@@ -45,7 +45,7 @@ public class JOIN_REPLY implements GridMessageHandler
 				}
 			}
 			nodesMap.clear();
-			GridContext.getNodesManager().addRemoteNode(meta.getNodeId(), ctx.channel());
+			GridRuntime.getNodesManager().addRemoteNode(meta.getNodeId(), ctx.channel());
 		}
 	}
 }

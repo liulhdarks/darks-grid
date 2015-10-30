@@ -6,7 +6,7 @@ import java.util.Map.Entry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import darks.grid.GridContext;
+import darks.grid.GridRuntime;
 import darks.grid.beans.GridNode;
 
 public class NodesMonitorThread extends Thread
@@ -29,7 +29,7 @@ public class NodesMonitorThread extends Thread
 		{
 			while (!stoped && !isInterrupted())
 			{
-				Map<String, GridNode> nodesMap = GridContext.getNodesManager().getNodesMap();
+				Map<String, GridNode> nodesMap = GridRuntime.getNodesManager().getNodesMap();
 				log.info("Start to monitor nodes.size:" + nodesMap.size());
 				for (Entry<String, GridNode> entry : nodesMap.entrySet())
 				{
@@ -37,7 +37,7 @@ public class NodesMonitorThread extends Thread
 				}
 				if (System.currentTimeMillis() - st > 60000)
 				{
-					log.info(GridContext.getNodesManager().getNodesInfo());
+					log.info(GridRuntime.getNodesManager().getNodesInfo());
 					st = System.currentTimeMillis();
 				}
 				Thread.sleep(30000);

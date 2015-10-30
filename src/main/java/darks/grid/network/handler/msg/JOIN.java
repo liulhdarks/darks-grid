@@ -10,7 +10,7 @@ import java.util.Map.Entry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import darks.grid.GridContext;
+import darks.grid.GridRuntime;
 import darks.grid.beans.GridMessage;
 import darks.grid.beans.GridNode;
 import darks.grid.beans.meta.JoinMeta;
@@ -28,7 +28,7 @@ public class JOIN implements GridMessageHandler
 	{
 		JoinMeta meta = msg.getData();
 		meta.setChannel(ctx.channel());
-		if (!GridContext.getRuntime().getClusterName().equals(meta.getClusterName()))
+		if (!GridRuntime.context().getClusterName().equals(meta.getClusterName()))
 		{
 			log.info("Refuse " + meta.getClusterName() + " cluster request join." + meta);
 			meta.getChannel().close();
@@ -37,7 +37,7 @@ public class JOIN implements GridMessageHandler
 		String nodeId = meta.getNodeId();
 		synchronized (nodeId)
 		{
-			GridNode node = GridContext.getNodesManager().getNode(nodeId);
+			GridNode node = GridRuntime.getNodesManager().getNode(nodeId);
 			if (node != null)
 			{
 				if (node.getChannel().isActive())
@@ -46,12 +46,12 @@ public class JOIN implements GridMessageHandler
 					return;
 				}
 				else
-					GridContext.getNodesManager().removeNode(nodeId);
+					GridRuntime.getNodesManager().removeNode(nodeId);
 			}
-			int count = GridContext.getNetwork().addWaitJoin(nodeId, meta);
+			int count = GridRuntime.getNetwork().addWaitJoin(nodeId, meta);
 			if (count > 1)
 			{
-				long localTime = GridContext.getRuntime().getStartupTime();
+				long localTime = GridRuntime.context().getStartupTime();
 				long remoteTime = meta.getStartupTime();
 				if (localTime > remoteTime)
 				{
@@ -73,7 +73,7 @@ public class JOIN implements GridMessageHandler
 	private void handleRepeatChannel(JoinMeta meta, GridMessage msg)
 	{
 		String nodeId = meta.getNodeId();
-		Map<SocketAddress, JoinMeta> nodesMap = GridContext.getNetwork().getWaitJoin(nodeId);
+		Map<SocketAddress, JoinMeta> nodesMap = GridRuntime.getNetwork().getWaitJoin(nodeId);
 		long keepJoinTime = 0;
 		JoinMeta keepJoinMeta = null;
 		for (Entry<SocketAddress, JoinMeta> entry : nodesMap.entrySet())
@@ -99,7 +99,7 @@ public class JOIN implements GridMessageHandler
 	private void handleNewChannel(JoinMeta meta, GridMessage msg, boolean autoJoin)
 	{
 		String nodeId = meta.getNodeId();
-		JoinNodeMeta data = new JoinNodeMeta(GridContext.getLocalId(), GridContext.getRuntime().getStartupTime());
+		JoinNodeMeta data = new JoinNodeMeta(GridRuntime.getLocalId(), GridRuntime.context().getStartupTime());
 		GridMessage replyMsg = new GridMessage(data, GridMessage.MSG_JOIN_REPLY, msg);
 		try
 		{
@@ -107,8 +107,8 @@ public class JOIN implements GridMessageHandler
 			if (autoJoin)
 			{
 				if (future.isSuccess())
-					GridContext.getNodesManager().addRemoteNode(nodeId, meta.getChannel());
-				Map<SocketAddress, JoinMeta> nodesMap = GridContext.getNetwork().getWaitJoin(nodeId);
+					GridRuntime.getNodesManager().addRemoteNode(nodeId, meta.getChannel());
+				Map<SocketAddress, JoinMeta> nodesMap = GridRuntime.getNetwork().getWaitJoin(nodeId);
 				nodesMap.clear();
 			}
 		}

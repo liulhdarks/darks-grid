@@ -42,7 +42,7 @@ public class GridNodesManager
 	public synchronized void addLocalNode(Channel channel)
 	{
 		String localNodeId = NodeId.localId();
-		GridContext.getRuntime().setLocalNodeId(localNodeId);
+		GridRuntime.context().setLocalNodeId(localNodeId);
 		GridNode node = new GridNode(localNodeId, channel, true);
 		nodesMap.put(localNodeId, node);
 		addressMap.put(node.getIpAddress(), localNodeId);
@@ -76,7 +76,7 @@ public class GridNodesManager
 	
 	public GridNode getLocalNode()
 	{
-		String localNodeId = GridContext.getRuntime().getLocalNodeId();
+		String localNodeId = GridRuntime.context().getLocalNodeId();
 		if (localNodeId == null)
 			return null;
 		return nodesMap.get(localNodeId);

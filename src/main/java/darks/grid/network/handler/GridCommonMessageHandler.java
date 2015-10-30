@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
-import darks.grid.GridContext;
+import darks.grid.GridRuntime;
 import darks.grid.beans.GridMessage;
 import darks.grid.beans.meta.JoinMeta;
 import darks.grid.network.handler.msg.GridMessageHandler;
@@ -27,9 +27,9 @@ public class GridCommonMessageHandler extends ChannelHandlerAdapter
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception
 	{
-		JoinMeta meta = new JoinMeta(GridContext.getLocalId(), 
-				GridContext.getRuntime().getStartupTime(),
-				GridContext.getRuntime().getClusterName());
+		JoinMeta meta = new JoinMeta(GridRuntime.getLocalId(), 
+				GridRuntime.context().getStartupTime(),
+				GridRuntime.context().getClusterName());
 		ctx.writeAndFlush(new GridMessage(meta, GridMessage.MSG_JOIN));
 		super.channelActive(ctx);
 	}

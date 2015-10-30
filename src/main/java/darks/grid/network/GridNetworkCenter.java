@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import darks.grid.GridConfiguration;
-import darks.grid.GridContext;
+import darks.grid.GridRuntime;
 import darks.grid.beans.meta.JoinMeta;
 import darks.grid.network.discovery.DiscoveryThread;
 import darks.grid.network.discovery.GridDiscovery;
@@ -39,7 +39,7 @@ public class GridNetworkCenter
 		messageServer = GridNetworkBuilder.buildMessageServer(config);
 		if (messageServer == null)
 			return false;
-		GridContext.getNodesManager().addLocalNode(messageServer.getChannel());
+		GridRuntime.getNodesManager().addLocalNode(messageServer.getChannel());
 		discoveries.add(new TCPPING());
 		for (GridDiscovery discovery : discoveries)
 		{

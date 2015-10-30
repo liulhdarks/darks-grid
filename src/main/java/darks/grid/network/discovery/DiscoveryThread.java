@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import darks.grid.GridContext;
+import darks.grid.GridRuntime;
 
 public class DiscoveryThread extends Thread
 {
@@ -25,7 +25,7 @@ public class DiscoveryThread extends Thread
 		{
 			while (!stoped && !isInterrupted())
 			{
-				LinkedList<GridDiscovery> discoveries = GridContext.getNetwork().getDiscoveries();
+				LinkedList<GridDiscovery> discoveries = GridRuntime.getNetwork().getDiscoveries();
 				if (discoveries != null)
 				{
 					for (GridDiscovery discovery : discoveries)

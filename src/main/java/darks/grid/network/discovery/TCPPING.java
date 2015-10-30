@@ -7,7 +7,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import darks.grid.GridContext;
+import darks.grid.GridRuntime;
 import darks.grid.GridNodesManager;
 import darks.grid.network.GridMessageClient;
 import darks.grid.utils.ParamsUtils;
@@ -30,7 +30,7 @@ public class TCPPING extends GridDiscovery
 	@Override
 	public void findNodes()
 	{
-		GridNodesManager nodesManager = GridContext.getNodesManager();
+		GridNodesManager nodesManager = GridRuntime.getNodesManager();
 		if (tryAddressList != null)
 		{
 			log.info("TCPPING try to ping address " + tryAddressList.size());
