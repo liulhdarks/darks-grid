@@ -1,18 +1,18 @@
 package darks.grid.network.handler;
 
-import io.netty.channel.ChannelHandlerAdapter;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPromise;
+import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import darks.grid.GridRuntime;
 import darks.grid.beans.GridMessage;
-import darks.grid.beans.GridNode;
 import darks.grid.beans.meta.JoinMeta;
 import darks.grid.network.handler.msg.GridMessageHandler;
 import darks.grid.network.handler.msg.MessageHandlerFactory;
+import io.netty.channel.ChannelHandlerAdapter;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPromise;
 
 public class GridCommonMessageHandler extends ChannelHandlerAdapter
 {
@@ -22,8 +22,15 @@ public class GridCommonMessageHandler extends ChannelHandlerAdapter
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception
 	{
-		// TODO Auto-generated method stub
-		super.exceptionCaught(ctx, cause);
+		if (cause instanceof IOException && cause.getMessage().indexOf("远程主机强迫关闭") >= 0)
+		{
+		    log.warn("Miss connection " + ctx.channel().remoteAddress());
+		}
+		else
+		{
+	        log.error(cause.getMessage(), cause);
+		}
+//		super.exceptionCaught(ctx, cause);
 	}
 
 	@Override

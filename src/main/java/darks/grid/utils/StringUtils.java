@@ -18,4 +18,10 @@ public final class StringUtils
 		return buf.toString();
 	}
 	
+	public static String percent(float v)
+	{ 
+	    v = v < 0.f ? 0.f : v * 100;
+	    return String.format("%.2f", v) + "%";
+	}
+	
 }

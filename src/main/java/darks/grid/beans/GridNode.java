@@ -132,10 +132,10 @@ public class GridNode implements Serializable
 		return StringUtils.stringBuffer(id, 
 				"  [", GridNodeType.valueOf(nodeType),']',
 				' ', context.getServerAddress(), 
-				"\t", GridNodeStatus.valueOf(this),
+				' ', GridNodeStatus.valueOf(this),
 				' ', System.currentTimeMillis() - heartAliveTime.get(),
-				'\t', context.getMachineInfo().getSystemCpuUsage(), 
-				'\t', context.getMachineInfo().getUsedTotalMemoryUsage());
+				'\t', StringUtils.percent(context.getMachineInfo().getSystemCpuUsage()), 
+				'\t', StringUtils.percent(context.getMachineInfo().getUsedTotalMemoryUsage()));
 	}
 
 	@Override
