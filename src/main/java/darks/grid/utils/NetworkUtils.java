@@ -59,6 +59,8 @@ public final class NetworkUtils
 				log.error(e.getMessage(), e);
 			}
 		}
+		if (ipLocalAddress == null)
+		    ipLocalAddress = "127.0.0.1";
 		return ipLocalAddress;
 	}
 

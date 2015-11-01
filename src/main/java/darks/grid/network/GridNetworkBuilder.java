@@ -5,7 +5,8 @@ import java.net.BindException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import darks.grid.GridConfiguration;
+import darks.grid.config.GridConfiguration;
+import darks.grid.config.NetworkConfig;
 
 public final class GridNetworkBuilder
 {
@@ -23,18 +24,20 @@ public final class GridNetworkBuilder
 		GridMessageServer server = new GridMessageServer();
 		if (!server.initialize())
 			return null;
-		int maxTryPort = config.getListenPort() + config.getListenTryCount();
-		for (int port = config.getListenPort(); port <= maxTryPort; port++)
+		NetworkConfig netConfig = config.getNetworkConfig();
+		String bindHost = netConfig.getBindHost();
+		int maxTryPort = netConfig.getBindPort() + netConfig.getBindPortRange();
+		for (int port = netConfig.getBindPort(); port <= maxTryPort; port++)
 		{
 			try
 			{
-				if (!server.listen(port))
-					log.error("Fail to bind port " + port + ".Exception occured.");
+				if (!server.listen(bindHost, port))
+					log.error("Fail to bind host:" + bindHost + " port:" + port + ".Exception occured.");
 				break;
 			}
 			catch (BindException e)
 			{
-				log.warn("Grid server try to listen port " + port + "[max:" + maxTryPort + "] failed.");
+				log.warn("Grid server try to listen host:" + bindHost + " port:" + port + "[max:" + maxTryPort + "] failed.");
 			}
 		}
 		return server.isBinded() ? server : null;

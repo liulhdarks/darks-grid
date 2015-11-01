@@ -1,8 +1,7 @@
 package darks.grid.network.discovery;
 
 import java.net.InetSocketAddress;
-import java.util.List;
-import java.util.Map;
+import java.util.Collection;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,11 +13,13 @@ import darks.grid.utils.ParamsUtils;
 public class TCPPING extends GridDiscovery
 {
 	
-	private static final Logger log = LoggerFactory.getLogger(TCPPING.class);
+    private static final long serialVersionUID = -2291696195096655837L;
+
+    private static final Logger log = LoggerFactory.getLogger(TCPPING.class);
 	
-	private static final String HOSTS = "hosts";
+	private Collection<InetSocketAddress> tryAddressList = null;
 	
-	private List<InetSocketAddress> tryAddressList = null;
+	private String hosts = null;
 	
 	public TCPPING()
 	{
@@ -40,16 +41,19 @@ public class TCPPING extends GridDiscovery
 			}
 		}
 	}
-	
-	@Override
-	public void setConfig(Map<String, String> params)
-	{
-		params.put(HOSTS, "30.2.44.188:[7800-7803]");
-		String hosts = params.get(HOSTS);
-		if (hosts != null)
-		{
-			tryAddressList = ParamsUtils.parseAddress(hosts);
-		}
-	}
+
+    public String getHosts()
+    {
+        return hosts;
+    }
+
+    public void setHosts(String hosts)
+    {
+        this.hosts = hosts;
+        if (hosts != null)
+        {
+            tryAddressList = ParamsUtils.parseAddress(hosts);
+        }
+    }
 	
 }

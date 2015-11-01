@@ -1,15 +1,31 @@
 package darks.grid.network.discovery;
 
-import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public abstract class GridDiscovery
+import darks.grid.beans.GridComponent;
+
+public abstract class GridDiscovery extends GridComponent
 {
+    
+    private static final Logger log = LoggerFactory.getLogger(GridDiscovery.class);
+    
+    private static final long serialVersionUID = 1459651037836923247L;
+    
 
-	public abstract void findNodes();
-	
-	public void setConfig(Map<String, String> params)
-	{
-		
-	}
+    @Override
+    protected void execute() throws Exception
+    {
+        try
+        {
+            findNodes();
+        }
+        catch (Exception e)
+        {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    public abstract void findNodes();
 	
 }

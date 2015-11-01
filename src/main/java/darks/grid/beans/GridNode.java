@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicLong;
 
 import darks.grid.GridContext;
+import darks.grid.GridRuntime;
 import darks.grid.utils.StringUtils;
 
 public class GridNode implements Serializable
@@ -25,6 +26,8 @@ public class GridNode implements Serializable
 	private GridContext context;
 	
 	private AtomicLong heartAliveTime = null;
+	
+	private MachineInfo machineInfo;
 	
 	public GridNode()
 	{
@@ -53,7 +56,8 @@ public class GridNode implements Serializable
 			return false;
 		if (nodeType == GridNodeType.TYPE_REMOTE)
 		{
-			if (System.currentTimeMillis() - heartAliveTime.get() > 1000 * 60 * 5)
+		    
+			if (System.currentTimeMillis() - heartAliveTime.get() > GridRuntime.config().getAliveConfig().getExpire())
 				return false;
 		}
 		else
@@ -112,14 +116,26 @@ public class GridNode implements Serializable
 	{
 		this.heartAliveTime.getAndSet(heartAliveTime);
 	}
+	
+	public MachineInfo getMachineInfo()
+    {
+        return machineInfo;
+    }
 
-	public String toSimpleString()
+    public void setMachineInfo(MachineInfo machineInfo)
+    {
+        this.machineInfo = machineInfo;
+    }
+
+    public String toSimpleString()
 	{
 		return StringUtils.stringBuffer(id, 
 				"  [", GridNodeType.valueOf(nodeType),']',
 				' ', context.getServerAddress(), 
 				"\t", GridNodeStatus.valueOf(this),
-				' ', System.currentTimeMillis() - heartAliveTime.get());
+				' ', System.currentTimeMillis() - heartAliveTime.get(),
+				'\t', context.getMachineInfo().getSystemCpuUsage(), 
+				'\t', context.getMachineInfo().getUsedTotalMemoryUsage());
 	}
 
 	@Override

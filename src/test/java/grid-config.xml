@@ -1,22 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <grid>
 
-	<register name="" class=""/>
+	<!-- <register name="asd" class="asd"/> -->
+
+	<cluster cluster_name="TEST"/>
 
 	<network 
 		bind_host=""
-		bind_port=""
-		bind_port_range=""
+		bind_port="7800"
+		bind_port_range="10"
 		tcp_nodelay="true"
 		keep_alive="true"
 		reuse_addr="false"
 		recv_timeout="50000"
 		connect_timeout="3000"
-		worker_thread_number="4"
-		server_thread_delta="2"
+		server_worker_thread_number="4"
+		server_boss_thread_delta="2"
+		client_worker_thread_number="4"
 		/>
 
-	<alive interval="300000" expire="600000"/>
+	<alive interval="300000" expire="600000" print_nodes_interval="60000"/>
 	
 	<TCPPING hosts="localhost:[7800-7803]" interval="300000"/>
 </grid>

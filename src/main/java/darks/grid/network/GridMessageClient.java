@@ -17,6 +17,8 @@ import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import darks.grid.GridRuntime;
+import darks.grid.config.NetworkConfig;
 import darks.grid.network.handler.GridClientMessageHandler;
 
 public class GridMessageClient extends GridMessageDispatcher
@@ -24,11 +26,9 @@ public class GridMessageClient extends GridMessageDispatcher
 	
 	private static final Logger log = LoggerFactory.getLogger(GridMessageClient.class);
 	
-	private static final int WORK_NUMBER = Runtime.getRuntime().availableProcessors() * 2;
-	
 	ExecutorService threadExecutor = null;
 	
-	EventLoopGroup workerGroup = new NioEventLoopGroup(WORK_NUMBER, threadExecutor);
+	EventLoopGroup workerGroup = null;
 	
 	Bootstrap bootstrap = null;
 
@@ -49,11 +49,16 @@ public class GridMessageClient extends GridMessageDispatcher
 		super.initialize();
 		try
 		{
+            NetworkConfig config = GridRuntime.config().getNetworkConfig();
+            int workerNum = config.getClientWorkerThreadNumber();
+		    workerGroup = new NioEventLoopGroup(workerNum, threadExecutor);
 			bootstrap = new Bootstrap();
 			bootstrap.group(workerGroup).channel(NioSocketChannel.class)
-					.option(ChannelOption.TCP_NODELAY, true)
-					.option(ChannelOption.SO_KEEPALIVE, true)
-					.option(ChannelOption.ALLOCATOR, new PooledByteBufAllocator(false));
+					.option(ChannelOption.TCP_NODELAY, config.isTcpNodelay())
+					.option(ChannelOption.SO_KEEPALIVE, config.isKeepAlive())
+					.option(ChannelOption.ALLOCATOR, new PooledByteBufAllocator(false))
+//	                .option(ChannelOption.SO_TIMEOUT, config.getRecvTimeout())
+	                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, config.getConnectTimeout());
 			bootstrap.handler(new GridMessageChannelInitializer(new GridClientMessageHandler()));
 			return true;
 		}

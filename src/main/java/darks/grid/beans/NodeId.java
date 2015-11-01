@@ -27,8 +27,10 @@ public final class NodeId
 			String proccessId = ManagementFactory.getRuntimeMXBean().getName();  
 			InetSocketAddress ipAddress = GridRuntime.network().getBindAddress();
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			baos.write(macBytes);
-			baos.write(proccessId.getBytes());
+			if (macBytes != null)
+			    baos.write(macBytes);
+			if (proccessId != null)
+			    baos.write(proccessId.getBytes());
 			baos.write(ipAddress.toString().getBytes());
 			byte[] bytes = baos.toByteArray();
 			return BytesUtils.md5(bytes);

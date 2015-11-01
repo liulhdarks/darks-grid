@@ -1,24 +1,20 @@
 package darks.grid.test;
 
+import org.junit.Assert;
 import org.junit.Test;
 
-import darks.grid.GridRuntime;
 import darks.grid.config.GridConfigFactory;
 import darks.grid.config.GridConfiguration;
-import darks.grid.utils.ThreadUtils;
 
-public class GridServerTest
+public class ConfigTest
 {
 
-	@Test
-	public void testStartup()
-	{
+    @Test
+    public void testLoadConfig()
+    {
         GridConfiguration config = GridConfigFactory.configure(this.getClass().getResourceAsStream("/grid-config.xml"));
-		GridRuntime.initialize(config);
-		while(true)
-		{
-			ThreadUtils.threadSleep(10000);
-		}
-	}
-	
+        Assert.assertNotNull(config);
+        System.out.println(config);
+    }
+    
 }

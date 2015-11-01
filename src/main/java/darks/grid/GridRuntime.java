@@ -1,10 +1,16 @@
 package darks.grid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import darks.grid.config.GridConfiguration;
 import darks.grid.network.GridNetworkCenter;
 import darks.grid.utils.ThreadUtils;
 
 public final class GridRuntime
 {
+    
+    private static final Logger log = LoggerFactory.getLogger(GridRuntime.class);
 
 	static GridConfiguration config;
 	
@@ -14,24 +20,51 @@ public final class GridRuntime
 	
 	static GridContext context;
 	
+	static GridComponentManager components;
+	
 	private GridRuntime()
 	{
 		
 	}
 	
-	public static void initialize(GridConfiguration config)
+	public static boolean initialize(GridConfiguration config)
 	{
 		GridRuntime.config = config;
 		context = new GridContext();
 		network = new GridNetworkCenter();
 		nodesManager = new GridNodesManager();
-		context.initialize(config);
-		nodesManager.initialize(config);
-		network.initialize(config);
+		components = new GridComponentManager();
+		boolean ret = context.initialize(config);
+		if (!ret)
+		{
+            log.error("Fail to initialize grid context.");
+            return false;
+		}
+		ret = components.initialize(config);
+        if (!ret)
+        {
+            log.error("Fail to initialize grid components.");
+            return false;
+        }
+        ret = nodesManager.initialize(config);
+        if (!ret)
+        {
+            log.error("Fail to initialize node manager.");
+            return false;
+        }
+        ret = network.initialize(config);
+        if (!ret)
+        {
+            log.error("Fail to initialize network.");
+            return false;
+        }
+		components.setupComponents();
+		return true;
 	}
 	
 	public static void destroy()
 	{
+	    components.destroy();
 		network.destroy();
 		nodesManager.destroy();
 		ThreadUtils.shutdownAll();

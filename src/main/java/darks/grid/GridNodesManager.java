@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import darks.grid.beans.GridNode;
 import darks.grid.beans.GridNodeType;
 import darks.grid.beans.NodeId;
+import darks.grid.config.GridConfiguration;
 import darks.grid.network.NodesMonitorThread;
 import darks.grid.utils.ThreadUtils;
 
@@ -31,10 +32,11 @@ public class GridNodesManager
 	
 	private NodesMonitorThread monitorThread;
 	
-	public synchronized void initialize(GridConfiguration config)
+	public synchronized boolean initialize(GridConfiguration config)
 	{
 		monitorThread = new NodesMonitorThread();
 		ThreadUtils.executeThread(monitorThread);
+		return true;
 	}
 	
 	public synchronized void destroy()

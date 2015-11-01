@@ -1,7 +1,5 @@
 package darks.grid.network;
 
-import io.netty.channel.ChannelFuture;
-
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -13,6 +11,8 @@ import darks.grid.beans.GridMessage;
 import darks.grid.beans.GridNode;
 import darks.grid.beans.GridNodeType;
 import darks.grid.beans.meta.HeartAliveMeta;
+import darks.grid.config.AliveConfig;
+import io.netty.channel.ChannelFuture;
 
 public class NodesMonitorThread extends Thread
 {
@@ -32,6 +32,8 @@ public class NodesMonitorThread extends Thread
 	{
 		try
 		{
+		    log.info("Startup heart-alive thread.");
+		    AliveConfig config = GridRuntime.config().getAliveConfig();
 			while (!stoped && !isInterrupted())
 			{
 				Map<String, GridNode> nodesMap = GridRuntime.nodes().getNodesMap();
@@ -40,7 +42,10 @@ public class NodesMonitorThread extends Thread
 				{
 					GridNode node = entry.getValue();
 					if (node.getNodeType() == GridNodeType.TYPE_LOCAL)
-						continue;
+					{
+					    node.context().getMachineInfo().update();
+                        continue;
+					}
 					if (!node.isAlive())
 					{
 						log.info("Grid node " + node.getId() + " " + node.context().getServerAddress() + " miss alive.");
@@ -51,12 +56,12 @@ public class NodesMonitorThread extends Thread
 						checkAlive(node);
 					}
 				}
-				if (System.currentTimeMillis() - st > 60000)
+				if (System.currentTimeMillis() - st > config.getPrintNodesInterval())
 				{
 					log.info(GridRuntime.nodes().getNodesInfo());
 					st = System.currentTimeMillis();
 				}
-				Thread.sleep(30000);
+				Thread.sleep(config.getInterval());
 			}
 		}
 		catch (Exception e)

@@ -32,6 +32,7 @@ public class HEART_ALIVE implements GridMessageHandler
 		else
 		{
 			node.setHeartAliveTime(System.currentTimeMillis());
+			node.context().setMachineInfo(meta.context().getMachineInfo());
 		}
 		//HEART ALIVE REPLY
 		if (msg.getType() == GridMessage.MSG_HEART_ALIVE)
@@ -39,6 +40,7 @@ public class HEART_ALIVE implements GridMessageHandler
 			boolean valid = true;
 			try
 			{
+			    GridRuntime.context().getMachineInfo().update();
 				HeartAliveMeta replyMeta = new HeartAliveMeta(GridRuntime.context().getLocalNodeId(), GridRuntime.context());
 				GridMessage replyMsg = new GridMessage(replyMeta, GridMessage.MSG_HEART_ALIVE_REPLY, msg);
 				ChannelFuture future = ctx.channel().writeAndFlush(replyMsg).sync();

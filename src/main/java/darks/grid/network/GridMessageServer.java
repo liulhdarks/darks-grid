@@ -1,13 +1,5 @@
 package darks.grid.network;
 
-import io.netty.bootstrap.ServerBootstrap;
-import io.netty.buffer.PooledByteBufAllocator;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
-
 import java.net.BindException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.ExecutorService;
@@ -16,23 +8,28 @@ import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import darks.grid.GridRuntime;
+import darks.grid.config.NetworkConfig;
 import darks.grid.network.handler.GridServerMessageHandler;
 import darks.grid.utils.NetworkUtils;
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 public class GridMessageServer extends GridMessageDispatcher
 {
 	
 	private static final Logger log = LoggerFactory.getLogger(GridMessageServer.class);
 	
-	private static final int BOSS_NUMBER = Runtime.getRuntime().availableProcessors() * 2;
-	
-	private static final int WORKER_NUMBER = 4;
-	
 	ExecutorService threadExecutor = Executors.newCachedThreadPool();
 	
-	EventLoopGroup bossGroup = new NioEventLoopGroup(BOSS_NUMBER, threadExecutor);
+	EventLoopGroup bossGroup = null;
 	
-	EventLoopGroup workerGroup = new NioEventLoopGroup(WORKER_NUMBER, threadExecutor);
+	EventLoopGroup workerGroup = null;
 	
 	ServerBootstrap bootstrap = null;
 	
@@ -50,20 +47,25 @@ public class GridMessageServer extends GridMessageDispatcher
 	{
 		try
 		{
+		    NetworkConfig config = GridRuntime.config().getNetworkConfig();
+		    int bossNum = Runtime.getRuntime().availableProcessors() * config.getServerBossThreadDelta();
+		    int workerNum = config.getServerWorkerThreadNumber();
+		    bossGroup = new NioEventLoopGroup(bossNum, threadExecutor);
+		    workerGroup = new NioEventLoopGroup(workerNum, threadExecutor);
 			super.initialize();
 			bootstrap = new ServerBootstrap();
 			bootstrap.group(bossGroup, workerGroup)
             	.channel(NioServerSocketChannel.class)
-				.option(ChannelOption.TCP_NODELAY, true)
-				.option(ChannelOption.SO_KEEPALIVE, true)
+				.option(ChannelOption.TCP_NODELAY, config.isTcpNodelay())
+				.option(ChannelOption.SO_KEEPALIVE, config.isKeepAlive())
 				.option(ChannelOption.ALLOCATOR, new PooledByteBufAllocator(false))
-				.option(ChannelOption.SO_TIMEOUT, 10000)
-				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 3000)
-				.childOption(ChannelOption.TCP_NODELAY, true)
-				.childOption(ChannelOption.SO_KEEPALIVE, true)
+				.option(ChannelOption.SO_TIMEOUT, config.getRecvTimeout())
+				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, config.getConnectTimeout())
+				.childOption(ChannelOption.TCP_NODELAY, config.isTcpNodelay())
+				.childOption(ChannelOption.SO_KEEPALIVE, config.isKeepAlive())
 				.childOption(ChannelOption.ALLOCATOR, new PooledByteBufAllocator(false))
-				.childOption(ChannelOption.SO_TIMEOUT, 10000)
-				.childOption(ChannelOption.CONNECT_TIMEOUT_MILLIS, 3000);
+				.childOption(ChannelOption.SO_TIMEOUT, config.getRecvTimeout())
+				.childOption(ChannelOption.CONNECT_TIMEOUT_MILLIS, config.getConnectTimeout());
 			bootstrap.childHandler(new GridMessageChannelInitializer(new GridServerMessageHandler()));
 			bindAddress = null;
 			return true;
@@ -74,19 +76,28 @@ public class GridMessageServer extends GridMessageDispatcher
 			return false;
 		}
 	}
+    
+    public boolean listen(int port) throws BindException
+    {
+        return listen(null, port);
+    }
 	
-	public boolean listen(int port) throws BindException
+	public boolean listen(String host, int port) throws BindException
 	{
 		bindAddress = null;
 		if (bootstrap == null)
 			return false;
 		try
 		{
-			ChannelFuture f = bootstrap.bind(port).sync();
+			ChannelFuture f = null;
+			if (host == null || "".equals(host))
+			    f = bootstrap.bind(port).sync();
+			else
+			    f = bootstrap.bind(host, port).sync();
 			channel = f.channel();
 			binded = true;
 			log.info("Grid message server binds address " + getAddress());
-			return true;
+			return true; 
 		}
 		catch (Exception e)
 		{
@@ -104,6 +115,7 @@ public class GridMessageServer extends GridMessageDispatcher
 		log.info("Destroying grid message server.");
 		bossGroup.shutdownGracefully();
 		workerGroup.shutdownGracefully();
+		threadExecutor.shutdown();
 		return super.destroy();
 	}
 

@@ -3,6 +3,9 @@ package darks.grid;
 import java.io.Serializable;
 import java.net.InetSocketAddress;
 
+import darks.grid.beans.MachineInfo;
+import darks.grid.config.GridConfiguration;
+
 public class GridContext implements Serializable
 {
 
@@ -18,16 +21,19 @@ public class GridContext implements Serializable
 	
 	private InetSocketAddress serverAddress;
 	
+	private MachineInfo machineInfo = new MachineInfo();
+	
 	public GridContext()
 	{
 		
 	}
 	
-	public void initialize(GridConfiguration config)
+	public boolean initialize(GridConfiguration config)
 	{
 		clusterName = config.getClusterName();
 		startupTime = System.currentTimeMillis();
 		startupNanoTime = System.nanoTime();
+		return true;
 	}
 	
 	public void destroy()
@@ -84,13 +90,23 @@ public class GridContext implements Serializable
 	{
 		this.serverAddress = serverAddress;
 	}
+	
+	public MachineInfo getMachineInfo()
+    {
+        return machineInfo;
+    }
 
-	@Override
+    public void setMachineInfo(MachineInfo machineInfo)
+    {
+        this.machineInfo = machineInfo;
+    }
+
+    @Override
 	public String toString()
 	{
 		return "GridContext [startupTime=" + startupTime + ", startupNanoTime=" + startupNanoTime
 				+ ", localNodeId=" + localNodeId + ", clusterName=" + clusterName
-				+ ", serverAddress=" + serverAddress + "]";
+				+ ", serverAddress=" + serverAddress+ ", machineInfo=" + machineInfo + "]";
 	}
 	
 }

@@ -2,8 +2,11 @@ package darks.grid.utils;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,18 +26,25 @@ public final class ParamsUtils
 	 * @param hosts
 	 * @return
 	 */
-	public static List<InetSocketAddress> parseAddress(String hosts)
+	public static Collection<InetSocketAddress> parseAddress(String hosts)
 	{
-		List<InetSocketAddress> result = new LinkedList<InetSocketAddress>();
+		Set<InetSocketAddress> result = new LinkedHashSet<InetSocketAddress>();
 		String[] ipsArray = hosts.split(",");
 		for (String strIps : ipsArray)
 		{
 			String[] ips = strIps.split(":");
 			String strIpList = ips[0];
 			String strPortList = ips[1];
-			String[] ipArg = strIpList.split("\\.");
-			List<String> ipList = new LinkedList<String>();
-			buildIpList(ipList, ipArg, 0, null);
+            List<String> ipList = new LinkedList<String>();
+			if (!"localhost".equals(strIpList))
+			{
+	            String[] ipArg = strIpList.split("\\.");
+	            buildIpList(ipList, ipArg, 0, null);
+			}
+			else
+			{
+			    ipList.add(NetworkUtils.getIpAddress());
+			}
 			List<Integer> portList = buildPortList(strPortList);
 			if (ipList.isEmpty() || portList.isEmpty())
 			{
@@ -109,7 +119,7 @@ public final class ParamsUtils
 	public static void main(String[] args)
 	{
 		String hosts = "10.12.13.5-15:[8000-8005],10.12.5-7.10-12:9000";
-		List<InetSocketAddress> list = parseAddress(hosts);
+		Collection<InetSocketAddress> list = parseAddress(hosts);
 		System.out.println(list.size());
 		for (InetSocketAddress addr : list)
 		{
