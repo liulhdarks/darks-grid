@@ -1,5 +1,20 @@
 package darks.grid.network;
 
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.serialization.ClassResolvers;
+import io.netty.handler.codec.serialization.ObjectDecoder;
+import io.netty.handler.codec.serialization.ObjectEncoder;
+import io.netty.handler.timeout.IdleStateHandler;
+
 import java.net.BindException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.ExecutorService;
@@ -12,13 +27,6 @@ import darks.grid.GridRuntime;
 import darks.grid.config.NetworkConfig;
 import darks.grid.network.handler.GridServerMessageHandler;
 import darks.grid.utils.NetworkUtils;
-import io.netty.bootstrap.ServerBootstrap;
-import io.netty.buffer.PooledByteBufAllocator;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 public class GridMessageServer extends GridMessageDispatcher
 {
@@ -57,16 +65,24 @@ public class GridMessageServer extends GridMessageDispatcher
 			bootstrap.group(bossGroup, workerGroup)
             	.channel(NioServerSocketChannel.class)
 				.option(ChannelOption.TCP_NODELAY, config.isTcpNodelay())
-				.option(ChannelOption.SO_KEEPALIVE, config.isKeepAlive())
+				.option(ChannelOption.SO_KEEPALIVE, config.isTcpKeepAlive())
 				.option(ChannelOption.ALLOCATOR, new PooledByteBufAllocator(false))
 				.option(ChannelOption.SO_TIMEOUT, config.getRecvTimeout())
 				.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, config.getConnectTimeout())
+				.option(ChannelOption.SO_REUSEADDR, config.isTcpReuseAddr())
+				.option(ChannelOption.SO_BACKLOG, config.getTcpBacklog())
+				.option(ChannelOption.SO_SNDBUF, config.getTcpSendBufferSize())
+				.option(ChannelOption.SO_RCVBUF, config.getTcpRecvBufferSize())
 				.childOption(ChannelOption.TCP_NODELAY, config.isTcpNodelay())
-				.childOption(ChannelOption.SO_KEEPALIVE, config.isKeepAlive())
+				.childOption(ChannelOption.SO_KEEPALIVE, config.isTcpKeepAlive())
 				.childOption(ChannelOption.ALLOCATOR, new PooledByteBufAllocator(false))
 				.childOption(ChannelOption.SO_TIMEOUT, config.getRecvTimeout())
-				.childOption(ChannelOption.CONNECT_TIMEOUT_MILLIS, config.getConnectTimeout());
-			bootstrap.childHandler(new GridMessageChannelInitializer(new GridServerMessageHandler()));
+				.childOption(ChannelOption.CONNECT_TIMEOUT_MILLIS, config.getConnectTimeout())
+				.childOption(ChannelOption.SO_REUSEADDR, config.isTcpReuseAddr())
+				.childOption(ChannelOption.SO_BACKLOG, config.getTcpBacklog())
+				.childOption(ChannelOption.SO_SNDBUF, config.getTcpSendBufferSize())
+				.childOption(ChannelOption.SO_RCVBUF, config.getTcpRecvBufferSize());
+			bootstrap.childHandler(newChannelHandler());
 			bindAddress = null;
 			return true;
 		}
@@ -135,6 +151,24 @@ public class GridMessageServer extends GridMessageDispatcher
 			bindAddress = new InetSocketAddress(ipHost, ipAddr.getPort());
 		}
 		return bindAddress;
+	}
+	
+	private ChannelInitializer<SocketChannel> newChannelHandler()
+	{
+		ChannelInitializer<SocketChannel> result = new ChannelInitializer<SocketChannel>()
+		{
+			
+			@Override
+			protected void initChannel(SocketChannel ch) throws Exception
+			{
+				ChannelPipeline pipeline = ch.pipeline();
+				pipeline.addLast("decoder", new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers.weakCachingConcurrentResolver(this.getClass().getClassLoader())));
+				pipeline.addLast("encoder", new ObjectEncoder());
+				pipeline.addLast("alive", new IdleStateHandler(60, 60, 120));
+				pipeline.addLast("message", new GridServerMessageHandler());
+			}
+		};
+		return result;
 	}
 	
 }

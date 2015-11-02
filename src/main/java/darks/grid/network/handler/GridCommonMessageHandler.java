@@ -1,5 +1,12 @@
 package darks.grid.network.handler;
 
+import io.netty.channel.ChannelHandlerAdapter;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPromise;
+import io.netty.handler.timeout.IdleState;
+import io.netty.handler.timeout.IdleStateEvent;
+import io.netty.util.ReferenceCountUtil;
+
 import java.io.IOException;
 
 import org.slf4j.Logger;
@@ -10,9 +17,6 @@ import darks.grid.beans.GridMessage;
 import darks.grid.beans.meta.JoinMeta;
 import darks.grid.network.handler.msg.GridMessageHandler;
 import darks.grid.network.handler.msg.MessageHandlerFactory;
-import io.netty.channel.ChannelHandlerAdapter;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPromise;
 
 public class GridCommonMessageHandler extends ChannelHandlerAdapter
 {
@@ -55,10 +59,17 @@ public class GridCommonMessageHandler extends ChannelHandlerAdapter
 		GridMessageHandler handler = MessageHandlerFactory.getHandler(message);
 		if (handler != null)
 		{
-			handler.handler(ctx, message);
+			try
+			{
+				handler.handler(ctx, message);
+			}
+			finally
+			{
+				ReferenceCountUtil.release(msg);
+			}
 		}
 		else
-			log.error("Fail to find handler for message " + msg);
+			super.channelRead(ctx, msg);
 	}
 
 	@Override
@@ -68,4 +79,20 @@ public class GridCommonMessageHandler extends ChannelHandlerAdapter
 		super.close(ctx, promise);
 	}
 
+	@Override
+	public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception
+	{
+		if (evt instanceof IdleStateEvent)
+		{
+			IdleStateEvent event = (IdleStateEvent) evt;
+			if (event.state() == IdleState.ALL_IDLE)
+			{
+				
+			}
+        }
+		else
+			super.userEventTriggered(ctx, evt);
+	}
+
+	
 }

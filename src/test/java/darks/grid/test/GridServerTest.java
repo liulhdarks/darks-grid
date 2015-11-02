@@ -1,5 +1,8 @@
 package darks.grid.test;
 
+import io.netty.util.ResourceLeakDetector;
+import io.netty.util.ResourceLeakDetector.Level;
+
 import org.junit.Test;
 
 import darks.grid.GridRuntime;
@@ -13,6 +16,7 @@ public class GridServerTest
 	@Test
 	public void testStartup()
 	{
+		ResourceLeakDetector.setLevel(Level.PARANOID);
         GridConfiguration config = GridConfigFactory.configure(this.getClass().getResourceAsStream("/grid-config.xml"));
 		GridRuntime.initialize(config);
 		while(true)

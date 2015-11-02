@@ -57,7 +57,7 @@ public class GridNode implements Serializable
 		if (nodeType == GridNodeType.TYPE_REMOTE)
 		{
 		    
-			if (System.currentTimeMillis() - heartAliveTime.get() > GridRuntime.config().getAliveConfig().getExpire())
+			if (System.currentTimeMillis() - heartAliveTime.get() > GridRuntime.config().getNetworkConfig().getNodesExpireTime())
 				return false;
 		}
 		else
@@ -133,7 +133,7 @@ public class GridNode implements Serializable
 				"  [", GridNodeType.valueOf(nodeType),']',
 				' ', context.getServerAddress(), 
 				' ', GridNodeStatus.valueOf(this),
-				' ', System.currentTimeMillis() - heartAliveTime.get(),
+				' ', String.format("%8d", System.currentTimeMillis() - heartAliveTime.get()),
 				'\t', StringUtils.percent(context.getMachineInfo().getSystemCpuUsage()), 
 				'\t', StringUtils.percent(context.getMachineInfo().getUsedTotalMemoryUsage()));
 	}

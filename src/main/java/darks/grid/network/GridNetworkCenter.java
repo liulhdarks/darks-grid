@@ -19,6 +19,8 @@ public class GridNetworkCenter
 	
 	private Object mutex = new Object();
 	
+	private ThreadLocal<GridMessageClient> clientLocal = new ThreadLocal<>();
+	
 	public GridNetworkCenter()
 	{
 		
@@ -41,8 +43,13 @@ public class GridNetworkCenter
 	
 	public boolean tryJoinAddress(InetSocketAddress address)
 	{
-		GridMessageClient client = new GridMessageClient(ThreadUtils.getThrealPool());
-		client.initialize();
+		GridMessageClient client = clientLocal.get();
+		if (client == null)
+		{
+			client = new GridMessageClient(ThreadUtils.getThrealPool());
+			client.initialize();
+			clientLocal.set(client);
+		}
 		return client.connect(address);
 	}
 

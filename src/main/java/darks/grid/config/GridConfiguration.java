@@ -9,8 +9,6 @@ public class GridConfiguration implements Serializable
 	
 	private NetworkConfig networkConfig = new NetworkConfig();
 	
-	private AliveConfig aliveConfig = new AliveConfig();
-	
 	private ComponentConfig componentConfig = new ComponentConfig();
 	
 	private String clusterName = "DEFAULT";
@@ -34,11 +32,6 @@ public class GridConfiguration implements Serializable
     {
         return networkConfig;
     }
-
-    public AliveConfig getAliveConfig()
-    {
-        return aliveConfig;
-    }
     
     public ComponentConfig getComponentConfig()
     {
@@ -48,7 +41,7 @@ public class GridConfiguration implements Serializable
     @Override
     public String toString()
     {
-        return "GridConfiguration [networkConfig=" + networkConfig + ", aliveConfig=" + aliveConfig + ", clusterName="
+        return "GridConfiguration [networkConfig=" + networkConfig + ", clusterName="
             + clusterName + "]";
     }
     

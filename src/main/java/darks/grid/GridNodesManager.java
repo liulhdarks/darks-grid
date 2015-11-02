@@ -16,8 +16,6 @@ import darks.grid.beans.GridNode;
 import darks.grid.beans.GridNodeType;
 import darks.grid.beans.NodeId;
 import darks.grid.config.GridConfiguration;
-import darks.grid.network.NodesMonitorThread;
-import darks.grid.utils.ThreadUtils;
 
 public class GridNodesManager
 {
@@ -30,19 +28,13 @@ public class GridNodesManager
 	
 	private Map<ChannelId, String> channelIdMap = new ConcurrentHashMap<ChannelId, String>();
 	
-	private NodesMonitorThread monitorThread;
-	
 	public synchronized boolean initialize(GridConfiguration config)
 	{
-		monitorThread = new NodesMonitorThread();
-		ThreadUtils.executeThread(monitorThread);
 		return true;
 	}
 	
 	public synchronized void destroy()
 	{
-		monitorThread.setStoped(true);
-		monitorThread.interrupt();
 	}
 	
 	public synchronized void addLocalNode(Channel channel)
@@ -120,15 +112,23 @@ public class GridNodesManager
 	public synchronized GridNode removeNode(String nodeId)
 	{
 		GridNode node = nodesMap.remove(nodeId);
-		addressMap.remove(node.context().getServerAddress());
-		channelIdMap.remove(node.getChannel().id());
+		if (node !=null)
+		{
+			addressMap.remove(node.context().getServerAddress());
+			channelIdMap.remove(node.getChannel().id());
+		}
 		return node;
 	}
 	
 	public synchronized GridNode removeNode(GridNode node)
 	{
 		GridNode rNode = GridRuntime.nodes().removeNode(node.getId());
-		rNode = rNode == null ? node : rNode;
+		if (rNode == null)
+		{
+			addressMap.remove(node.context().getServerAddress());
+			channelIdMap.remove(node.getChannel().id());
+			rNode = node;
+		}
 		if (rNode != null)
 		{
 			log.info("Grid node " + rNode.getId() + " " + rNode.context().getServerAddress() + " quit.");

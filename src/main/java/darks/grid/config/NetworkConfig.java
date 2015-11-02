@@ -11,9 +11,21 @@ public class NetworkConfig
     
     private boolean tcpNodelay = true;
     
-    private boolean keepAlive = true;
+    private int tcpKeepIdle = 60000;
     
-    private boolean reuseAddr = false;
+    private int tcpKeepInterval = 5000;
+    
+    private int tcpKeepCount = 3;
+    
+    private int tcpBacklog = 128;
+    
+    private boolean tcpKeepAlive = true;
+    
+    private boolean tcpReuseAddr = false;
+    
+    private int tcpSendBufferSize = 8 * 1024;
+    
+    private int tcpRecvBufferSize = 8 * 1024;
     
     private int recvTimeout = 10000;
     
@@ -25,6 +37,7 @@ public class NetworkConfig
     
     private int clientWorkerThreadNumber = Runtime.getRuntime().availableProcessors() * 2;
     
+    private int nodesExpireTime = 600000;
     
     public NetworkConfig()
     {
@@ -69,26 +82,6 @@ public class NetworkConfig
     public void setTcpNodelay(boolean tcpNodelay)
     {
         this.tcpNodelay = tcpNodelay;
-    }
-
-    public boolean isKeepAlive()
-    {
-        return keepAlive;
-    }
-
-    public void setKeepAlive(boolean keepAlive)
-    {
-        this.keepAlive = keepAlive;
-    }
-
-    public boolean isReuseAddr()
-    {
-        return reuseAddr;
-    }
-
-    public void setReuseAddr(boolean reuseAddr)
-    {
-        this.reuseAddr = reuseAddr;
     }
 
     public int getRecvTimeout()
@@ -143,14 +136,112 @@ public class NetworkConfig
         this.clientWorkerThreadNumber = clientWorkerThreadNumber;
     }
 
-    @Override
-    public String toString()
-    {
-        return "NetworkConfig [bindHost=" + bindHost + ", bindPort=" + bindPort + ", bindPortRange=" + bindPortRange
-            + ", tcpNodelay=" + tcpNodelay + ", keepAlive=" + keepAlive + ", reuseAddr=" + reuseAddr + ", recvTimeout="
-            + recvTimeout + ", connectTimeout=" + connectTimeout + ", serverWorkerThreadNumber="
-            + serverWorkerThreadNumber + ", serverBossThreadDelta=" + serverBossThreadDelta
-            + ", clientWorkerThreadNumber=" + clientWorkerThreadNumber + "]";
-    }
+    public int getNodesExpireTime()
+	{
+		return nodesExpireTime;
+	}
 
+	public void setNodesExpireTime(int nodesExpireTime)
+	{
+		this.nodesExpireTime = nodesExpireTime;
+	}
+	
+	
+
+	public int getTcpKeepIdle()
+	{
+		return tcpKeepIdle;
+	}
+
+	public void setTcpKeepIdle(int tcpKeepIdle)
+	{
+		this.tcpKeepIdle = tcpKeepIdle;
+	}
+
+	public int getTcpKeepInterval()
+	{
+		return tcpKeepInterval;
+	}
+
+	public void setTcpKeepInterval(int tcpKeepInterval)
+	{
+		this.tcpKeepInterval = tcpKeepInterval;
+	}
+
+	public int getTcpKeepCount()
+	{
+		return tcpKeepCount;
+	}
+
+	public void setTcpKeepCount(int tcpKeepCount)
+	{
+		this.tcpKeepCount = tcpKeepCount;
+	}
+
+	public int getTcpBacklog()
+	{
+		return tcpBacklog;
+	}
+
+	public void setTcpBacklog(int tcpBacklog)
+	{
+		this.tcpBacklog = tcpBacklog;
+	}
+
+	public boolean isTcpKeepAlive()
+	{
+		return tcpKeepAlive;
+	}
+
+	public void setTcpKeepAlive(boolean tcpKeepAlive)
+	{
+		this.tcpKeepAlive = tcpKeepAlive;
+	}
+
+	public boolean isTcpReuseAddr()
+	{
+		return tcpReuseAddr;
+	}
+
+	public void setTcpReuseAddr(boolean tcpReuseAddr)
+	{
+		this.tcpReuseAddr = tcpReuseAddr;
+	}
+	
+	public int getTcpSendBufferSize()
+	{
+		return tcpSendBufferSize;
+	}
+
+	public void setTcpSendBufferSize(int tcpSendBufferSize)
+	{
+		this.tcpSendBufferSize = tcpSendBufferSize;
+	}
+
+	public int getTcpRecvBufferSize()
+	{
+		return tcpRecvBufferSize;
+	}
+
+	public void setTcpRecvBufferSize(int tcpRecvBufferSize)
+	{
+		this.tcpRecvBufferSize = tcpRecvBufferSize;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "NetworkConfig [bindHost=" + bindHost + ", bindPort=" + bindPort
+				+ ", bindPortRange=" + bindPortRange + ", tcpNodelay=" + tcpNodelay
+				+ ", tcpKeepIdle=" + tcpKeepIdle + ", tcpKeepInterval=" + tcpKeepInterval
+				+ ", tcpKeepCount=" + tcpKeepCount + ", tcpBacklog=" + tcpBacklog
+				+ ", tcpKeepAlive=" + tcpKeepAlive + ", tcpReuseAddr=" + tcpReuseAddr
+				+ ", tcpSendBufferSize=" + tcpSendBufferSize + ", tcpRecvBufferSize="
+				+ tcpRecvBufferSize + ", recvTimeout=" + recvTimeout + ", connectTimeout="
+				+ connectTimeout + ", serverWorkerThreadNumber=" + serverWorkerThreadNumber
+				+ ", serverBossThreadDelta=" + serverBossThreadDelta
+				+ ", clientWorkerThreadNumber=" + clientWorkerThreadNumber + ", nodesExpireTime="
+				+ nodesExpireTime + "]";
+	}
+	
 }
