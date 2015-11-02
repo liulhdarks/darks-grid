@@ -2,7 +2,6 @@ package darks.grid.utils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,14 +122,14 @@ public final class ReflectUtils
         }
     }
     
-    public static Class<?>[] getObjectClasses(List<Object> list)
+    public static Class<?>[] getObjectClasses(Object[] objs)
     {
-    	if (list == null || list.isEmpty())
+    	if (objs == null || objs.length == 0)
     		return null;
-    	Class<?>[] classes = new Class<?>[list.size()];
-    	for (int i = 0; i < list.size(); i++)
+    	Class<?>[] classes = new Class<?>[objs.length];
+    	for (int i = 0; i < objs.length; i++)
     	{
-    		classes[i] = list.get(i) == null ? null : list.get(i).getClass();
+    		classes[i] = objs[i] == null ? null : objs[i].getClass();
     	}
     	return classes;
     }
