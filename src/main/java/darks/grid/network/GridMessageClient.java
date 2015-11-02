@@ -63,7 +63,7 @@ public class GridMessageClient extends GridMessageDispatcher
 			bootstrap.group(workerGroup).channel(NioSocketChannel.class)
 					.option(ChannelOption.TCP_NODELAY, config.isTcpNodelay())
 					.option(ChannelOption.SO_KEEPALIVE, config.isTcpKeepAlive())
-					.option(ChannelOption.ALLOCATOR, new PooledByteBufAllocator(false))
+					.option(ChannelOption.ALLOCATOR, new PooledByteBufAllocator(true))
 //	                .option(ChannelOption.SO_TIMEOUT, config.getRecvTimeout())
 	                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, config.getConnectTimeout())
 					.option(ChannelOption.SO_SNDBUF, config.getTcpSendBufferSize())

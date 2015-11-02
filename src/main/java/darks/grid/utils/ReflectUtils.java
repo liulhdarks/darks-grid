@@ -2,6 +2,7 @@ package darks.grid.utils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,6 +93,46 @@ public final class ReflectUtils
             log.error(e.getMessage(), e);
             return null;
         }
+    }
+    
+    public static Method getDeepMethod(Class<?> clazz, String methodName, Class<?>... types)
+    {
+        try
+        {
+        	Method method = null;
+            do
+            {
+                try
+                {
+                	method = clazz.getDeclaredMethod(methodName, types);
+                    if (method == null)
+                        clazz = clazz.getSuperclass();
+                }
+                catch (NoSuchMethodException e)
+                {
+                    clazz = clazz.getSuperclass();
+                }
+            }
+            while (!clazz.equals(Object.class) && method == null);
+            return method;
+        }
+        catch (Exception e)
+        {
+            log.error(e.getMessage(), e);
+            return null;
+        }
+    }
+    
+    public static Class<?>[] getObjectClasses(List<Object> list)
+    {
+    	if (list == null || list.isEmpty())
+    		return null;
+    	Class<?>[] classes = new Class<?>[list.size()];
+    	for (int i = 0; i < list.size(); i++)
+    	{
+    		classes[i] = list.get(i) == null ? null : list.get(i).getClass();
+    	}
+    	return classes;
     }
     
     public static Method getSetMethod(Class<?> clazz, String fieldName, Class<?>... types)

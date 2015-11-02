@@ -1,9 +1,13 @@
 package darks.grid.beans;
 
-import java.io.Serializable;
-import java.util.UUID;
+import io.netty.util.ReferenceCounted;
 
-public class GridMessage implements Serializable, Cloneable
+import java.io.Serializable;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import darks.grid.utils.UUIDUtils;
+
+public class GridMessage implements Serializable, Cloneable, ReferenceCounted
 {
 
 	private static final long serialVersionUID = -3272844069153062845L;
@@ -27,28 +31,33 @@ public class GridMessage implements Serializable, Cloneable
 	private String sourceId;
 	
 	private int sourceType;
+	
+	AtomicInteger cnt = new AtomicInteger(0);
 
 	public GridMessage()
 	{
-		this.id = UUID.randomUUID().toString();
+		this.id = UUIDUtils.newUUID();
+		retain();
 	}
 	
 
 	public GridMessage(Object data, int type)
 	{
-		this.id = UUID.randomUUID().toString();
+		this.id = UUIDUtils.newUUID();
 		this.data = data;
 		this.type = type;
+		retain();
 	}
 	
 
 	public GridMessage(Object data, int type, GridMessage source)
 	{
-		this.id = UUID.randomUUID().toString();
+		this.id = UUIDUtils.newUUID();
 		this.data = data;
 		this.type = type;
 		this.sourceId = source.getId();
 		this.sourceType = source.getType();
+		retain();
 	}
 	
 
@@ -57,6 +66,7 @@ public class GridMessage implements Serializable, Cloneable
 		this.id = id;
 		this.data = data;
 		this.type = type;
+		retain();
 	}
 
 
@@ -133,6 +143,57 @@ public class GridMessage implements Serializable, Cloneable
 	{
 		return "GridMessage [id=" + id + ", data=" + data + ", type=" + type + ", success="
 				+ success + ", sourceId=" + sourceId + ", sourceType=" + sourceType + "]";
+	}
+
+
+	@Override
+	public int refCnt()
+	{
+		return cnt.get();
+	}
+
+
+	@Override
+	public ReferenceCounted retain()
+	{
+		cnt.incrementAndGet();
+		return this;
+	}
+
+
+	@Override
+	public ReferenceCounted retain(int increment)
+	{
+		cnt.addAndGet(increment);
+		return this;
+	}
+
+
+	@Override
+	public ReferenceCounted touch()
+	{
+		return this;
+	}
+
+
+	@Override
+	public ReferenceCounted touch(Object hint)
+	{
+		return this;
+	}
+
+
+	@Override
+	public boolean release()
+	{
+		return cnt.decrementAndGet() == 0;
+	}
+
+
+	@Override
+	public boolean release(int decrement)
+	{
+		return cnt.addAndGet(-decrement) == 0;
 	}
 
 	
