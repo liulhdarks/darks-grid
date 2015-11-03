@@ -44,7 +44,9 @@ public class GridRpcJobFuture extends GridJobFuture<MethodResult>
 	@Override
 	public List<MethodResult> getList()
 	{
-		return null;
+		List<MethodResult> ret = new ArrayList<>(1);
+		ret.add(get());
+		return ret;
 	}
 
 	

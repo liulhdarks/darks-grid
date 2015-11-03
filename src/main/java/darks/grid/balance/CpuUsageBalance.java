@@ -9,14 +9,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import darks.grid.GridRuntime;
 import darks.grid.beans.GridNode;
 
-public class RollPolingBalance extends GridBalance
+public class CpuUsageBalance extends GridBalance
 {
 	
 	private static AtomicInteger globalIndex = new AtomicInteger(0);
 
 	private List<GridNode> nodesList = null;
 	
-	public RollPolingBalance()
+	public CpuUsageBalance()
 	{
 		
 	}
