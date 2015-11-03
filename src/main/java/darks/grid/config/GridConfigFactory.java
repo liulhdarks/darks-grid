@@ -78,9 +78,9 @@ public final class GridConfigFactory
                 {
                     parseAttrForObject(el, config);
                 }
-                else if ("register".equalsIgnoreCase(el.getNodeName()))
+                else if ("component".equalsIgnoreCase(el.getNodeName()))
                 {
-                    parseRegister(config, el);
+                    parseComponent(config, el);
                 }
                 else
                 {
@@ -91,7 +91,7 @@ public final class GridConfigFactory
 		return config;
 	}
 	
-	private static void parseRegister(GridConfiguration config, Element el)
+	private static void parseComponent(GridConfiguration config, Element el)
 	{
 	    String labelName = el.getAttribute("name");
 	    String className = el.getAttribute("class");

@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import darks.grid.beans.JobStatus;
 import darks.grid.beans.JobStatus.JobStatusType;
 import darks.grid.executor.task.rpc.MethodJobReply;
+import darks.grid.utils.ThreadUtils;
 
 public class GridJobFuture<V> extends GridFuture<V>
 {
@@ -128,6 +129,7 @@ public class GridJobFuture<V> extends GridFuture<V>
 			}
 			if (finishedCount == statusMap.size())
 				break;
+			ThreadUtils.threadSleep(50);
 			if (maxTime > 0 && System.currentTimeMillis() - st > maxTime)
 			{
 				return false;

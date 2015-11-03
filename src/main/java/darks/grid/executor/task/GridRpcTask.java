@@ -19,10 +19,10 @@ import darks.grid.executor.task.rpc.MethodJob;
 import darks.grid.executor.task.rpc.MethodJobReply;
 import darks.grid.executor.task.rpc.MethodRequest;
 
-public class RpcTask extends GridTask<MethodResult>
+public class GridRpcTask extends GridTask<MethodResult>
 {
 	
-	private static final Logger log = LoggerFactory.getLogger(RpcTask.class);
+	private static final Logger log = LoggerFactory.getLogger(GridRpcTask.class);
 
     private MethodRequest request;
     
@@ -30,13 +30,13 @@ public class RpcTask extends GridTask<MethodResult>
     
     private GridRpcJobFuture future = new GridRpcJobFuture();
     
-    public RpcTask(MethodRequest request)
+    public GridRpcTask(MethodRequest request)
     {
         super(TaskType.RPC);
         this.request = request;
     }
     
-    public RpcTask(MethodRequest request, TaskResultListener<MethodResult> listener)
+    public GridRpcTask(MethodRequest request, TaskResultListener<MethodResult> listener)
     {
         super(TaskType.RPC);
         this.request = request;
@@ -65,6 +65,7 @@ public class RpcTask extends GridTask<MethodResult>
                 executeTaskOnNode(node);
         }
         future.await();
+        GridRuntime.tasks().completeTask(getId());
         MethodResult ret = future.get();
         if (listener != null)
             return listener.handle(ret);
@@ -77,20 +78,13 @@ public class RpcTask extends GridTask<MethodResult>
     	MethodJob job = new MethodJob(request);
     	job.setTaskId(getId());
     	JobStatus status = new JobStatus(job, node);
-//    	if (node.isLocal())
-//    	{
-//    		log.info("Ignore local node for task " + getId());
-//    	}
-//    	else
-//    	{
-        	future.addJobStatus(status);
-            GridMessage message = new GridMessage(job, GridMessage.MSG_RPC_REQUEST);
-            boolean ret = node.sendSyncMessage(message);
-            if (ret)
-            	status.setStatusType(JobStatusType.DOING);
-            else
-            	future.removeJobStatus(job.getJobId());
-//    	}
+    	future.addJobStatus(status);
+        GridMessage message = new GridMessage(job, GridMessage.MSG_RPC_REQUEST);
+        boolean ret = node.sendSyncMessage(message);
+        if (ret)
+        	status.setStatusType(JobStatusType.DOING);
+        else
+        	future.removeJobStatus(job.getJobId());
     }
     
     public void replyJob(MethodJobReply reply)

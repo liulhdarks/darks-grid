@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <grid>
 
-	<!-- <register name="asd" class="asd"/> -->
+	<!-- <component name="asd" class="asd"/> -->
 
 	<cluster cluster_name="TEST"/>
 
@@ -20,7 +20,7 @@
 		nodes_expire_time="600000"
 		/>
 
-	<alive interval="60000" print_nodes_interval="60000"/>
+	<alive interval="300000" print_nodes_interval="60000"/>
 	
 	<TCPPING hosts="localhost:[7800-7803]" interval="300000"/>
 </grid>

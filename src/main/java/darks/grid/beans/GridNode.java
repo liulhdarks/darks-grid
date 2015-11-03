@@ -76,8 +76,7 @@ public class GridNode implements Serializable
 	{
 		if (session == null || !session.isActive())
 			return false;
-		session.sendMessage(obj);
-		return true;
+		return session.sendMessage(obj);
 	}
 	
 	public boolean sendSyncMessage(Object obj)

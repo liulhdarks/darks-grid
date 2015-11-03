@@ -14,7 +14,7 @@ import darks.grid.beans.GridRpcBean;
 import darks.grid.beans.MethodResult;
 import darks.grid.config.MethodConfig;
 import darks.grid.config.MethodConfig.ResponseType;
-import darks.grid.executor.task.RpcTask;
+import darks.grid.executor.task.GridRpcTask;
 import darks.grid.executor.task.TaskResultListener;
 import darks.grid.executor.task.rpc.MethodJob;
 import darks.grid.executor.task.rpc.MethodJobReply;
@@ -50,7 +50,7 @@ public class RpcExecutor extends GridExecutor
 	        config = new MethodConfig();
 	    config.fixType();
 	    MethodRequest request = new MethodRequest(methodName, params, config);
-	    RpcTask task = new RpcTask(request);
+	    GridRpcTask task = new GridRpcTask(request);
 	    FutureTask<MethodResult> future = GridRuntime.tasks().executeTask(task);
 	    if (config.getResponseType() == ResponseType.NONE)
 	        return new MethodResult();
@@ -75,7 +75,7 @@ public class RpcExecutor extends GridExecutor
             config = new MethodConfig();
         config.fixType();
         MethodRequest request = new MethodRequest(methodName, params, config);
-        RpcTask task = new RpcTask(request, listenr);
+        GridRpcTask task = new GridRpcTask(request, listenr);
         ThreadUtils.submitTask(task);
     }
 	

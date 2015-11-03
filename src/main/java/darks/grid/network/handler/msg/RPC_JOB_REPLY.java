@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import darks.grid.GridRuntime;
 import darks.grid.beans.GridMessage;
-import darks.grid.executor.task.RpcTask;
+import darks.grid.executor.task.GridRpcTask;
 import darks.grid.executor.task.rpc.MethodJobReply;
 import darks.grid.network.GridSession;
 
@@ -18,7 +18,7 @@ public class RPC_JOB_REPLY implements GridMessageHandler
 	public void handler(GridSession session, GridMessage msg) throws Exception
 	{
 		MethodJobReply replyBean = (MethodJobReply) msg.getData();
-		RpcTask task = (RpcTask)GridRuntime.tasks().getTask(replyBean.getTaskId());
+		GridRpcTask task = (GridRpcTask)GridRuntime.tasks().getTask(replyBean.getTaskId());
 		if (task == null)
 		{
 			log.error("Cannot find task " + replyBean.getTaskId());

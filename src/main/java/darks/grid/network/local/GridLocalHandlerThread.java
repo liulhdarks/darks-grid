@@ -66,7 +66,7 @@ public class GridLocalHandlerThread extends Thread
 		{
 			GridMessage message = (GridMessage) obj;
 			if (log.isDebugEnabled())
-				log.debug("Channel read:" + message);
+				log.debug("Local read:" + message);
 			GridMessageHandler handler = MessageHandlerFactory.getHandler(message);
 			if (handler != null)
 			{
