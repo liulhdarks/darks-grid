@@ -1,6 +1,8 @@
-package darks.grid.beans.meta;
+package darks.grid.executor.task.rpc;
 
-public class MethodResponse extends BaseMeta
+import darks.grid.beans.meta.BaseMeta;
+
+public class MethodJobReply extends BaseMeta
 {
 	
 	private static final long serialVersionUID = 4108563313452408686L;
@@ -14,6 +16,10 @@ public class MethodResponse extends BaseMeta
     public static final int ERR_INVOKE_EXCEPTION = 104;
 
     public static final int ERR_GET_CLASS_METHOD = 105;
+    
+    private String taskId;
+    
+    private String jobId;
 	
 	private Object result;
 	
@@ -23,12 +29,18 @@ public class MethodResponse extends BaseMeta
 	
 	private int errorCode;
 	
-	public MethodResponse()
+	public MethodJobReply()
 	{
 		
 	}
+	
+	public MethodJobReply(MethodJob job)
+	{
+		this.taskId = job.getTaskId();
+		this.jobId = job.getJobId();
+	}
 
-	public MethodResponse(Object result)
+	public MethodJobReply(Object result)
 	{
 		this.result = result;
 	}
@@ -73,17 +85,46 @@ public class MethodResponse extends BaseMeta
         this.errorCode = errorCode;
     }
 
-    public MethodResponse failed()
+    public MethodJobReply failed()
 	{
 		success = false;
 		return this;
 	}
 	
-	public MethodResponse failed(int errorCode, String errorMessage)
+	public MethodJobReply failed(int errorCode, String errorMessage)
 	{
 	    this.errorCode = errorCode;
 		this.errorMessage = errorMessage;
 		this.success = false;
 		return this;
 	}
+
+	public String getTaskId()
+	{
+		return taskId;
+	}
+
+	public void setTaskId(String taskId)
+	{
+		this.taskId = taskId;
+	}
+
+	public String getJobId()
+	{
+		return jobId;
+	}
+
+	public void setJobId(String jobId)
+	{
+		this.jobId = jobId;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "MethodJobRps [taskId=" + taskId + ", jobId=" + jobId + ", result=" + result
+				+ ", success=" + success + ", errorMessage=" + errorMessage + ", errorCode="
+				+ errorCode + "]";
+	}
+	
 }

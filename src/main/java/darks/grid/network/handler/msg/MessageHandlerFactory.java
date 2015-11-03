@@ -24,6 +24,8 @@ public final class MessageHandlerFactory
 		handlersMap.put(GridMessage.MSG_JOIN_REPLY, new JOIN_REPLY());
 		handlersMap.put(GridMessage.MSG_HEART_ALIVE, new HEART_ALIVE());
 		handlersMap.put(GridMessage.MSG_HEART_ALIVE_REPLY, new HEART_ALIVE());
+		handlersMap.put(GridMessage.MSG_RPC_REQUEST, new RPC_JOB());
+		handlersMap.put(GridMessage.MSG_RPC_RESPONSE, new RPC_JOB_REPLY());
 	}
 	
 	private MessageHandlerFactory()

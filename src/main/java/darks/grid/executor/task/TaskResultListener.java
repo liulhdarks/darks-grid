@@ -3,6 +3,6 @@ package darks.grid.executor.task;
 public interface TaskResultListener<T>
 {
 
-    public void handle(T result);
+    public T handle(T result);
     
 }

@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import darks.grid.config.GridConfiguration;
+import darks.grid.executor.task.GridTaskManager;
 import darks.grid.network.GridNetworkCenter;
 import darks.grid.utils.ThreadUtils;
 
@@ -22,6 +23,8 @@ public final class GridRuntime
 	
 	static GridComponentManager components;
 	
+	static GridTaskManager tasks;
+	
 	private GridRuntime()
 	{
 		
@@ -34,6 +37,7 @@ public final class GridRuntime
 		network = new GridNetworkCenter();
 		nodesManager = new GridNodesManager();
 		components = new GridComponentManager();
+		tasks = new GridTaskManager();
 		boolean ret = context.initialize(config);
 		if (!ret)
 		{
@@ -59,11 +63,18 @@ public final class GridRuntime
             return false;
         }
 		components.setupComponents();
+		ret = tasks.initialize(config);
+        if (!ret)
+        {
+            log.error("Fail to initialize tasks manager.");
+            return false;
+        }
 		return true;
 	}
 	
 	public static void destroy()
 	{
+		tasks.destroy();
 	    components.destroy();
 		network.destroy();
 		nodesManager.destroy();
@@ -88,6 +99,11 @@ public final class GridRuntime
 	public static GridNodesManager nodes()
 	{
 		return nodesManager;
+	}
+
+	public static GridTaskManager tasks()
+	{
+		return tasks;
 	}
 
 	public static GridContext context()

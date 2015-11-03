@@ -16,6 +16,7 @@ import darks.grid.beans.GridNode;
 import darks.grid.beans.GridNodeType;
 import darks.grid.beans.NodeId;
 import darks.grid.config.GridConfiguration;
+import darks.grid.utils.MachineUtils;
 
 public class GridNodesManager
 {
@@ -85,12 +86,15 @@ public class GridNodesManager
 	public String getNodesInfo()
 	{
 		StringBuilder buf = new StringBuilder();
-		buf.append("\n===================================================\n");
+		buf.append("\n===========================================================\n");
 		for (Entry<String, GridNode> entry : nodesMap.entrySet())
 		{
 			buf.append(entry.getValue().toSimpleString()).append('\n');
 		}
-		buf.append("---------------------------------------------------\n");
+		buf.append("-------------------------------------------------------------\n");
+		buf.append("Direct Memory:").append(MachineUtils.getReservedDirectMemory())
+				.append('/').append(MachineUtils.getMaxDirectMemory()).append('\n');
+		buf.append("=============================================================\n");
 		return buf.toString();
 	}
 	

@@ -18,6 +18,11 @@ public class MethodResult implements Serializable, Cloneable
         
     }
     
+    public MethodResult(List<Object> result)
+    {
+        this.result = result;
+    }
+    
     public static MethodResult fail(String error)
     {
         MethodResult result = new MethodResult();
@@ -61,5 +66,12 @@ public class MethodResult implements Serializable, Cloneable
     {
         this.success = success;
     }
+
+	@Override
+	public String toString()
+	{
+		return "MethodResult [result=" + result + ", errorMessage=" + errorMessage + ", success="
+				+ success + "]";
+	}
     
 }

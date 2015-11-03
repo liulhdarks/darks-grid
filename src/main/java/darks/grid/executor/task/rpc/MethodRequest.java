@@ -1,10 +1,11 @@
-package darks.grid.beans.meta;
+package darks.grid.executor.task.rpc;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 import darks.grid.config.MethodConfig;
 
-public class MethodRequest extends BaseMeta
+public class MethodRequest implements Serializable
 {
 
 	/**

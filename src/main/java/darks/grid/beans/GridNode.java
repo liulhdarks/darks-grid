@@ -1,9 +1,11 @@
 package darks.grid.beans;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 import darks.grid.GridContext;
 import darks.grid.GridRuntime;
@@ -27,7 +29,7 @@ public class GridNode implements Serializable
 	
 	private AtomicLong heartAliveTime = null;
 	
-	private MachineInfo machineInfo;
+	private AtomicReference<MachineInfo> machineInfo = new AtomicReference<>();
 	
 	public GridNode()
 	{
@@ -41,6 +43,11 @@ public class GridNode implements Serializable
 		this.nodeType = nodeType;
 		this.context = context;
 		heartAliveTime = new AtomicLong(System.currentTimeMillis());
+	}
+	
+	public boolean isLocal()
+	{
+		return nodeType == GridNodeType.TYPE_LOCAL;
 	}
 
 	public boolean isValid()
@@ -65,6 +72,30 @@ public class GridNode implements Serializable
 			heartAliveTime.getAndSet(System.currentTimeMillis());
 		}
 		return true;
+	}
+	
+	public boolean sendMessage(Object obj)
+	{
+		if (channel == null || !channel.isActive())
+			return false;
+		channel.writeAndFlush(obj);
+		return true;
+	}
+	
+	public boolean sendSyncMessage(Object obj)
+	{
+		if (channel == null || !channel.isActive())
+			return false;
+		try
+		{
+			ChannelFuture future = channel.writeAndFlush(obj).sync();
+			return future.isSuccess();
+		}
+		catch (InterruptedException e)
+		{
+			e.printStackTrace();
+			return false;
+		}
 	}
 	
 	public String getId()
@@ -119,12 +150,12 @@ public class GridNode implements Serializable
 	
 	public MachineInfo getMachineInfo()
     {
-        return machineInfo;
+		return machineInfo.get();
     }
 
     public void setMachineInfo(MachineInfo machineInfo)
     {
-        this.machineInfo = machineInfo;
+    	this.machineInfo.getAndSet(machineInfo);
     }
 
     public String toSimpleString()

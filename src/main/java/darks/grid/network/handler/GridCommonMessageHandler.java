@@ -56,6 +56,7 @@ public class GridCommonMessageHandler extends ChannelHandlerAdapter
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception
 	{
 		GridMessage message = (GridMessage) msg;
+		log.debug("Channel read:" + message);
 		GridMessageHandler handler = MessageHandlerFactory.getHandler(message);
 		if (handler != null)
 		{

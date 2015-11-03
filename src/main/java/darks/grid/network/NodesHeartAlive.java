@@ -18,6 +18,11 @@ import darks.grid.beans.meta.HeartAliveMeta;
 public class NodesHeartAlive extends GridComponent
 {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5037403083950340100L;
+
 	private static final Logger log = LoggerFactory.getLogger(NodesHeartAlive.class);
     
     private int expire = 600000;
