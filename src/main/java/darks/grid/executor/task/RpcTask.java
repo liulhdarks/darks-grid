@@ -77,12 +77,12 @@ public class RpcTask extends GridTask<MethodResult>
     	MethodJob job = new MethodJob(request);
     	job.setTaskId(getId());
     	JobStatus status = new JobStatus(job, node);
-    	if (node.isLocal())
-    	{
-    		log.info("Ignore local node for task " + getId());
-    	}
-    	else
-    	{
+//    	if (node.isLocal())
+//    	{
+//    		log.info("Ignore local node for task " + getId());
+//    	}
+//    	else
+//    	{
         	future.addJobStatus(status);
             GridMessage message = new GridMessage(job, GridMessage.MSG_RPC_REQUEST);
             boolean ret = node.sendSyncMessage(message);
@@ -90,7 +90,7 @@ public class RpcTask extends GridTask<MethodResult>
             	status.setStatusType(JobStatusType.DOING);
             else
             	future.removeJobStatus(job.getJobId());
-    	}
+//    	}
     }
     
     public void replyJob(MethodJobReply reply)

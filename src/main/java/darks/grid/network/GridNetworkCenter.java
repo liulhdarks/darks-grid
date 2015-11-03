@@ -1,5 +1,7 @@
 package darks.grid.network;
 
+import io.netty.channel.Channel;
+
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.Map;
@@ -32,7 +34,7 @@ public class GridNetworkCenter
 		if (messageServer == null)
 			return false;
 		GridRuntime.context().setServerAddress(getBindAddress());
-		GridRuntime.nodes().addLocalNode(messageServer.getChannel());
+		GridRuntime.nodes().addLocalNode(GridSessionFactory.getLocalSession(messageServer.getChannel()));
 		return true;
 	}
 	
@@ -64,7 +66,7 @@ public class GridNetworkCenter
 				waitJoin.put(nodeId, channelMap);
 			}
 			meta.setJoinTime(System.currentTimeMillis());
-			channelMap.put(meta.getChannel().remoteAddress(), meta);
+			channelMap.put(meta.getSession().remoteAddress(), meta);
 			return channelMap.size();
 		}
 	}
@@ -90,4 +92,11 @@ public class GridNetworkCenter
 		return messageServer.getAddress();
 	}
 	
+	
+	public Channel getServerChannel()
+	{
+		if (messageServer == null)
+			return null;
+		return messageServer.getChannel();
+	}
 }

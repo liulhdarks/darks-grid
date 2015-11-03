@@ -1,8 +1,5 @@
 package darks.grid.network.handler.msg;
 
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandlerContext;
-
 import java.net.SocketAddress;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -14,6 +11,7 @@ import darks.grid.GridRuntime;
 import darks.grid.beans.GridMessage;
 import darks.grid.beans.meta.JoinMeta;
 import darks.grid.beans.meta.JoinNodeMeta;
+import darks.grid.network.GridSession;
 
 public class JOIN_REPLY implements GridMessageHandler
 {
@@ -23,7 +21,7 @@ public class JOIN_REPLY implements GridMessageHandler
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void handler(ChannelHandlerContext ctx, GridMessage msg) throws Exception
+	public void handler(GridSession session, GridMessage msg) throws Exception
 	{
 		JoinNodeMeta meta = msg.getData();
 		String nodeId = meta.getNodeId();
@@ -34,10 +32,10 @@ public class JOIN_REPLY implements GridMessageHandler
 			{
 				try
 				{
-					Channel channel = entry.getValue().getChannel();
-					if (channel.id().toString().equals(ctx.channel().id().toString()))
+					GridSession entrySession = entry.getValue().getSession();
+					if (entrySession.getId().equals(session.getId()))
 						continue;
-					channel.close();
+					entrySession.close();
 				}
 				catch (Exception e)
 				{
@@ -45,7 +43,7 @@ public class JOIN_REPLY implements GridMessageHandler
 				}
 			}
 			nodesMap.clear();
-			GridRuntime.nodes().addRemoteNode(meta.getNodeId(), ctx.channel(), meta.context());
+			GridRuntime.nodes().addRemoteNode(meta.getNodeId(), session, meta.context());
 		}
 	}
 }

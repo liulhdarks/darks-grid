@@ -1,14 +1,12 @@
 package darks.grid.beans;
 
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 import darks.grid.GridContext;
 import darks.grid.GridRuntime;
+import darks.grid.network.GridSession;
 import darks.grid.utils.StringUtils;
 
 public class GridNode implements Serializable
@@ -21,7 +19,7 @@ public class GridNode implements Serializable
 
 	private String id;
 	
-	private transient Channel channel;
+	private transient GridSession session;
 	
 	private int nodeType;
 	
@@ -36,10 +34,10 @@ public class GridNode implements Serializable
 		heartAliveTime = new AtomicLong(System.currentTimeMillis());
 	}
 	
-	public GridNode(String id, Channel channel, GridContext context, int nodeType)
+	public GridNode(String id, GridSession session, GridContext context, int nodeType)
 	{
 		this.id = id;
-		this.channel = channel;
+		this.session = session;
 		this.nodeType = nodeType;
 		this.context = context;
 		heartAliveTime = new AtomicLong(System.currentTimeMillis());
@@ -59,7 +57,7 @@ public class GridNode implements Serializable
 	
 	public boolean isAlive()
 	{
-		if (!channel.isActive())
+		if (!session.isActive())
 			return false;
 		if (nodeType == GridNodeType.TYPE_REMOTE)
 		{
@@ -76,26 +74,17 @@ public class GridNode implements Serializable
 	
 	public boolean sendMessage(Object obj)
 	{
-		if (channel == null || !channel.isActive())
+		if (session == null || !session.isActive())
 			return false;
-		channel.writeAndFlush(obj);
+		session.sendMessage(obj);
 		return true;
 	}
 	
 	public boolean sendSyncMessage(Object obj)
 	{
-		if (channel == null || !channel.isActive())
+		if (session == null || !session.isActive())
 			return false;
-		try
-		{
-			ChannelFuture future = channel.writeAndFlush(obj).sync();
-			return future.isSuccess();
-		}
-		catch (InterruptedException e)
-		{
-			e.printStackTrace();
-			return false;
-		}
+		return session.sendSyncMessage(obj);
 	}
 	
 	public String getId()
@@ -107,15 +96,15 @@ public class GridNode implements Serializable
 	{
 		this.id = id;
 	}
-
-	public Channel getChannel()
+	
+	public GridSession getSession()
 	{
-		return channel;
+		return session;
 	}
 
-	public void setChannel(Channel channel)
+	public void setSession(GridSession session)
 	{
-		this.channel = channel;
+		this.session = session;
 	}
 
 	public int getNodeType()

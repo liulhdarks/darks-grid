@@ -32,6 +32,7 @@ public class GridRpcJobFuture extends GridJobFuture<MethodResult>
 			else
 				objs.add(status.getResult());
 		}
+		result.setResult(objs);
 		if (errorBuf.length() > 0)
 		{
 			result.setErrorMessage(errorBuf.toString());

@@ -6,20 +6,20 @@ import darks.grid.beans.GridMessage;
 import darks.grid.executor.RpcExecutor;
 import darks.grid.executor.task.rpc.MethodJob;
 import darks.grid.executor.task.rpc.MethodJobReply;
+import darks.grid.network.GridSession;
 
 public class RPC_JOB implements GridMessageHandler
 {
 
 	@Override
-	public void handler(ChannelHandlerContext ctx, GridMessage msg) throws Exception
+	public void handler(GridSession session, GridMessage msg) throws Exception
 	{
 		MethodJob jobBean = (MethodJob) msg.getData();
 		MethodJobReply resp = RpcExecutor.executeMethod(jobBean);
 		GridMessage replyMsg = new GridMessage(resp, GridMessage.MSG_RPC_RESPONSE, msg);
 		for (int i = 0; i < 3; i++)
 		{
-			ChannelFuture future = ctx.channel().writeAndFlush(replyMsg).sync();
-			if (future.isSuccess())
+			if (session.sendSyncMessage(replyMsg))
 				break;
 		}
 	}

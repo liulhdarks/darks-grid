@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import darks.grid.config.GridConfiguration;
 import darks.grid.executor.task.GridTaskManager;
 import darks.grid.network.GridNetworkCenter;
+import darks.grid.network.local.GridLocalMessageManager;
 import darks.grid.utils.ThreadUtils;
 
 public final class GridRuntime
@@ -25,6 +26,8 @@ public final class GridRuntime
 	
 	static GridTaskManager tasks;
 	
+	static GridLocalMessageManager localManager;
+	
 	private GridRuntime()
 	{
 		
@@ -38,6 +41,7 @@ public final class GridRuntime
 		nodesManager = new GridNodesManager();
 		components = new GridComponentManager();
 		tasks = new GridTaskManager();
+		localManager = new GridLocalMessageManager();
 		boolean ret = context.initialize(config);
 		if (!ret)
 		{
@@ -62,6 +66,12 @@ public final class GridRuntime
             log.error("Fail to initialize network.");
             return false;
         }
+        ret = localManager.initialize(config);
+        if (!ret)
+        {
+            log.error("Fail to initialize local message manager.");
+            return false;
+        }
 		components.setupComponents();
 		ret = tasks.initialize(config);
         if (!ret)
@@ -76,6 +86,7 @@ public final class GridRuntime
 	{
 		tasks.destroy();
 	    components.destroy();
+	    localManager.destroy();
 		network.destroy();
 		nodesManager.destroy();
 		ThreadUtils.shutdownAll();
@@ -110,5 +121,11 @@ public final class GridRuntime
 	{
 		return context;
 	}
+
+	public static GridLocalMessageManager local()
+	{
+		return localManager;
+	}
+	
 	
 }

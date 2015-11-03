@@ -39,6 +39,8 @@ public class NetworkConfig
     
     private int nodesExpireTime = 600000;
     
+    private int localMsgHandlerNumber = Runtime.getRuntime().availableProcessors() * 2;
+    
     public NetworkConfig()
     {
         
@@ -227,6 +229,18 @@ public class NetworkConfig
 	{
 		this.tcpRecvBufferSize = tcpRecvBufferSize;
 	}
+	
+	
+
+	public int getLocalMsgHandlerNumber()
+	{
+		return localMsgHandlerNumber;
+	}
+
+	public void setLocalMsgHandlerNumber(int localMsgHandlerNumber)
+	{
+		this.localMsgHandlerNumber = localMsgHandlerNumber;
+	}
 
 	@Override
 	public String toString()
@@ -241,7 +255,7 @@ public class NetworkConfig
 				+ connectTimeout + ", serverWorkerThreadNumber=" + serverWorkerThreadNumber
 				+ ", serverBossThreadDelta=" + serverBossThreadDelta
 				+ ", clientWorkerThreadNumber=" + clientWorkerThreadNumber + ", nodesExpireTime="
-				+ nodesExpireTime + "]";
+				+ nodesExpireTime + ", localMsgHandlerNumber=" + localMsgHandlerNumber + "]";
 	}
-	
+
 }

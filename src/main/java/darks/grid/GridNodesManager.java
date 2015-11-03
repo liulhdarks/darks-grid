@@ -1,8 +1,5 @@
 package darks.grid;
 
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelId;
-
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.Map;
@@ -16,6 +13,7 @@ import darks.grid.beans.GridNode;
 import darks.grid.beans.GridNodeType;
 import darks.grid.beans.NodeId;
 import darks.grid.config.GridConfiguration;
+import darks.grid.network.GridSession;
 import darks.grid.utils.MachineUtils;
 
 public class GridNodesManager
@@ -27,7 +25,7 @@ public class GridNodesManager
 	
 	private Map<SocketAddress, String> addressMap = new ConcurrentHashMap<SocketAddress, String>();
 	
-	private Map<ChannelId, String> channelIdMap = new ConcurrentHashMap<ChannelId, String>();
+	private Map<String, String> sessionIdMap = new ConcurrentHashMap<String, String>();
 	
 	public synchronized boolean initialize(GridConfiguration config)
 	{
@@ -38,40 +36,40 @@ public class GridNodesManager
 	{
 	}
 	
-	public synchronized void addLocalNode(Channel channel)
+	public synchronized void addLocalNode(GridSession session)
 	{
 		String localNodeId = NodeId.localId();
 		GridRuntime.context().setLocalNodeId(localNodeId);
-		GridNode node = new GridNode(localNodeId, channel, GridRuntime.context(), GridNodeType.TYPE_LOCAL);
+		GridNode node = new GridNode(localNodeId, session, GridRuntime.context(), GridNodeType.TYPE_LOCAL);
 		nodesMap.put(localNodeId, node);
 		addressMap.put(node.context().getServerAddress(), localNodeId);
-		channelIdMap.put(channel.id(), localNodeId);
+		sessionIdMap.put(session.getId(), localNodeId);
 		log.info("Join local node " + node.toSimpleString());
 	}
 	
-	public synchronized void addRemoteNode(String nodeId, Channel channel, GridContext context)
+	public synchronized void addRemoteNode(String nodeId, GridSession session, GridContext context)
 	{
 		GridNode oldNode = nodesMap.get(nodeId);
 		if (oldNode != null)
 		{
-			if (oldNode.getChannel().id().toString().equals(channel.id().toString()))
+			if (oldNode.getSession().getId().equals(session.getId()))
 				return;
-			if (oldNode.getChannel().isActive())
+			if (oldNode.getSession().isActive())
 			{
-				channel.close();
+				session.close();
 				//TODO re-add node to remote
 				return;
 			}
 			else
 			{
-				oldNode.getChannel().close();
+				oldNode.getSession().close();
 				nodesMap.remove(nodeId);
 			}
 		}
-		GridNode node = new GridNode(nodeId, channel, context, GridNodeType.TYPE_REMOTE);
+		GridNode node = new GridNode(nodeId, session, context, GridNodeType.TYPE_REMOTE);
 		nodesMap.put(nodeId, node);
 		addressMap.put(node.context().getServerAddress(), nodeId);
-		channelIdMap.put(channel.id(), nodeId);
+		sessionIdMap.put(session.getId(), nodeId);
 		log.info("Join remote node " + node.toSimpleString());
 	}
 	
@@ -119,7 +117,7 @@ public class GridNodesManager
 		if (node !=null)
 		{
 			addressMap.remove(node.context().getServerAddress());
-			channelIdMap.remove(node.getChannel().id());
+			sessionIdMap.remove(node.getSession().getId());
 		}
 		return node;
 	}
@@ -130,28 +128,28 @@ public class GridNodesManager
 		if (rNode == null)
 		{
 			addressMap.remove(node.context().getServerAddress());
-			channelIdMap.remove(node.getChannel().id());
+			sessionIdMap.remove(node.getSession().getId());
 			rNode = node;
 		}
 		if (rNode != null)
 		{
 			log.info("Grid node " + rNode.getId() + " " + rNode.context().getServerAddress() + " quit.");
-			rNode.getChannel().close();
+			rNode.getSession().close();
 		}
 		return rNode;
 	}
 	
-	public synchronized GridNode removeNode(Channel channel)
+	public synchronized GridNode removeNode(GridSession session)
 	{
 		GridNode node = null;
-		String nodeId = GridRuntime.nodes().getNodeId(channel.id());
+		String nodeId = GridRuntime.nodes().getNodeId(session.getId());
 		if (nodeId != null)
 		{
 			node = GridRuntime.nodes().removeNode(nodeId);
 			if (node != null)
 			{
 				log.info("Grid node " + node.getId() + " " + node.context().getServerAddress() + " quit.");
-				node.getChannel().close();
+				node.getSession().close();
 			}
 		}
 		return node;
@@ -170,9 +168,9 @@ public class GridNodesManager
 		return addressMap.get(address);
 	}
 	
-	public String getNodeId(ChannelId channelId)
+	public String getNodeId(String sessionId)
 	{
-		return channelIdMap.get(channelId);
+		return sessionIdMap.get(sessionId);
 	}
 
 	public Map<String, GridNode> getNodesMap()

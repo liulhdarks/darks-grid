@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import darks.grid.GridRuntime;
 import darks.grid.beans.GridMessage;
 import darks.grid.beans.meta.JoinMeta;
+import darks.grid.network.GridSessionFactory;
 import darks.grid.network.handler.msg.GridMessageHandler;
 import darks.grid.network.handler.msg.MessageHandlerFactory;
 
@@ -48,7 +49,7 @@ public class GridCommonMessageHandler extends ChannelHandlerAdapter
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception
 	{
-		GridRuntime.nodes().removeNode(ctx.channel());
+		GridRuntime.nodes().removeNode(GridSessionFactory.getSession(ctx.channel()));
 		super.channelInactive(ctx);
 	}
 
@@ -56,13 +57,14 @@ public class GridCommonMessageHandler extends ChannelHandlerAdapter
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception
 	{
 		GridMessage message = (GridMessage) msg;
-		log.debug("Channel read:" + message);
+		if (log.isDebugEnabled())
+			log.debug("Channel read:" + message);
 		GridMessageHandler handler = MessageHandlerFactory.getHandler(message);
 		if (handler != null)
 		{
 			try
 			{
-				handler.handler(ctx, message);
+				handler.handler(GridSessionFactory.getSession(ctx.channel()), message);
 			}
 			finally
 			{
@@ -76,7 +78,7 @@ public class GridCommonMessageHandler extends ChannelHandlerAdapter
 	@Override
 	public void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception
 	{
-		GridRuntime.nodes().removeNode(ctx.channel());
+		GridRuntime.nodes().removeNode(GridSessionFactory.getSession(ctx.channel()));
 		super.close(ctx, promise);
 	}
 

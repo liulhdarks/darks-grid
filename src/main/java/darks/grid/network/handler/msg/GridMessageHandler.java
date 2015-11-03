@@ -1,12 +1,12 @@
 package darks.grid.network.handler.msg;
 
-import io.netty.channel.ChannelHandlerContext;
 import darks.grid.beans.GridMessage;
+import darks.grid.network.GridSession;
 
 public interface GridMessageHandler
 {
 
-	public void handler(ChannelHandlerContext ctx, GridMessage msg) throws Exception;
+	public void handler(GridSession session, GridMessage msg) throws Exception;
 
 	
 }

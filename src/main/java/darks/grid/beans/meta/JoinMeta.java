@@ -1,7 +1,7 @@
 package darks.grid.beans.meta;
 
-import io.netty.channel.Channel;
 import darks.grid.GridContext;
+import darks.grid.network.GridSession;
 
 public class JoinMeta extends BaseMeta
 {
@@ -15,7 +15,7 @@ public class JoinMeta extends BaseMeta
 	
 	private GridContext nodeContext;
 	
-	private transient Channel channel;
+	private transient GridSession session;
 	
 	private long joinTime;
 	
@@ -50,15 +50,15 @@ public class JoinMeta extends BaseMeta
 	{
 		this.nodeContext = nodeContext;
 	}
-
-	public Channel getChannel()
+	
+	public GridSession getSession()
 	{
-		return channel;
+		return session;
 	}
 
-	public void setChannel(Channel channel)
+	public void setSession(GridSession session)
 	{
-		this.channel = channel;
+		this.session = session;
 	}
 
 	public long getJoinTime()

@@ -1,7 +1,5 @@
 package darks.grid.network;
 
-import io.netty.channel.ChannelFuture;
-
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -73,8 +71,7 @@ public class NodesHeartAlive extends GridComponent
 		{
 			HeartAliveMeta meta = new HeartAliveMeta(GridRuntime.context().getLocalNodeId(), GridRuntime.context());
 			GridMessage msg = new GridMessage(meta, GridMessage.MSG_HEART_ALIVE);
-			ChannelFuture future = node.getChannel().writeAndFlush(msg).sync();
-			valid = future.isSuccess();
+			valid = node.sendSyncMessage(msg);
 		}
 		catch (Exception e)
 		{

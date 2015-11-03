@@ -12,7 +12,7 @@ public abstract class GridComponent extends Thread implements Serializable, Clon
 
     private static final Logger log = LoggerFactory.getLogger(GridComponent.class);
 
-    private boolean destroyed = false;
+    private volatile boolean destroyed = false;
     
     private int interval = 1000;
     

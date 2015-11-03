@@ -1,8 +1,5 @@
 package darks.grid.network.handler.msg;
 
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandlerContext;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,6 +7,7 @@ import darks.grid.GridRuntime;
 import darks.grid.beans.GridMessage;
 import darks.grid.beans.GridNode;
 import darks.grid.beans.meta.HeartAliveMeta;
+import darks.grid.network.GridSession;
 
 public class HEART_ALIVE implements GridMessageHandler
 {
@@ -20,14 +18,14 @@ public class HEART_ALIVE implements GridMessageHandler
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void handler(ChannelHandlerContext ctx, GridMessage msg) throws Exception
+	public void handler(GridSession session, GridMessage msg) throws Exception
 	{
 		HeartAliveMeta meta = msg.getData();
 		String nodeId = meta.getNodeId();
 		GridNode node = GridRuntime.nodes().getNode(nodeId);
 		if (node == null)
 		{
-			GridRuntime.nodes().addRemoteNode(nodeId, ctx.channel(), meta.context());
+			GridRuntime.nodes().addRemoteNode(nodeId, session, meta.context());
 		}
 		else
 		{
@@ -43,8 +41,7 @@ public class HEART_ALIVE implements GridMessageHandler
 			    GridRuntime.context().getMachineInfo().update();
 				HeartAliveMeta replyMeta = new HeartAliveMeta(GridRuntime.context().getLocalNodeId(), GridRuntime.context());
 				GridMessage replyMsg = new GridMessage(replyMeta, GridMessage.MSG_HEART_ALIVE_REPLY, msg);
-				ChannelFuture future = ctx.channel().writeAndFlush(replyMsg).sync();
-				valid = future.isSuccess();
+				valid = session.sendSyncMessage(replyMsg);
 			}
 			catch (Exception e)
 			{

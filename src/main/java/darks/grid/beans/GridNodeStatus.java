@@ -1,6 +1,6 @@
 package darks.grid.beans;
 
-import io.netty.channel.Channel;
+import darks.grid.network.GridSession;
 
 public class GridNodeStatus
 {
@@ -11,19 +11,15 @@ public class GridNodeStatus
 	
 	public static final int INACTIVE = 2;
 	
-	public static final int OPENED = 3;
-	
 	public static String valueOf(GridNode node)
 	{
-		Channel channel = node.getChannel();
-		if (channel == null)
+		GridSession session = node.getSession();
+		if (session == null)
 			return "INVALID";
 		if (node.isAlive())
 			return "ALIVE";
-		if (channel.isActive())
+		if (session.isActive())
 			return "ACTIVE";
-		if (channel.isOpen())
-			return "OPENED";
 		return "INACTIVE";
 	}
 

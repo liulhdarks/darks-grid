@@ -1,8 +1,5 @@
 package darks.grid.network.handler.msg;
 
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelHandlerContext;
-
 import java.net.SocketAddress;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -15,6 +12,7 @@ import darks.grid.beans.GridMessage;
 import darks.grid.beans.GridNode;
 import darks.grid.beans.meta.JoinMeta;
 import darks.grid.beans.meta.JoinNodeMeta;
+import darks.grid.network.GridSession;
 
 public class JOIN implements GridMessageHandler
 {
@@ -24,14 +22,14 @@ public class JOIN implements GridMessageHandler
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void handler(ChannelHandlerContext ctx, GridMessage msg) throws Exception
+	public void handler(GridSession session, GridMessage msg) throws Exception
 	{
 		JoinMeta meta = msg.getData();
-		meta.setChannel(ctx.channel());
+		meta.setSession(session);
 		if (!GridRuntime.context().getClusterName().equals(meta.context().getClusterName()))
 		{
 			log.info("Refuse " + meta.context().getClusterName() + " cluster request join." + meta);
-			meta.getChannel().close();
+			meta.getSession().close();
 			return;
 		}
 		String nodeId = meta.getNodeId();
@@ -40,9 +38,9 @@ public class JOIN implements GridMessageHandler
 			GridNode node = GridRuntime.nodes().getNode(nodeId);
 			if (node != null)
 			{
-				if (node.getChannel().isActive())
+				if (node.getSession().isActive())
 				{
-					meta.getChannel().close();
+					meta.getSession().close();
 					return;
 				}
 				else
@@ -83,7 +81,7 @@ public class JOIN implements GridMessageHandler
 			{
 				if (keepJoinMeta != null)
 				{
-					keepJoinMeta.getChannel().close();
+					keepJoinMeta.getSession().close();
 				}
 				keepJoinMeta = joinMeta;
 				keepJoinTime = joinMeta.getJoinTime();
@@ -103,11 +101,11 @@ public class JOIN implements GridMessageHandler
 		GridMessage replyMsg = new GridMessage(data, GridMessage.MSG_JOIN_REPLY, msg);
 		try
 		{
-			ChannelFuture future = meta.getChannel().writeAndFlush(replyMsg).sync();
+			boolean success = meta.getSession().sendSyncMessage(replyMsg);
 			if (autoJoin)
 			{
-				if (future.isSuccess())
-					GridRuntime.nodes().addRemoteNode(nodeId, meta.getChannel(), meta.context());
+				if (success)
+					GridRuntime.nodes().addRemoteNode(nodeId, meta.getSession(), meta.context());
 				Map<SocketAddress, JoinMeta> nodesMap = GridRuntime.network().getWaitJoin(nodeId);
 				nodesMap.clear();
 			}
