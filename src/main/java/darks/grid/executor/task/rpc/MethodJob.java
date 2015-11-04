@@ -21,14 +21,16 @@ public class MethodJob extends GridJob
 	
 	public MethodJob()
 	{
-		
+		setFailRedo(false);
 	}
 	
-	public MethodJob(MethodRequest request)
+	public MethodJob(String taskId, MethodRequest request)
 	{
+		super(taskId);
 		this.methodName = request.getMethodName();
 		this.params = request.getParams();
 		this.methodConfig = request.getMethodConfig();
+		setFailRedo(false);
 	}
 
 	public String getMethodName()

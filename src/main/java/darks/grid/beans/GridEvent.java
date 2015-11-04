@@ -1,55 +1,37 @@
 package darks.grid.beans;
 
-import io.netty.channel.Channel;
-
 import java.io.Serializable;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class GridEvent implements Serializable, Cloneable
 {
 
+	public static final String NODE_JOIN = "node_join";
+	public static final String NODE_LEAVE = "node_leave";
+	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -58960549212644997L;
-
-	public static final int EVT_NETWORK = 1001;
 	
-	private String id;
+	private static AtomicLong eventIdSeed = new AtomicLong(0);
+	
+	private long id;
 	
 	private Object data;
 	
-	private int type;
-	
-	private Channel channel;
+	private String type;
 	
 	public GridEvent()
 	{
-		
+		this.id = eventIdSeed.incrementAndGet();
 	}
 
-	public GridEvent(Object data, int type)
+	public GridEvent(Object data, String type)
 	{
-		super();
+		this.id = eventIdSeed.incrementAndGet();
 		this.data = data;
 		this.type = type;
-	}
-
-	public GridEvent(Object data, int type, Channel channel)
-	{
-		super();
-		this.data = data;
-		this.type = type;
-		this.channel = channel;
-	}
-	
-	public String getId()
-	{
-		return id;
-	}
-
-	public void setId(String id)
-	{
-		this.id = id;
 	}
 
 	public <T> T getData()
@@ -62,25 +44,31 @@ public class GridEvent implements Serializable, Cloneable
 		this.data = data;
 	}
 
-	public int getType()
+	public long getId()
+	{
+		return id;
+	}
+
+	public void setId(long id)
+	{
+		this.id = id;
+	}
+
+	public String getType()
 	{
 		return type;
 	}
 
-	public void setType(int type)
+	public void setType(String type)
 	{
 		this.type = type;
 	}
 
-	public Channel getChannel()
+	@Override
+	public String toString()
 	{
-		return channel;
+		return "GridEvent [id=" + id + ", data=" + data + ", type=" + type + "]";
 	}
 
-	public void setChannel(Channel channel)
-	{
-		this.channel = channel;
-	}
-	
 	
 }

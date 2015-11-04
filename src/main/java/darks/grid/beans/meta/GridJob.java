@@ -10,6 +10,8 @@ public class GridJob extends BaseMeta
 
 	private String taskId;
 	
+	private boolean failRedo = true;
+	
 	public GridJob()
 	{
 		
@@ -35,13 +37,23 @@ public class GridJob extends BaseMeta
 	{
 		return getMetaId();
 	}
+	
+
+	public boolean isFailRedo()
+	{
+		return failRedo;
+	}
+
+	public void setFailRedo(boolean failRedo)
+	{
+		this.failRedo = failRedo;
+	}
 
 	@Override
 	public String toString()
 	{
-		return "JobMeta [jobId=" + getJobId() + ", taskId=" + taskId + "]";
+		return "GridJob [taskId=" + taskId + ", failRedo=" + failRedo + "]";
 	}
 
-	
 	
 }

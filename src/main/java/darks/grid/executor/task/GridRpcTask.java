@@ -75,8 +75,7 @@ public class GridRpcTask extends GridTask<MethodResult>
 
     private void executeTaskOnNode(GridNode node)
     {
-    	MethodJob job = new MethodJob(request);
-    	job.setTaskId(getId());
+    	MethodJob job = new MethodJob(getId(), request);
     	JobStatus status = new JobStatus(job, node);
     	future.addJobStatus(status);
         GridMessage message = new GridMessage(job, GridMessage.MSG_RPC_REQUEST);

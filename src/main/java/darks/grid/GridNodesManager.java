@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import darks.grid.beans.GridEvent;
 import darks.grid.beans.GridNode;
 import darks.grid.beans.GridNodeType;
 import darks.grid.beans.NodeId;
@@ -44,6 +45,7 @@ public class GridNodesManager
 		nodesMap.put(localNodeId, node);
 		addressMap.put(node.context().getServerAddress(), localNodeId);
 		sessionIdMap.put(session.getId(), localNodeId);
+		GridRuntime.events().publish(GridEvent.NODE_JOIN, node);
 		log.info("Join local node " + node.toSimpleString());
 	}
 	
@@ -70,6 +72,7 @@ public class GridNodesManager
 		nodesMap.put(nodeId, node);
 		addressMap.put(node.context().getServerAddress(), nodeId);
 		sessionIdMap.put(session.getId(), nodeId);
+		GridRuntime.events().publish(GridEvent.NODE_JOIN, node);
 		log.info("Join remote node " + node.toSimpleString());
 	}
 	
@@ -133,8 +136,8 @@ public class GridNodesManager
 		}
 		if (rNode != null)
 		{
-			log.info("Grid node " + rNode.getId() + " " + rNode.context().getServerAddress() + " quit.");
 			rNode.getSession().close();
+			GridRuntime.events().publish(GridEvent.NODE_LEAVE, rNode);
 		}
 		return rNode;
 	}
@@ -148,8 +151,8 @@ public class GridNodesManager
 			node = GridRuntime.nodes().removeNode(nodeId);
 			if (node != null)
 			{
-				log.info("Grid node " + node.getId() + " " + node.context().getServerAddress() + " quit.");
 				node.getSession().close();
+				GridRuntime.events().publish(GridEvent.NODE_LEAVE, node);
 			}
 		}
 		return node;

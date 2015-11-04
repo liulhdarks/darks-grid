@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import darks.grid.config.GridConfiguration;
+import darks.grid.events.GridEventsManager;
 import darks.grid.executor.task.GridTaskManager;
 import darks.grid.network.GridNetworkCenter;
 import darks.grid.network.local.GridLocalMessageManager;
@@ -28,6 +29,8 @@ public final class GridRuntime
 	
 	static GridLocalMessageManager localManager;
 	
+	static GridEventsManager eventsManager;
+	
 	private GridRuntime()
 	{
 		
@@ -42,12 +45,19 @@ public final class GridRuntime
 		components = new GridComponentManager();
 		tasks = new GridTaskManager();
 		localManager = new GridLocalMessageManager();
+		eventsManager = new GridEventsManager();
 		boolean ret = context.initialize(config);
 		if (!ret)
 		{
             log.error("Fail to initialize grid context.");
             return false;
 		}
+		ret = eventsManager.initialize(config);
+        if (!ret)
+        {
+            log.error("Fail to initialize events manager.");
+            return false;
+        }
 		ret = components.initialize(config);
         if (!ret)
         {
@@ -89,6 +99,7 @@ public final class GridRuntime
 	    localManager.destroy();
 		network.destroy();
 		nodesManager.destroy();
+		eventsManager.destroy();
 		ThreadUtils.shutdownAll();
 	}
 	
@@ -125,6 +136,11 @@ public final class GridRuntime
 	public static GridLocalMessageManager local()
 	{
 		return localManager;
+	}
+
+	public static GridEventsManager events()
+	{
+		return eventsManager;
 	}
 	
 	

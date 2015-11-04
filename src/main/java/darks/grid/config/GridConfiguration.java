@@ -11,6 +11,8 @@ public class GridConfiguration implements Serializable
 	
 	private ComponentConfig componentConfig = new ComponentConfig();
 	
+	private EventsConfig eventsConfig = new EventsConfig();
+	
 	private String clusterName = "DEFAULT";
 	
 	public GridConfiguration()
@@ -38,12 +40,21 @@ public class GridConfiguration implements Serializable
         return componentConfig;
     }
 
-    @Override
-    public String toString()
-    {
-        return "GridConfiguration [networkConfig=" + networkConfig + ", clusterName="
-            + clusterName + "]";
-    }
+    
+    
+    public EventsConfig getEventsConfig()
+	{
+		return eventsConfig;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "GridConfiguration [networkConfig=" + networkConfig + ", componentConfig="
+				+ componentConfig + ", eventsConfig=" + eventsConfig + ", clusterName="
+				+ clusterName + "]";
+	}
+
     
 	
 }

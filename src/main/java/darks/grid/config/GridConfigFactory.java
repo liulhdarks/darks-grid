@@ -78,6 +78,10 @@ public final class GridConfigFactory
                 {
                     parseAttrForObject(el, config);
                 }
+                else if ("events".equalsIgnoreCase(el.getNodeName()))
+                {
+                    parseAttrForObject(el, config.getEventsConfig());
+                }
                 else if ("component".equalsIgnoreCase(el.getNodeName()))
                 {
                     parseComponent(config, el);
