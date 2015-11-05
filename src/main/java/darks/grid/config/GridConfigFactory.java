@@ -74,6 +74,10 @@ public final class GridConfigFactory
 	            {
 	                parseAttrForObject(el, config.getNetworkConfig());
 	            }
+                else if ("task".equalsIgnoreCase(el.getNodeName()))
+                {
+                    parseAttrForObject(el, config.getTaskConfig());
+                }
                 else if ("cluster".equalsIgnoreCase(el.getNodeName()))
                 {
                     parseAttrForObject(el, config);

@@ -101,7 +101,6 @@ public final class GridRuntime
             log.error("Fail to initialize jobs manager.");
             return false;
         }
-        startupPrintThread(config);
 		return true;
 	}
 	
@@ -117,35 +116,6 @@ public final class GridRuntime
 		nodesManager.destroy();
 		eventsManager.destroy();
 		ThreadUtils.shutdownAll();
-	}
-	
-	private static void startupPrintThread(final GridConfiguration config)
-	{
-		printThread = new Thread()
-		{
-			
-			public void run()
-			{
-				int interval = config.getPrintNodesInterval();
-				try
-				{
-					while (!isInterrupted())
-					{
-						log.info(nodes().getNodesInfo());
-						Thread.sleep(interval);
-					}
-				}
-				catch (InterruptedException e)
-				{
-				}
-				catch (Exception e)
-				{
-					log.error(e.getMessage(), e);
-				}
-			}
-			
-		};
-		ThreadUtils.executeThread(printThread);
 	}
 	
 	public static String getLocalId()

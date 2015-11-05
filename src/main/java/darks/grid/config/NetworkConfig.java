@@ -41,6 +41,8 @@ public class NetworkConfig
     
     private int localMsgHandlerNumber = Runtime.getRuntime().availableProcessors() * 2;
     
+    private int sendFailRetry = 3;
+    
     public NetworkConfig()
     {
         
@@ -240,6 +242,16 @@ public class NetworkConfig
 	public void setLocalMsgHandlerNumber(int localMsgHandlerNumber)
 	{
 		this.localMsgHandlerNumber = localMsgHandlerNumber;
+	}
+	
+	public int getSendFailRetry()
+	{
+		return sendFailRetry;
+	}
+
+	public void setSendFailRetry(int sendFailRetry)
+	{
+		this.sendFailRetry = sendFailRetry;
 	}
 
 	@Override

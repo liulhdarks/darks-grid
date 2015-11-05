@@ -39,13 +39,13 @@ public class GridLocalHandlerThread extends Thread
 				while ((obj = messageQueue.poll()) != null)
 				{
 					handlerMessage(obj);
-					if (System.currentTimeMillis() - st > 5000)
+					if (System.currentTimeMillis() - st > 3000)
 					{
 						st = System.currentTimeMillis();
-						Thread.sleep(10);
+						Thread.sleep(5);
 					}
 				}
-				Thread.sleep(50);
+				Thread.sleep(10);
 			}
 		}
 		catch (Exception e)

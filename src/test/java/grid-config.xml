@@ -3,7 +3,15 @@
 
 	<!-- <component name="asd" class="asd"/> -->
 
-	<cluster cluster_name="TEST" print_nodes_interval="60000"/>
+	<cluster cluster_name="TEST" />
+	
+	<task jobs_exec_count="30"/>
+	
+	<log interval="60000" 
+		nodes_info="true" 
+	    task_info="true" 
+	    exec_job_info="true" 
+	    jvm_info="true"/>
 
 	<network 
 		bind_host=""

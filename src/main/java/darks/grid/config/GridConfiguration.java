@@ -13,10 +13,10 @@ public class GridConfiguration implements Serializable
 	
 	private EventsConfig eventsConfig = new EventsConfig();
 	
+	private TaskConfig taskConfig = new TaskConfig();
+	
 	private String clusterName = "DEFAULT";
     
-    private int printNodesInterval = 180000;
-	
 	public GridConfiguration()
 	{
 		
@@ -42,31 +42,23 @@ public class GridConfiguration implements Serializable
         return componentConfig;
     }
 
-    
-    
     public EventsConfig getEventsConfig()
 	{
 		return eventsConfig;
 	}
     
-	public int getPrintNodesInterval()
+	public TaskConfig getTaskConfig()
 	{
-		return printNodesInterval;
-	}
-
-	public void setPrintNodesInterval(int printNodesInterval)
-	{
-		this.printNodesInterval = printNodesInterval;
+		return taskConfig;
 	}
 
 	@Override
 	public String toString()
 	{
 		return "GridConfiguration [networkConfig=" + networkConfig + ", componentConfig="
-				+ componentConfig + ", eventsConfig=" + eventsConfig + ", clusterName="
-				+ clusterName + "]";
+				+ componentConfig + ", eventsConfig=" + eventsConfig + ", taskConfig=" + taskConfig
+				+ ", clusterName=" + clusterName + "]";
 	}
-
-    
+	
 	
 }

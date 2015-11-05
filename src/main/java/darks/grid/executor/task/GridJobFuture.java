@@ -148,7 +148,7 @@ public class GridJobFuture<V> extends GridFuture<V>
 			}
 			if (finishedCount == statusMap.size())
 				break;
-			ThreadUtils.threadSleep(50);
+			ThreadUtils.threadSleep(20);
 			if (maxTime > 0 && System.currentTimeMillis() - st > maxTime)
 			{
 				return false;

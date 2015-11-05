@@ -1,18 +1,22 @@
 package darks.grid.network;
 
+import io.netty.channel.Channel;
+
 import java.net.SocketAddress;
 
 import darks.grid.GridRuntime;
-import io.netty.channel.Channel;
 
 public class GridLocalSession implements GridSession
 {
 	
 	Channel channel;
 	
+	int failRetryCount;
+	
 	public GridLocalSession(Channel channel)
 	{
 		this.channel = channel;
+		failRetryCount = GridRuntime.config().getNetworkConfig().getSendFailRetry();
 	}
 
 	@Override
@@ -24,15 +28,29 @@ public class GridLocalSession implements GridSession
 	@Override
 	public boolean sendMessage(Object msg)
 	{
-		GridRuntime.local().offerMessage(msg);
-		return true;
+		return GridRuntime.local().offerMessage(msg);
 	}
 
 	@Override
 	public boolean sendSyncMessage(Object msg)
 	{
-		GridRuntime.local().offerMessage(msg);
-		return true;
+		return sendSyncMessage(msg, true);
+	}
+	
+	@Override
+	public boolean sendSyncMessage(Object msg, boolean failRetry)
+	{
+		boolean ret = false;
+		int count = 0;
+		do
+		{
+			ret = GridRuntime.local().offerMessage(msg);
+			if (ret)
+				break;
+			count++;
+		}
+		while (count < failRetryCount && failRetry);
+		return ret;
 	}
 
 	@Override

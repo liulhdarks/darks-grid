@@ -2,6 +2,7 @@ package darks.grid.network;
 
 import java.net.SocketAddress;
 
+import darks.grid.GridRuntime;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 
@@ -9,10 +10,13 @@ public class GridRemoteSession implements GridSession
 {
 	
 	Channel channel;
+	
+	int failRetryCount = 3;
 
 	public GridRemoteSession(Channel channel)
 	{
 		this.channel = channel;
+		failRetryCount = GridRuntime.config().getNetworkConfig().getSendFailRetry();
 	}
 	
 	@Override
@@ -33,12 +37,29 @@ public class GridRemoteSession implements GridSession
 	@Override
 	public boolean sendSyncMessage(Object msg)
 	{
+		return sendSyncMessage(msg, true);
+	}
+	
+
+	@Override
+	public boolean sendSyncMessage(Object msg, boolean failRetry)
+	{
 		if (channel == null || !channel.isActive())
 			return false;
 		try
 		{
-			ChannelFuture future = channel.writeAndFlush(msg).sync();
-			return future.isSuccess();
+			boolean ret = false;
+			int count = 0;
+			do
+			{
+				ChannelFuture future = channel.writeAndFlush(msg).sync();
+				ret = future.isSuccess();
+				if (ret)
+					break;
+				count++;
+			}
+			while (count < failRetryCount && failRetry);
+			return ret;
 		}
 		catch (InterruptedException e)
 		{

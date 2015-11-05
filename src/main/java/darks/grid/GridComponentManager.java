@@ -32,6 +32,7 @@ public class GridComponentManager implements GridManager
     {
         systemCompConfig.put("tcpping", TCPPING.class);
         systemCompConfig.put("alive", NodesHeartAlive.class);
+        systemCompConfig.put("log", RuntimeLog.class);
     }
     
     public GridComponentManager()

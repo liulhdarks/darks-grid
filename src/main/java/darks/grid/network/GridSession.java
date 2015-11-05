@@ -11,6 +11,8 @@ public interface GridSession
 	
 	public boolean sendSyncMessage(Object msg);
 	
+	public boolean sendSyncMessage(Object msg, boolean failRetry);
+	
 	public void close();
 	
 	public boolean isActive();

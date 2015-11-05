@@ -3,6 +3,8 @@ package darks.grid.executor.job;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -16,9 +18,11 @@ public class GridJobManager implements GridManager
 
 	private Map<String, Map<String, GridJob>> nodesJobsMap = new ConcurrentHashMap<>();
 
-	private Map<String, Map<String, GridJob>> remoteJobsMap = new ConcurrentHashMap<>();
+	private Map<String, Map<String, JobExecutor>> execJobsMap = new ConcurrentHashMap<>();
 	
 	private Lock lock = new ReentrantLock();
+	
+	private ExecutorService threadPool = null;
 	
 	public GridJobManager()
 	{
@@ -28,6 +32,7 @@ public class GridJobManager implements GridManager
 	@Override
 	public boolean initialize(GridConfiguration config)
 	{
+		threadPool = Executors.newFixedThreadPool(config.getTaskConfig().getJobsExecCount());
 		return true;
 	}
 
@@ -35,20 +40,22 @@ public class GridJobManager implements GridManager
 	public void destroy()
 	{
 		nodesJobsMap.clear();
+		threadPool.shutdownNow();
 	}
 	
-	public void addRemoteJob(GridJob job)
+	public void addExecuteJob(JobExecutor job)
 	{
-		Map<String, GridJob> jobsMap = getRemoteJobs(job.getTaskId());
+		Map<String, JobExecutor> jobsMap = getExecuteJobs(job.getTaskId());
 		jobsMap.put(job.getJobId(), job);
+		threadPool.execute(job);
 	}
 	
-	public void completeRemoteJob(GridJob job)
+	public void completeExecuteJob(JobExecutor job)
 	{
-		Map<String, GridJob> jobsMap = getRemoteJobs(job.getTaskId());
+		Map<String, JobExecutor> jobsMap = getExecuteJobs(job.getTaskId());
 		jobsMap.remove(job.getJobId());
 		if (jobsMap.isEmpty())
-			remoteJobsMap.remove(job.getTaskId());
+			execJobsMap.remove(job.getTaskId());
 	}
 	
 	public void addNodeJob(GridNode node, GridJob job)
@@ -92,19 +99,19 @@ public class GridJobManager implements GridManager
 		return jobsMap;
 	}
 	
-	public Map<String, GridJob> getRemoteJobs(String taskId)
+	public Map<String, JobExecutor> getExecuteJobs(String taskId)
 	{
-		Map<String, GridJob> jobsMap = remoteJobsMap.get(taskId);
+		Map<String, JobExecutor> jobsMap = execJobsMap.get(taskId);
 		if (jobsMap == null)
 		{
 			lock.lock();
 			try
 			{
-				jobsMap = remoteJobsMap.get(taskId);
+				jobsMap = execJobsMap.get(taskId);
 				if (jobsMap == null)
 				{
 					jobsMap = new ConcurrentHashMap<>();
-					remoteJobsMap.put(taskId, jobsMap);
+					execJobsMap.put(taskId, jobsMap);
 				}
 			}
 			finally
@@ -115,18 +122,18 @@ public class GridJobManager implements GridManager
 		return jobsMap;
 	}
 	
-	public String toRemoteJobsString()
+	public String toExecuteJobsString()
 	{
 		lock.lock();
 		try
 		{
 			StringBuilder buf = new StringBuilder();
-			for (Entry<String, Map<String, GridJob>> entry : remoteJobsMap.entrySet())
+			for (Entry<String, Map<String, JobExecutor>> entry : execJobsMap.entrySet())
 			{
 				buf.append(entry.getKey()).append('\n');
-				for (GridJob job : entry.getValue().values())
+				for (JobExecutor job : entry.getValue().values())
 				{
-					buf.append("     ").append(job.getJobId()).append('\n');
+					buf.append("     ").append(job.getJobId()).append(' ').append(job.getStatusType()).append('\n');
 				}
 			}
 			return buf.toString().trim();

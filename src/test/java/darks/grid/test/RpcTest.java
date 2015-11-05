@@ -93,7 +93,7 @@ public class RpcTest
 		RpcExecutor.registerMethod("print", RemoteObject.class, new RemoteObject());
 		RpcExecutor.registerMethod("add", RemoteObject.class, new RemoteObject());
 		ThreadUtils.threadSleep(5000);
-		for (int i = 1; i <= 1000; i++)
+		for (int i = 1; i <= 100; i++)
 		{
 			int a = rand.nextInt(100);
 			int b = rand.nextInt(100);

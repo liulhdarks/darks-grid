@@ -52,9 +52,9 @@ public class GridLocalMessageManager implements GridManager
 		}
 	}
 	
-	public void offerMessage(Object obj)
+	public boolean offerMessage(Object obj)
 	{
-		messageQueue.offer(obj);
+		return messageQueue.offer(obj);
 	}
 	
 }
