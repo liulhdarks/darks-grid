@@ -198,4 +198,48 @@ public final class ReflectUtils
         ReflectUtils.invokeMethod(obj, method, value);
     }
     
+    public static String getMethodUniqueName(Method method)
+    {
+        try 
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.append(method.getDeclaringClass().getName()).append('.');
+            sb.append(method.getName()).append('(');
+            Class<?>[] params = method.getParameterTypes(); 
+            if (params != null)
+            {
+                for (int j = 0; j < params.length; j++) {
+                    sb.append(getTypeName(params[j]));
+                    if (j < (params.length - 1))
+                        sb.append(',');
+                }
+            }
+            sb.append(')');
+            return sb.toString();
+        } 
+        catch (Exception e) 
+        {
+            return null;
+        }
+    }
+    
+    public static String getTypeName(Class<?> type) {
+        if (type.isArray()) {
+            try {
+                Class<?> cl = type;
+                int dimensions = 0;
+                while (cl.isArray()) {
+                    dimensions++;
+                    cl = cl.getComponentType();
+                }
+                StringBuffer sb = new StringBuffer();
+                sb.append(cl.getName());
+                for (int i = 0; i < dimensions; i++) {
+                    sb.append("[]");
+                }
+                return sb.toString();
+            } catch (Throwable e) { /*FALLTHRU*/ }
+        }
+        return type.getName();
+    }
 }
