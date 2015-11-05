@@ -17,7 +17,7 @@ import darks.grid.config.GridConfiguration;
 import darks.grid.network.GridSession;
 import darks.grid.utils.MachineUtils;
 
-public class GridNodesManager
+public class GridNodesManager implements GridManager
 {
 
 	private static final Logger log = LoggerFactory.getLogger(GridNodesManager.class);
@@ -28,11 +28,13 @@ public class GridNodesManager
 	
 	private Map<String, String> sessionIdMap = new ConcurrentHashMap<String, String>();
 	
+	@Override
 	public synchronized boolean initialize(GridConfiguration config)
 	{
 		return true;
 	}
-	
+
+	@Override
 	public synchronized void destroy()
 	{
 	}
@@ -95,6 +97,10 @@ public class GridNodesManager
 		buf.append("-------------------------------------------------------------\n");
 		buf.append("Direct Memory:").append(MachineUtils.getReservedDirectMemory())
 				.append('/').append(MachineUtils.getMaxDirectMemory()).append('\n');
+		buf.append("-------------------------------------------------------------\n");
+		buf.append(GridRuntime.tasks().toSimgleString()).append('\n');
+		buf.append("-------------------------------------------------------------\n");
+		buf.append(GridRuntime.jobs().toRemoteJobsString()).append('\n');
 		buf.append("=============================================================\n");
 		return buf.toString();
 	}

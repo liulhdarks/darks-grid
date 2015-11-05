@@ -8,11 +8,17 @@ import darks.grid.beans.JobStatus;
 import darks.grid.beans.JobStatus.JobStatusType;
 import darks.grid.beans.MethodResult;
 import darks.grid.executor.task.GridJobFuture;
+import darks.grid.executor.task.GridTask;
 
 public class GridRpcJobFuture extends GridJobFuture<MethodResult>
 {
 	
 	
+
+	public GridRpcJobFuture(GridTask<?> task)
+	{
+		super(task);
+	}
 
 	@Override
 	public MethodResult get()

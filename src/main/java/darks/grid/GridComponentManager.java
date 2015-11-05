@@ -17,7 +17,7 @@ import darks.grid.network.NodesHeartAlive;
 import darks.grid.network.discovery.TCPPING;
 import darks.grid.utils.ReflectUtils;
 
-public class GridComponentManager
+public class GridComponentManager implements GridManager
 {
     
     private static final Logger log = LoggerFactory.getLogger(GridComponentManager.class);
@@ -39,6 +39,7 @@ public class GridComponentManager
         
     }
     
+    @Override
     public synchronized boolean initialize(GridConfiguration config)
     {
         try
@@ -85,6 +86,7 @@ public class GridComponentManager
         }
     }
     
+    @Override
     public synchronized void destroy()
     {
         for (Entry<String, GridComponent> entry : componentsMap.entrySet())

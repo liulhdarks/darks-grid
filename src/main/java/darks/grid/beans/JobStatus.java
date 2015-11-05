@@ -1,6 +1,7 @@
 package darks.grid.beans;
 
 import java.io.Serializable;
+import java.util.concurrent.atomic.AtomicReference;
 
 import darks.grid.beans.meta.GridJob;
 
@@ -23,7 +24,7 @@ public class JobStatus implements Serializable
 
 	private GridNode node;
 	
-	private JobStatusType statusType = JobStatusType.WAITING;
+	private AtomicReference<JobStatusType> statusType = new AtomicReference<JobStatusType>(JobStatusType.WAITING);
 	
 	private String errorMessage;
 	
@@ -57,12 +58,12 @@ public class JobStatus implements Serializable
 
 	public JobStatusType getStatusType()
 	{
-		return statusType;
+		return statusType.get();
 	}
 
 	public void setStatusType(JobStatusType statusType)
 	{
-		this.statusType = statusType;
+		this.statusType.getAndSet(statusType);
 	}
 
 	public Object getResult()

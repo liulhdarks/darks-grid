@@ -14,6 +14,8 @@ public class GridConfiguration implements Serializable
 	private EventsConfig eventsConfig = new EventsConfig();
 	
 	private String clusterName = "DEFAULT";
+    
+    private int printNodesInterval = 180000;
 	
 	public GridConfiguration()
 	{
@@ -45,6 +47,16 @@ public class GridConfiguration implements Serializable
     public EventsConfig getEventsConfig()
 	{
 		return eventsConfig;
+	}
+    
+	public int getPrintNodesInterval()
+	{
+		return printNodesInterval;
+	}
+
+	public void setPrintNodesInterval(int printNodesInterval)
+	{
+		this.printNodesInterval = printNodesInterval;
 	}
 
 	@Override

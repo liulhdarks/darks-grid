@@ -45,7 +45,7 @@ public class GridLocalHandlerThread extends Thread
 						Thread.sleep(10);
 					}
 				}
-				Thread.sleep(100);
+				Thread.sleep(50);
 			}
 		}
 		catch (Exception e)

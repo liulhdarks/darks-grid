@@ -6,7 +6,7 @@ import java.net.InetSocketAddress;
 import darks.grid.beans.MachineInfo;
 import darks.grid.config.GridConfiguration;
 
-public class GridContext implements Serializable
+public class GridContext implements Serializable, GridManager
 {
 
 	private static final long serialVersionUID = -4898402719806434910L;
@@ -28,6 +28,7 @@ public class GridContext implements Serializable
 		
 	}
 	
+	@Override
 	public boolean initialize(GridConfiguration config)
 	{
 		clusterName = config.getClusterName();
@@ -36,6 +37,7 @@ public class GridContext implements Serializable
 		return true;
 	}
 	
+	@Override
 	public void destroy()
 	{
 		

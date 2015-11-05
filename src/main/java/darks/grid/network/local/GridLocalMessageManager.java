@@ -8,10 +8,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import darks.grid.GridManager;
 import darks.grid.config.GridConfiguration;
 import darks.grid.utils.ThreadUtils;
 
-public class GridLocalMessageManager
+public class GridLocalMessageManager implements GridManager
 {
 	
 	private static final Logger log = LoggerFactory.getLogger(GridLocalMessageManager.class);
@@ -25,6 +26,7 @@ public class GridLocalMessageManager
 		
 	}
 	
+	@Override
 	public boolean initialize(GridConfiguration config)
 	{
 		log.info("Start to initialize grid local message mananger");
@@ -38,7 +40,8 @@ public class GridLocalMessageManager
 		}
 		return true;
 	}
-	
+
+	@Override
 	public void destroy()
 	{
 		log.info("Destroy grid local message mananger.");

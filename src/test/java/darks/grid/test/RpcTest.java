@@ -1,5 +1,6 @@
 package darks.grid.test;
 
+import java.util.Random;
 import java.util.Scanner;
 
 import io.netty.util.ResourceLeakDetector;
@@ -36,12 +37,14 @@ public class RpcTest
 	@Test
 	public void testExecuteRpc()
 	{
+		Random rand = new Random(System.currentTimeMillis());
 		ResourceLeakDetector.setLevel(Level.PARANOID);
         GridConfiguration config = GridConfigFactory.configure(this.getClass().getResourceAsStream("/grid-config.xml"));
 		GridRuntime.initialize(config);
 		RpcExecutor.registerMethod("print", RemoteObject.class, new RemoteObject());
 		RpcExecutor.registerMethod("add", RemoteObject.class, new RemoteObject());
 		ThreadUtils.threadSleep(3000);
+		System.out.println("ready scanner");
 		Scanner scan = new Scanner(System.in);
 		while (scan.hasNext())
 		{
@@ -59,8 +62,46 @@ public class RpcTest
 				result = RpcExecutor.callMethod("add", new Object[]{a, b}, new MethodConfig());
 				System.out.println(result);
 			}
+			else if (cmd.startsWith("loop_add"))
+			{
+				int n = scan.nextInt();
+				for (int i = 1; i <= n; i++)
+				{
+					int a = rand.nextInt(100);
+					int b = rand.nextInt(100);
+					long st = System.currentTimeMillis();
+					result = RpcExecutor.callMethod("add", new Object[]{a, b}, new MethodConfig());
+					System.out.println("==========>" + i + " " + result + " cost:" + (System.currentTimeMillis() - st));
+					ThreadUtils.threadSleep(10);
+				}
+			}
 		}
 		scan.close();
+		while(true)
+		{
+			ThreadUtils.threadSleep(10000);
+		}
+	}
+
+	@Test
+	public void testExecuteMultiThreadRpc()
+	{
+		Random rand = new Random(System.currentTimeMillis());
+		ResourceLeakDetector.setLevel(Level.PARANOID);
+        GridConfiguration config = GridConfigFactory.configure(this.getClass().getResourceAsStream("/grid-config.xml"));
+		GridRuntime.initialize(config);
+		RpcExecutor.registerMethod("print", RemoteObject.class, new RemoteObject());
+		RpcExecutor.registerMethod("add", RemoteObject.class, new RemoteObject());
+		ThreadUtils.threadSleep(5000);
+		for (int i = 1; i <= 1000; i++)
+		{
+			int a = rand.nextInt(100);
+			int b = rand.nextInt(100);
+			long st = System.currentTimeMillis();
+			MethodResult result = RpcExecutor.callMethod("add", new Object[]{a, b}, new MethodConfig());
+			System.out.println("==========>" + i + " " + result + " cost:" + (System.currentTimeMillis() - st));
+			ThreadUtils.threadSleep(10);
+		}
 		while(true)
 		{
 			ThreadUtils.threadSleep(10000);

@@ -28,7 +28,7 @@ public class GridRpcTask extends GridTask<MethodResult>
     
     private TaskResultListener<MethodResult> listener;
     
-    private GridRpcJobFuture future = new GridRpcJobFuture();
+    private GridRpcJobFuture future = new GridRpcJobFuture(this);
     
     public GridRpcTask(MethodRequest request)
     {
@@ -77,18 +77,31 @@ public class GridRpcTask extends GridTask<MethodResult>
     {
     	MethodJob job = new MethodJob(getId(), request);
     	JobStatus status = new JobStatus(job, node);
+    	status.setStatusType(JobStatusType.DOING);
     	future.addJobStatus(status);
+    	GridRuntime.jobs().addNodeJob(node, job);
         GridMessage message = new GridMessage(job, GridMessage.MSG_RPC_REQUEST);
         boolean ret = node.sendSyncMessage(message);
-        if (ret)
-        	status.setStatusType(JobStatusType.DOING);
-        else
+        if (!ret)
+        {
         	future.removeJobStatus(job.getJobId());
+        	GridRuntime.jobs().removeNodeJob(node.getId(), job.getJobId());
+        }
     }
     
     public void replyJob(MethodJobReply reply)
     {
     	future.replyStatus(reply);
     }
+
+	@Override
+	public String toSimpleString()
+	{
+		StringBuilder buf = new StringBuilder();
+		buf.append(getId()).append('\n');
+		buf.append(future.toSimpleString("    ")).append('\n');
+		return buf.toString();
+	}
+    
     
 }

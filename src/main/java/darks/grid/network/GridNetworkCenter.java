@@ -7,12 +7,13 @@ import java.net.SocketAddress;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import darks.grid.GridManager;
 import darks.grid.GridRuntime;
 import darks.grid.beans.meta.JoinMeta;
 import darks.grid.config.GridConfiguration;
 import darks.grid.utils.ThreadUtils;
 
-public class GridNetworkCenter
+public class GridNetworkCenter implements GridManager
 {
 	
 	private GridMessageServer messageServer;
@@ -28,6 +29,7 @@ public class GridNetworkCenter
 		
 	}
 	
+	@Override
 	public boolean initialize(GridConfiguration config)
 	{
 		messageServer = GridNetworkBuilder.buildMessageServer(config);
@@ -37,7 +39,8 @@ public class GridNetworkCenter
 		GridRuntime.nodes().addLocalNode(GridSessionFactory.getLocalSession(messageServer.getChannel()));
 		return true;
 	}
-	
+
+	@Override
 	public void destroy()
 	{
 		messageServer.destroy();

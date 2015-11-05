@@ -2,6 +2,7 @@ package darks.grid.executor.task;
 
 import java.util.concurrent.Callable;
 
+import darks.grid.beans.meta.GridJob;
 import darks.grid.utils.UUIDUtils;
 
 public abstract class GridTask<V> implements Callable<V>
@@ -30,6 +31,11 @@ public abstract class GridTask<V> implements Callable<V>
     }
 
     protected abstract V execute();
+    
+    protected boolean failRedo(GridJob job)
+	{
+		return true;
+	}
 
     public String getId()
     {
@@ -39,6 +45,11 @@ public abstract class GridTask<V> implements Callable<V>
     public TaskType getTaskType()
     {
         return taskType;
+    }
+    
+    public String toSimpleString()
+    {
+    	return id;
     }
     
 }

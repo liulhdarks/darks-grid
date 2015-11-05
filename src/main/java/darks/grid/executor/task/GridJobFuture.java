@@ -7,7 +7,8 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,11 +25,17 @@ public class GridJobFuture<V> extends GridFuture<V>
 	
     protected Map<String, JobStatus> statusMap = new ConcurrentHashMap<>();
     
-    private Lock lock = new ReentrantLock();
+    private ReadWriteLock wrlock = new ReentrantReadWriteLock();
+    
+    private Lock rlock = wrlock.readLock();
+    
+    private Lock wlock = wrlock.writeLock();
+    
+    private GridTask<?> task;
 
-    public GridJobFuture()
+    public GridJobFuture(GridTask<?> task)
     {
-    	
+    	this.task = task;
     }
     
     public void addJobStatus(JobStatus status)
@@ -44,7 +51,7 @@ public class GridJobFuture<V> extends GridFuture<V>
     
     public void replyStatus(MethodJobReply reply)
     {
-    	lock.lock();
+    	wlock.lock();
     	try
 		{
     		String jobId = reply.getJobId();
@@ -66,7 +73,7 @@ public class GridJobFuture<V> extends GridFuture<V>
 		}
 		finally
 		{
-			lock.unlock();
+			wlock.unlock();
 		}
     }
     
@@ -74,7 +81,7 @@ public class GridJobFuture<V> extends GridFuture<V>
 	public boolean isSuccess()
 	{
 		boolean success = true;
-		lock.lock();
+		rlock.lock();
 		try
 		{
 			for (Entry<String, JobStatus> entry : statusMap.entrySet())
@@ -84,7 +91,7 @@ public class GridJobFuture<V> extends GridFuture<V>
 		}
 		finally
 		{
-			lock.unlock();
+			rlock.unlock();
 		}
 		return success;
 	}
@@ -107,15 +114,27 @@ public class GridJobFuture<V> extends GridFuture<V>
 	{
 		long maxTime = timeout > 0 ? unit.toMillis(timeout) : 0;
 		long st = System.currentTimeMillis();
+		List<JobStatus> statuses = new ArrayList<>(statusMap.size());
 		for (;;)
 		{
 			int finishedCount = 0;
-			for (Entry<String, JobStatus> entry : statusMap.entrySet())
+			statuses.clear();
+			statuses.addAll(statusMap.values());
+			for (JobStatus status : statuses)
 			{
-				lock.lock();
+				if (!status.getNode().isAlive())
+				{
+					log.info("Remove job " + status.getJob().getJobId() + ". failed in node " + status.getNode().getId());
+					statusMap.remove(status.getJob().getJobId());
+					if (status.getJob().isFailRedo())
+					{
+						task.failRedo(status.getJob());
+					}
+					continue;
+				}
+				rlock.lock();
 				try
 				{
-					JobStatus status = entry.getValue();
 					if (status.getStatusType() == JobStatusType.SUCCESS
 							|| status.getStatusType() == JobStatusType.FAIL)
 					{
@@ -124,7 +143,7 @@ public class GridJobFuture<V> extends GridFuture<V>
 				}
 				finally
 				{
-					lock.unlock();
+					rlock.unlock();
 				}
 			}
 			if (finishedCount == statusMap.size())
@@ -147,6 +166,25 @@ public class GridJobFuture<V> extends GridFuture<V>
 			result.add((V) entry.getValue().getResult());
 		}
 		return result;
+	}
+	
+	public String toSimpleString(String linePrefix)
+	{
+		StringBuilder buf = new StringBuilder();
+		for (JobStatus status : statusMap.values())
+		{
+			rlock.lock();
+			try
+			{
+				buf.append(linePrefix).append(status.getJob().getJobId()).append(' ')
+					.append(status.getStatusType()).append(' ').append(status.getResult()).append(" node:").append(status.getNode().getId()).append('\n');
+			}
+			finally
+			{
+				rlock.unlock();
+			}
+		}
+		return buf.toString();
 	}
 
 }

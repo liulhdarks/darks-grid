@@ -29,6 +29,8 @@ public class GridNode implements Serializable
 	
 	private AtomicReference<MachineInfo> machineInfo = new AtomicReference<>();
 	
+	private volatile boolean quit = false;
+	
 	public GridNode()
 	{
 		heartAliveTime = new AtomicLong(System.currentTimeMillis());
@@ -57,7 +59,7 @@ public class GridNode implements Serializable
 	
 	public boolean isAlive()
 	{
-		if (!session.isActive())
+		if (!session.isActive() || quit)
 			return false;
 		if (nodeType == GridNodeType.TYPE_REMOTE)
 		{
@@ -145,8 +147,18 @@ public class GridNode implements Serializable
     {
     	this.machineInfo.getAndSet(machineInfo);
     }
+    
+    public boolean isQuit()
+	{
+		return quit;
+	}
 
-    public String toSimpleString()
+	public void setQuit(boolean quit)
+	{
+		this.quit = quit;
+	}
+
+	public String toSimpleString()
 	{
 		return StringUtils.stringBuffer(id, 
 				"  [", GridNodeType.valueOf(nodeType),']',

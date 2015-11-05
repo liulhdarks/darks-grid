@@ -10,10 +10,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import darks.grid.GridManager;
 import darks.grid.beans.GridEvent;
 import darks.grid.config.GridConfiguration;
 
-public class GridEventsManager
+public class GridEventsManager implements GridManager
 {
 	
 	private static final Logger log = LoggerFactory.getLogger(GridEventsManager.class);
@@ -29,6 +30,7 @@ public class GridEventsManager
 		
 	}
 	
+	@Override
 	public boolean initialize(GridConfiguration config)
 	{
 		log.info("Start to initialize events manager.");
@@ -43,7 +45,8 @@ public class GridEventsManager
 		}
 		return true;
 	}
-	
+
+	@Override
 	public void destroy()
 	{
 		for (EventsConsumer consumer : concumers)

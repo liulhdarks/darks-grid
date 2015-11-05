@@ -24,10 +24,6 @@ public class NodesHeartAlive extends GridComponent
 	private static final Logger log = LoggerFactory.getLogger(NodesHeartAlive.class);
     
     private int expire = 600000;
-    
-    private int printNodesInterval = 180000;
-	
-    private long st = System.currentTimeMillis();
 	
 	public NodesHeartAlive()
 	{
@@ -56,11 +52,6 @@ public class NodesHeartAlive extends GridComponent
 			{
 				checkAlive(node);
 			}
-		}
-		if (System.currentTimeMillis() - st > printNodesInterval)
-		{
-			log.info(GridRuntime.nodes().getNodesInfo());
-			st = System.currentTimeMillis();
 		}
 	}
 	
@@ -92,16 +83,6 @@ public class NodesHeartAlive extends GridComponent
 	public void setExpire(int expire)
 	{
 		this.expire = expire;
-	}
-
-	public int getPrintNodesInterval()
-	{
-		return printNodesInterval;
-	}
-
-	public void setPrintNodesInterval(int printNodesInterval)
-	{
-		this.printNodesInterval = printNodesInterval;
 	}
 	
 }

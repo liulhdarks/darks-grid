@@ -3,7 +3,7 @@
 
 	<!-- <component name="asd" class="asd"/> -->
 
-	<cluster cluster_name="TEST"/>
+	<cluster cluster_name="TEST" print_nodes_interval="60000"/>
 
 	<network 
 		bind_host=""
@@ -20,7 +20,7 @@
 		nodes_expire_time="600000"
 		/>
 
-	<alive interval="300000" print_nodes_interval="60000"/>
+	<alive interval="300000"/>
 	
 	<TCPPING hosts="localhost:[7800-7803]" interval="300000"/>
 </grid>
