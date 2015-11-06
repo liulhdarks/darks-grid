@@ -13,7 +13,7 @@ public class MethodJob extends GridJob
 	 */
 	private static final long serialVersionUID = -1781136302155242623L;
 
-	private String methodName;
+	private String uniqueName;
 	
 	private Object[] params;
 	
@@ -27,20 +27,21 @@ public class MethodJob extends GridJob
 	public MethodJob(String taskId, MethodRequest request)
 	{
 		super(taskId);
-		this.methodName = request.getMethodName();
+		this.uniqueName = request.getUniqueName();
 		this.params = request.getParams();
 		this.methodConfig = request.getMethodConfig();
 		setFailRedo(false);
 	}
 
-	public String getMethodName()
+	
+	public String getUniqueName()
 	{
-		return methodName;
+		return uniqueName;
 	}
 
-	public void setMethodName(String methodName)
+	public void setUniqueName(String uniqueName)
 	{
-		this.methodName = methodName;
+		this.uniqueName = uniqueName;
 	}
 
 	public Object[] getParams()
@@ -66,10 +67,10 @@ public class MethodJob extends GridJob
 	@Override
 	public String toString()
 	{
-		return "MethodJob [methodName=" + methodName + ", params=" + Arrays.toString(params)
-				+ ", methodConfig=" + methodConfig + ", getTaskId()=" + getTaskId()
-				+ ", getJobId()=" + getJobId() + "]";
+		return "MethodJob [uniqueName=" + uniqueName + ", params=" + Arrays.toString(params)
+				+ ", methodConfig=" + methodConfig + "]";
 	}
-	
+
+
 	
 }

@@ -13,7 +13,7 @@ public class MethodRequest implements Serializable
 	 */
 	private static final long serialVersionUID = -8107745899221499625L;
 
-	private String methodName;
+	private String uniqueName;
 	
 	private Object[] params;
 	
@@ -26,26 +26,31 @@ public class MethodRequest implements Serializable
 
 
 
-    public MethodRequest(String methodName, Object[] params, MethodConfig methodConfig)
+    public MethodRequest(String uniqueName, Object[] params, MethodConfig methodConfig)
     {
         super();
-        this.methodName = methodName;
+        this.uniqueName = uniqueName;
         this.params = params;
         this.methodConfig = methodConfig;
     }
 
-
-    public String getMethodName()
+    
+    
+    public String getUniqueName()
 	{
-		return methodName;
+		return uniqueName;
 	}
 
-	public void setMethodName(String methodName)
+
+
+	public void setUniqueName(String uniqueName)
 	{
-		this.methodName = methodName;
+		this.uniqueName = uniqueName;
 	}
 
-    public Object[] getParams()
+
+
+	public Object[] getParams()
     {
         return params;
     }
@@ -71,11 +76,12 @@ public class MethodRequest implements Serializable
 
 
 
-    @Override
-    public String toString()
-    {
-        return "MethodRequest [methodName=" + methodName + ", params=" + Arrays.toString(params) + ", methodConfig="
-            + methodConfig + "]";
-    }
+	@Override
+	public String toString()
+	{
+		return "MethodRequest [uniqueName=" + uniqueName + ", params=" + Arrays.toString(params)
+				+ ", methodConfig=" + methodConfig + "]";
+	}
+
 
 }

@@ -3,12 +3,17 @@ package darks.grid.spring;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
-public class GridRpcFactoryBean<T> implements FactoryBean<T>, InitializingBean
+import darks.grid.RpcReduceHandler;
+import darks.grid.utils.ReflectUtils;
+
+public class GridRpcSpringConsumerBean<T> implements FactoryBean<T>, InitializingBean
 {
 
     private Class<T> target;
     
     private String proxy = "jdk";
+    
+    private Class<? extends RpcReduceHandler> reducer;
     
     @Override
     public void afterPropertiesSet()
@@ -23,7 +28,10 @@ public class GridRpcFactoryBean<T> implements FactoryBean<T>, InitializingBean
     {
         if ("jdk".equals(proxy))
         {
-            ProxyBuilder builder = new JdkProxyBuilder();
+        	RpcReduceHandler handler = null;
+        	if (reducer != null)
+        		handler = ReflectUtils.newInstance(reducer);
+            ProxyBuilder builder = new JdkProxyBuilder(handler);
             return (T)builder.build(target);
         }
         return null;
@@ -38,7 +46,7 @@ public class GridRpcFactoryBean<T> implements FactoryBean<T>, InitializingBean
     @Override
     public boolean isSingleton()
     {
-        return false;
+        return true;
     }
 
     public Class<T> getTarget()
@@ -61,5 +69,14 @@ public class GridRpcFactoryBean<T> implements FactoryBean<T>, InitializingBean
         this.proxy = proxy;
     }
 
-    
+	public Class<? extends RpcReduceHandler> getReducer()
+	{
+		return reducer;
+	}
+
+	public void setReducer(Class<? extends RpcReduceHandler> reducer)
+	{
+		this.reducer = reducer;
+	}
+
 }

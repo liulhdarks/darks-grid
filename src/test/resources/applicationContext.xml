@@ -8,8 +8,14 @@
 	http://www.springframework.org/schema/context/spring-context-3.2.xsd">
 	
 	
-	<bean id="rpcComputer" class="darks.grid.spring.GridRpcFactoryBean">
+	<bean id="rpcComputer" class="darks.grid.spring.GridRpcSpringConsumerBean">
 		<property name="target" value="darks.grid.test.spring.RpcComputer"/>
+	</bean>
+	
+	<bean id="rpcComputerImpl" class="darks.grid.test.spring.RpcComputerImpl"/>
+	<bean id="rpcComputerService" class="darks.grid.spring.GridRpcSpringProviderBean">
+		<property name="serviceInterface" value="darks.grid.test.spring.RpcComputer"/>
+		<property name="target" ref="rpcComputerImpl"/>
 	</bean>
 
 </beans>

@@ -30,12 +30,17 @@ public class RpcExecutor extends GridExecutor
 	
 	static Map<String, GridRpcBean> rpcMap = new ConcurrentHashMap<>();
 
-	public static boolean registerMethod(String methodName, Class<?> targetClass, Object targetObject)
+	public static boolean registerMethod(String uniqueName, Class<?> targetClass, Object targetObject)
+	{
+		return registerMethod(uniqueName, uniqueName, targetClass, targetObject);
+	}
+	
+	public static boolean registerMethod(String uniqueName, String methodName, Class<?> targetClass, Object targetObject)
 	{
 		if (!rpcMap.containsKey(methodName))
 		{
 			GridRpcBean bean = new GridRpcBean(methodName, targetClass, targetObject);
-			rpcMap.put(methodName, bean);
+			rpcMap.put(uniqueName, bean);
 			return true;
 		}
 		else
@@ -44,12 +49,12 @@ public class RpcExecutor extends GridExecutor
 		}
 	}
 	
-	public static MethodResult callMethod(String methodName, Object[] params, MethodConfig config)
+	public static MethodResult callMethod(String uniqueName, Object[] params, MethodConfig config)
 	{
 	    if (config == null)
 	        config = new MethodConfig();
 	    config.fixType();
-	    MethodRequest request = new MethodRequest(methodName, params, config);
+	    MethodRequest request = new MethodRequest(uniqueName, params, config);
 	    GridRpcTask task = new GridRpcTask(request);
 	    FutureTask<MethodResult> future = GridRuntime.tasks().executeTask(task);
 	    if (config.getResponseType() == ResponseType.NONE)
@@ -64,17 +69,17 @@ public class RpcExecutor extends GridExecutor
         catch (Exception e)
         {
             log.error(e.getMessage(), e);
-            return MethodResult.fail("Fail to call method " + methodName + ". Cause " + e.getMessage());
+            return MethodResult.fail("Fail to call method " + uniqueName + ". Cause " + e.getMessage());
         }
 	}
     
-    public static void asyncCallMethod(String methodName, Object[] params, MethodConfig config, 
+    public static void asyncCallMethod(String uniqueName, Object[] params, MethodConfig config, 
                         TaskResultListener<MethodResult> listenr)
     {
         if (config == null)
             config = new MethodConfig();
         config.fixType();
-        MethodRequest request = new MethodRequest(methodName, params, config);
+        MethodRequest request = new MethodRequest(uniqueName, params, config);
         GridRpcTask task = new GridRpcTask(request, listenr);
         ThreadUtils.submitTask(task);
     }
@@ -82,10 +87,10 @@ public class RpcExecutor extends GridExecutor
 	public static MethodJobReply executeMethod(MethodJob job)
 	{
 		MethodJobReply rep = new MethodJobReply(job);
-		String methodName = job.getMethodName();
-		GridRpcBean bean = rpcMap.get(methodName);
+		String uniqueName = job.getUniqueName();
+		GridRpcBean bean = rpcMap.get(uniqueName);
 		if (bean == null)
-			return rep.failed(MethodJobReply.ERR_NO_METHOD, "Cannot find method " + methodName);
+			return rep.failed(MethodJobReply.ERR_NO_METHOD, "Cannot find method " + uniqueName);
 		Object obj = null;
 		obj = bean.getTargetObject();
 		if (obj == null)
@@ -102,10 +107,10 @@ public class RpcExecutor extends GridExecutor
 		try
         {
 	        Class<?>[] paramsTypes = ReflectUtils.getObjectClasses(job.getParams());
-	        Method method = ReflectUtils.getDeepMethod(obj.getClass(), methodName, paramsTypes);
+	        Method method = ReflectUtils.getDeepMethod(obj.getClass(), bean.getMethodName(), paramsTypes);
 	        if (method == null)
                 return rep.failed(MethodJobReply.ERR_GET_CLASS_METHOD, 
-                    "Fail to get deep method " + methodName + " from " + obj.getClass() + " [" + paramsTypes + "]");
+                    "Fail to get deep method " + bean.getMethodName() + " from " + obj.getClass() + " [" + paramsTypes + "]");
 	        if (!method.isAccessible())
 	        	method.setAccessible(true);
 	        Object retObj = ReflectUtils.invokeMethod(obj, method, job.getParams());
@@ -116,7 +121,7 @@ public class RpcExecutor extends GridExecutor
         {
             log.error(e.getMessage(), e);
             return rep.failed(MethodJobReply.ERR_INVOKE_EXCEPTION, 
-                "Fail to invoke method " + methodName + ". Cause " + e.getMessage());
+                "Fail to invoke method " + uniqueName + ". Cause " + e.getMessage());
         }
 	}
 }
