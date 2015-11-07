@@ -7,12 +7,14 @@ import java.util.concurrent.FutureTask;
 
 import darks.grid.GridManager;
 import darks.grid.config.GridConfiguration;
+import darks.grid.executor.task.mapred.MapReduceExecutor;
+import darks.grid.executor.task.mapred.MapReduceTask;
 import darks.grid.utils.ThreadUtils;
 
 public class GridTaskManager implements GridManager
 {
 
-	Map<String, GridTask<?>> doingTasksMap = new ConcurrentHashMap<>();
+	Map<String, TaskExecutor<?, ?>> doingTasksMap = new ConcurrentHashMap<>();
 
 	public GridTaskManager()
 	{
@@ -31,10 +33,11 @@ public class GridTaskManager implements GridManager
 
 	}
 
-	public <V> FutureTask<V> executeTask(GridTask<V> task)
+	public <T, R> FutureTask<R> executeMapReduceTask(MapReduceTask<T, R> task, T args)
 	{
-		doingTasksMap.put(task.getId(), task);
-		return (FutureTask<V>) ThreadUtils.submitTask(task);
+	    TaskExecutor<T, R> executor = new MapReduceExecutor<T, R>(task, args);
+		doingTasksMap.put(task.getId(), executor);
+		return (FutureTask<R>) ThreadUtils.submitTask(executor);
 	}
 
 	public void completeTask(String taskId)
@@ -42,7 +45,7 @@ public class GridTaskManager implements GridManager
 		doingTasksMap.remove(taskId);
 	}
 	
-	public GridTask<?> getTask(String taskId)
+	public TaskExecutor<?, ?> getTaskExecutor(String taskId)
 	{
 		return doingTasksMap.get(taskId);
 	}
@@ -50,7 +53,7 @@ public class GridTaskManager implements GridManager
 	public String toSimgleString()
 	{
 		StringBuilder buf = new StringBuilder();
-		for (Entry<String, GridTask<?>> entry : doingTasksMap.entrySet())
+		for (Entry<String, TaskExecutor<?, ?>> entry : doingTasksMap.entrySet())
 		{
 			buf.append(entry.getValue().toSimpleString().trim()).append('\n');
 		}

@@ -7,7 +7,7 @@
 	
 	<task jobs_exec_count="30"/>
 	
-	<log interval="60000" 
+	<log interval="120000" 
 		nodes_info="true" 
 	    task_info="true" 
 	    exec_job_info="true" 
@@ -28,7 +28,7 @@
 		nodes_expire_time="600000"
 		/>
 
-	<alive interval="300000"/>
+	<alive interval="60000"/>
 	
-	<TCPPING hosts="localhost:[7800-7810]" interval="300000"/>
+	<TCPPING hosts="localhost:[7800-7803]" interval="300000"/>
 </grid>

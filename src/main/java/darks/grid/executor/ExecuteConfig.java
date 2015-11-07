@@ -1,10 +1,10 @@
-package darks.grid.config;
+package darks.grid.executor;
 
 import java.io.Serializable;
 
 import darks.grid.RpcReduceHandler;
 
-public class MethodConfig implements Serializable
+public class ExecuteConfig implements Serializable
 {
     
     private static final long serialVersionUID = -7677264908208421584L;
@@ -27,7 +27,7 @@ public class MethodConfig implements Serializable
     
     private transient RpcReduceHandler reducerHandler;
     
-    public MethodConfig()
+    public ExecuteConfig()
     {
         
     }

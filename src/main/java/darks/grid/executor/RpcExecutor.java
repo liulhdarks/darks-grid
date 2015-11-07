@@ -12,17 +12,15 @@ import org.slf4j.LoggerFactory;
 
 import darks.grid.GridException;
 import darks.grid.GridRuntime;
-import darks.grid.beans.GridRpcBean;
+import darks.grid.beans.GridRpcMethod;
 import darks.grid.beans.MethodResult;
-import darks.grid.config.MethodConfig;
-import darks.grid.config.MethodConfig.ResponseType;
-import darks.grid.executor.task.GridRpcTask;
+import darks.grid.executor.ExecuteConfig.ResponseType;
+import darks.grid.executor.task.GridJobReply;
 import darks.grid.executor.task.TaskResultListener;
-import darks.grid.executor.task.rpc.MethodJob;
-import darks.grid.executor.task.rpc.MethodJobReply;
-import darks.grid.executor.task.rpc.MethodRequest;
+import darks.grid.executor.task.rpc.GridRpcJob;
+import darks.grid.executor.task.rpc.GridRpcTask;
+import darks.grid.executor.task.rpc.RpcRequest;
 import darks.grid.utils.ReflectUtils;
-import darks.grid.utils.ThreadUtils;
 
 
 public class RpcExecutor extends GridExecutor
@@ -30,7 +28,7 @@ public class RpcExecutor extends GridExecutor
     
     private static final Logger log = LoggerFactory.getLogger(RpcExecutor.class);
 	
-	static Map<String, GridRpcBean> rpcMap = new ConcurrentHashMap<>();
+	static Map<String, GridRpcMethod> rpcMap = new ConcurrentHashMap<>();
 
     public static boolean registerMethod(Method method, Class<?> targetClass, Object targetObject)
     {
@@ -63,7 +61,7 @@ public class RpcExecutor extends GridExecutor
 	{
 		if (!rpcMap.containsKey(uniqueName))
 		{
-			GridRpcBean bean = new GridRpcBean(methodName, targetClass, targetObject, method);
+			GridRpcMethod bean = new GridRpcMethod(methodName, targetClass, targetObject, method);
 			rpcMap.put(uniqueName, bean);
 			return true;
 		}
@@ -73,19 +71,19 @@ public class RpcExecutor extends GridExecutor
 		}
 	}
 
-    public static MethodResult callMethod(String uniqueName, Object[] params, MethodConfig config) {
+    public static MethodResult callMethod(String uniqueName, Object[] params, ExecuteConfig config) {
         Class<?>[] types = ReflectUtils.getObjectClasses(params);
         return callMethod(uniqueName, params, types, config);
     }
 
-    public static MethodResult callMethod(String uniqueName, Object[] params, Class<?>[] types, MethodConfig config)
+    public static MethodResult callMethod(String uniqueName, Object[] params, Class<?>[] types, ExecuteConfig config)
 	{
 	    if (config == null)
-	        config = new MethodConfig();
+	        config = new ExecuteConfig();
 	    config.fixType();
-	    MethodRequest request = new MethodRequest(uniqueName, params, types, config);
-	    GridRpcTask task = new GridRpcTask(request);
-	    FutureTask<MethodResult> future = GridRuntime.tasks().executeTask(task);
+	    RpcRequest request = new RpcRequest(uniqueName, params, types, config);
+	    GridRpcTask task = new GridRpcTask();
+	    FutureTask<MethodResult> future = GridRuntime.tasks().executeMapReduceTask(task, request);
 	    if (config.getResponseType() == ResponseType.NONE)
 	        return new MethodResult();
 	    try
@@ -102,43 +100,44 @@ public class RpcExecutor extends GridExecutor
         }
 	}
 
-    public static void asyncCallMethod(String uniqueName, Object[] params, MethodConfig config,
+    public static void asyncCallMethod(String uniqueName, Object[] params, ExecuteConfig config,
                                        TaskResultListener<MethodResult> listener)
     {
         Class<?>[] types = ReflectUtils.getObjectClasses(params);
         asyncCallMethod(uniqueName, params, types, config, listener);
     }
     
-    public static void asyncCallMethod(String uniqueName, Object[] params, Class<?>[] types, MethodConfig config,
+    public static void asyncCallMethod(String uniqueName, Object[] params, Class<?>[] types, ExecuteConfig config,
                         TaskResultListener<MethodResult> listener)
     {
         if (config == null)
-            config = new MethodConfig();
+            config = new ExecuteConfig();
         config.fixType();
-        MethodRequest request = new MethodRequest(uniqueName, params, types, config);
-        GridRpcTask task = new GridRpcTask(request, listener);
-        ThreadUtils.submitTask(task);
+        RpcRequest request = new RpcRequest(uniqueName, params, types, config);
+        GridRpcTask task = new GridRpcTask();
+        //TODO listener
+        GridRuntime.tasks().executeMapReduceTask(task, request);
     }
 	
-	public static MethodJobReply executeMethod(MethodJob job)
+	public static GridJobReply executeMethod(GridRpcJob job)
 	{
-		MethodJobReply rep = new MethodJobReply(job);
+		GridJobReply rep = new GridJobReply(job);
 		String uniqueName = job.getUniqueName();
-		GridRpcBean bean = rpcMap.get(uniqueName);
+		GridRpcMethod bean = rpcMap.get(uniqueName);
 		if (bean == null)
-			return rep.failed(MethodJobReply.ERR_NO_METHOD, "Cannot find method " + uniqueName);
+			return rep.failed(GridJobReply.ERR_NO_METHOD, "Cannot find method " + uniqueName);
 		Object obj = null;
 		obj = bean.getTargetObject();
 		if (obj == null)
 		{
 			if (bean.getTargetClass() == null)
 			{
-			    return rep.failed(MethodJobReply.ERR_INVALID_OBJANDCLASS, 
+			    return rep.failed(GridJobReply.ERR_INVALID_OBJANDCLASS, 
 			        "Invalid target object and class which is null.");
 			}
 			obj = ReflectUtils.newInstance(bean.getTargetClass());
 	        if (obj == null)
-	            return rep.failed(MethodJobReply.ERR_INSTANCE_CLASS_FAIL, "Fail to instance class " + bean.getTargetClass());
+	            return rep.failed(GridJobReply.ERR_INSTANCE_CLASS_FAIL, "Fail to instance class " + bean.getTargetClass());
 		}
 		try
         {
@@ -159,7 +158,7 @@ public class RpcExecutor extends GridExecutor
                 }
 		    }
 	        if (method == null)
-                return rep.failed(MethodJobReply.ERR_GET_CLASS_METHOD, 
+                return rep.failed(GridJobReply.ERR_GET_CLASS_METHOD, 
                     "Fail to get deep method " + bean.getMethodName() + " from " + obj.getClass() + " [" + Arrays.toString(job.getTypes()) + "]");
 	        if (!method.isAccessible())
 	        	method.setAccessible(true);
@@ -170,7 +169,7 @@ public class RpcExecutor extends GridExecutor
         catch (Exception e)
         {
             log.error(e.getMessage(), e);
-            return rep.failed(MethodJobReply.ERR_INVOKE_EXCEPTION, 
+            return rep.failed(GridJobReply.ERR_INVOKE_EXCEPTION, 
                 "Fail to invoke method " + uniqueName + ". Cause " + e.getMessage());
         }
 	}

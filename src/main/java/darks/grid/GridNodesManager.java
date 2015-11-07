@@ -2,6 +2,8 @@ package darks.grid;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -168,6 +170,18 @@ public class GridNodesManager implements GridManager
 	public String getNodeId(String sessionId)
 	{
 		return sessionIdMap.get(sessionId);
+	}
+	
+	public List<GridNode> getSnapshotNodes()
+	{
+	    List<GridNode> nodesList = new ArrayList<GridNode>(nodesMap.size());
+	    for (Entry<String, GridNode> entry : nodesMap.entrySet())
+	    {
+	        GridNode node = entry.getValue();
+	        if (node.isAlive())
+	            nodesList.add(node);
+	    }
+	    return nodesList;
 	}
 
 	public Map<String, GridNode> getNodesMap()

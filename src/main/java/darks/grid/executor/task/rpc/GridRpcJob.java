@@ -2,10 +2,10 @@ package darks.grid.executor.task.rpc;
 
 import java.util.Arrays;
 
-import darks.grid.beans.meta.GridJob;
-import darks.grid.config.MethodConfig;
+import darks.grid.executor.ExecuteConfig;
+import darks.grid.executor.job.GridJob;
 
-public class MethodJob extends GridJob
+public class GridRpcJob extends GridJob
 {
 
 	/**
@@ -19,20 +19,19 @@ public class MethodJob extends GridJob
 
     private Class<?>[] types;
 	
-	private MethodConfig methodConfig;
+	private ExecuteConfig config;
 	
-	public MethodJob()
+	public GridRpcJob()
 	{
 		setFailRedo(false);
 	}
 	
-	public MethodJob(String taskId, MethodRequest request)
+	public GridRpcJob(RpcRequest request)
 	{
-		super(taskId);
 		this.uniqueName = request.getUniqueName();
 		this.params = request.getParams();
         this.types = request.getTypes();
-		this.methodConfig = request.getMethodConfig();
+		this.config = request.getConfig();
 		setFailRedo(false);
 	}
 
@@ -56,16 +55,17 @@ public class MethodJob extends GridJob
 	{
 		this.params = params;
 	}
+	
 
-	public MethodConfig getMethodConfig()
-	{
-		return methodConfig;
-	}
+    public ExecuteConfig getConfig()
+    {
+        return config;
+    }
 
-	public void setMethodConfig(MethodConfig methodConfig)
-	{
-		this.methodConfig = methodConfig;
-	}
+    public void setConfig(ExecuteConfig config)
+    {
+        this.config = config;
+    }
 
     public Class<?>[] getTypes()
     {
@@ -78,12 +78,10 @@ public class MethodJob extends GridJob
     }
 
     @Override
-    public String toString() {
-        return "MethodJob{" +
-                "uniqueName='" + uniqueName + '\'' +
-                ", params=" + Arrays.toString(params) +
-                ", types=" + Arrays.toString(types) +
-                ", methodConfig=" + methodConfig +
-                '}';
+    public String toString()
+    {
+        return "GridRpcJob [uniqueName=" + uniqueName + ", params=" + Arrays.toString(params) + ", types="
+            + Arrays.toString(types) + ", config=" + config + "]";
     }
+    
 }

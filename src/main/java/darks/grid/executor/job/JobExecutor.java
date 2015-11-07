@@ -5,8 +5,6 @@ import org.slf4j.LoggerFactory;
 
 import darks.grid.GridRuntime;
 import darks.grid.beans.GridMessage;
-import darks.grid.beans.JobStatus.JobStatusType;
-import darks.grid.beans.meta.GridJob;
 import darks.grid.network.GridSession;
 
 public abstract class JobExecutor implements Runnable

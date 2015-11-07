@@ -3,14 +3,14 @@ package darks.grid.spring;
 import java.lang.reflect.Proxy;
 
 import darks.grid.RpcReduceHandler;
-import darks.grid.config.MethodConfig;
+import darks.grid.executor.ExecuteConfig;
 
 public class JdkProxyBuilder implements ProxyBuilder
 {
 	
-	private MethodConfig config;
+	private ExecuteConfig config;
 	
-	public JdkProxyBuilder(MethodConfig config)
+	public JdkProxyBuilder(ExecuteConfig config)
 	{
 		this.config = config;
 	}

@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import darks.grid.beans.MethodResult;
-import darks.grid.config.MethodConfig;
+import darks.grid.executor.ExecuteConfig;
 import darks.grid.executor.RpcExecutor;
 import darks.grid.utils.ReflectUtils;
 
@@ -18,9 +18,9 @@ public class ProxyRpcInvocationHandler implements InvocationHandler
 	private static final Logger log = LoggerFactory.getLogger(ProxyRpcInvocationHandler.class);
 	
 
-	private MethodConfig config;
+	private ExecuteConfig config;
 	
-	public ProxyRpcInvocationHandler(MethodConfig config)
+	public ProxyRpcInvocationHandler(ExecuteConfig config)
 	{
 		this.config = config;
 	} 

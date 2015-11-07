@@ -1,8 +1,9 @@
-package darks.grid.executor.task.rpc;
+package darks.grid.executor.task;
 
 import darks.grid.beans.meta.BaseMeta;
+import darks.grid.executor.task.rpc.GridRpcJob;
 
-public class MethodJobReply extends BaseMeta
+public class GridJobReply extends BaseMeta
 {
 	
 	private static final long serialVersionUID = 4108563313452408686L;
@@ -29,18 +30,18 @@ public class MethodJobReply extends BaseMeta
 	
 	private int errorCode;
 	
-	public MethodJobReply()
+	public GridJobReply()
 	{
 		
 	}
 	
-	public MethodJobReply(MethodJob job)
+	public GridJobReply(GridRpcJob job)
 	{
 		this.taskId = job.getTaskId();
 		this.jobId = job.getJobId();
 	}
 
-	public MethodJobReply(Object result)
+	public GridJobReply(Object result)
 	{
 		this.result = result;
 	}
@@ -85,13 +86,13 @@ public class MethodJobReply extends BaseMeta
         this.errorCode = errorCode;
     }
 
-    public MethodJobReply failed()
+    public GridJobReply failed()
 	{
 		success = false;
 		return this;
 	}
 	
-	public MethodJobReply failed(int errorCode, String errorMessage)
+	public GridJobReply failed(int errorCode, String errorMessage)
 	{
 	    this.errorCode = errorCode;
 		this.errorMessage = errorMessage;

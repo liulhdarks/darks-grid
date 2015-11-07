@@ -12,7 +12,7 @@ import darks.grid.GridRuntime;
 import darks.grid.beans.MethodResult;
 import darks.grid.config.GridConfigFactory;
 import darks.grid.config.GridConfiguration;
-import darks.grid.config.MethodConfig;
+import darks.grid.executor.ExecuteConfig;
 import darks.grid.executor.RpcExecutor;
 import darks.grid.utils.MachineUtils;
 import darks.grid.utils.ThreadUtils;
@@ -52,14 +52,14 @@ public class RpcTest
 			MethodResult result = null;
 			if ("print".equals(cmd))
 			{
-				result = RpcExecutor.callMethod("print", null, new MethodConfig());
+				result = RpcExecutor.callMethod("print", null, new ExecuteConfig());
 				System.out.println(result);
 			}
 			else if (cmd.startsWith("add"))
 			{
 				int a = scan.nextInt();
 				int b = scan.nextInt();
-				result = RpcExecutor.callMethod("add", new Object[]{a, b}, new MethodConfig());
+				result = RpcExecutor.callMethod("add", new Object[]{a, b}, new ExecuteConfig());
 				System.out.println(result);
 			}
 			else if (cmd.startsWith("loop_add"))
@@ -70,7 +70,7 @@ public class RpcTest
 					int a = rand.nextInt(100);
 					int b = rand.nextInt(100);
 					long st = System.currentTimeMillis();
-					result = RpcExecutor.callMethod("add", new Object[]{a, b}, new MethodConfig());
+					result = RpcExecutor.callMethod("add", new Object[]{a, b}, new ExecuteConfig());
 					System.out.println("==========>" + i + " " + result + " cost:" + (System.currentTimeMillis() - st));
 					ThreadUtils.threadSleep(10);
 				}
@@ -98,7 +98,7 @@ public class RpcTest
 			int a = rand.nextInt(100);
 			int b = rand.nextInt(100);
 			long st = System.currentTimeMillis();
-			MethodResult result = RpcExecutor.callMethod("add", new Object[]{a, b}, new MethodConfig());
+			MethodResult result = RpcExecutor.callMethod("add", new Object[]{a, b}, new ExecuteConfig());
 			System.out.println("==========>" + i + " " + result + " cost:" + (System.currentTimeMillis() - st));
 			ThreadUtils.threadSleep(10);
 		}

@@ -19,10 +19,10 @@ public class GridMessage implements Serializable, Cloneable, ReferenceCounted
 	public static final int MSG_HEART_ALIVE = 1003;
 	
 	public static final int MSG_HEART_ALIVE_REPLY = 1004;
-	
-	public static final int MSG_RPC_REQUEST = 2001;
-	
-	public static final int MSG_RPC_RESPONSE = 2002;
+    
+    public static final int MSG_MR_REQUEST = 2001;
+    
+    public static final int MSG_MR_RESPONSE = 2002;
 	
 	private String id;
 	

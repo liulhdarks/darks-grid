@@ -3,7 +3,7 @@ package darks.grid.beans;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 
-public class GridRpcBean implements Serializable
+public class GridRpcMethod implements Serializable
 {
 
 	/**
@@ -19,12 +19,12 @@ public class GridRpcBean implements Serializable
 	
 	Method method;
 	
-	public GridRpcBean()
+	public GridRpcMethod()
 	{
 		
 	}
 
-	public GridRpcBean(String methodName, Class<?> targetClass, Object targetObject, Method method)
+	public GridRpcMethod(String methodName, Class<?> targetClass, Object targetObject, Method method)
 	{
 		super();
 		this.methodName = methodName;
@@ -102,7 +102,7 @@ public class GridRpcBean implements Serializable
             return false;
         if (getClass() != obj.getClass())
             return false;
-        GridRpcBean other = (GridRpcBean)obj;
+        GridRpcMethod other = (GridRpcMethod)obj;
         if (method == null)
         {
             if (other.method != null)

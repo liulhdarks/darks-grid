@@ -4,9 +4,9 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
 import darks.grid.RpcReduceHandler;
-import darks.grid.config.MethodConfig;
-import darks.grid.config.MethodConfig.CallType;
-import darks.grid.config.MethodConfig.ResponseType;
+import darks.grid.executor.ExecuteConfig;
+import darks.grid.executor.ExecuteConfig.CallType;
+import darks.grid.executor.ExecuteConfig.ResponseType;
 import darks.grid.utils.ReflectUtils;
 
 public class GridRpcSpringConsumerBean<T> implements FactoryBean<T>, InitializingBean
@@ -18,7 +18,7 @@ public class GridRpcSpringConsumerBean<T> implements FactoryBean<T>, Initializin
     
     private Class<? extends RpcReduceHandler> reducer;
     
-    private MethodConfig config = new MethodConfig();
+    private ExecuteConfig config = new ExecuteConfig();
     
     @Override
     public void afterPropertiesSet()

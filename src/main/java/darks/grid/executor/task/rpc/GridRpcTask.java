@@ -1,0 +1,64 @@
+package darks.grid.executor.task.rpc;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import darks.grid.beans.MethodResult;
+import darks.grid.executor.ExecuteConfig;
+import darks.grid.executor.ExecuteConfig.CallType;
+import darks.grid.executor.job.GridJob;
+import darks.grid.executor.job.JobResult;
+import darks.grid.executor.task.mapred.MapReduceTask;
+
+public class GridRpcTask extends MapReduceTask<RpcRequest, MethodResult>
+{
+     
+    public GridRpcTask()
+    {
+        super(TaskType.RPC);
+    }
+
+    @Override
+    public Collection<? extends GridJob> map(int nodeSize, RpcRequest request)
+    {
+        ExecuteConfig config = request.getConfig();
+        int jobCount = nodeSize;
+        if (config.getCallType() == CallType.SINGLE)
+            jobCount = 1;
+        List<GridRpcJob> jobs = new ArrayList<GridRpcJob>(jobCount);
+        for (int i = 0; i < jobCount; i++)
+        {
+            GridRpcJob job = new GridRpcJob(request);
+            jobs.add(job);
+        }
+        return jobs;
+    }
+
+    @Override
+    public MethodResult reduce(List<JobResult> results)
+    {
+        StringBuilder errorBuf = new StringBuilder();
+        MethodResult result = new MethodResult();
+        List<Object> objs = new ArrayList<>(results.size());
+        for (JobResult jobRet : results)
+        {
+            if (!jobRet.isSuccess())
+            {
+                errorBuf.append("Error ").append(jobRet.getErrorCode())
+                    .append(" on ").append(jobRet.getNode().getId()).append(" ")
+                    .append(jobRet.getErrorMessage()).append('\n');
+            }
+            else
+                objs.add(jobRet.getObject());
+        }
+        result.setResult(objs);
+        if (errorBuf.length() > 0)
+        {
+            result.setErrorMessage(errorBuf.toString());
+            result.setSuccess(false);
+        }
+        return result;
+    }
+    
+}

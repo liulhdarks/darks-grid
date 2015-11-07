@@ -10,7 +10,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import darks.grid.GridManager;
 import darks.grid.beans.GridNode;
-import darks.grid.beans.meta.GridJob;
 import darks.grid.config.GridConfiguration;
 
 public class GridJobManager implements GridManager
