@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import darks.grid.beans.GridEvent;
+import darks.grid.events.handler.ConnectionActiveHandler;
 import darks.grid.events.handler.NodeJoinHandler;
 import darks.grid.events.handler.NodeLeaveHandler;
 
@@ -29,6 +30,7 @@ public final class EventsHandlerFactory
 	
 	static
 	{
+        addHandler(GridEvent.CONNECT_ACTIVE, new ConnectionActiveHandler());
 		addHandler(GridEvent.NODE_JOIN, new NodeJoinHandler());
 		addHandler(GridEvent.NODE_LEAVE, new NodeLeaveHandler());
 	}

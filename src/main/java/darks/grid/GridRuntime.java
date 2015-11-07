@@ -1,5 +1,7 @@
 package darks.grid;
 
+import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +36,7 @@ public final class GridRuntime
 	
 	static GridEventsManager eventsManager;
 	
-	static Thread printThread = null;
+	static volatile boolean finishLoaded = false;
 	
 	private GridRuntime()
 	{
@@ -64,6 +66,24 @@ public final class GridRuntime
             log.error("Fail to initialize events manager.");
             return false;
         }
+        ret = localManager.initialize(config);
+        if (!ret)
+        {
+            log.error("Fail to initialize local message manager.");
+            return false;
+        }
+        ret = tasksManager.initialize(config);
+        if (!ret)
+        {
+            log.error("Fail to initialize tasks manager.");
+            return false;
+        }
+        ret = jobsManager.initialize(config);
+        if (!ret)
+        {
+            log.error("Fail to initialize jobs manager.");
+            return false;
+        }
 		ret = componentsManager.initialize(config);
         if (!ret)
         {
@@ -82,32 +102,13 @@ public final class GridRuntime
             log.error("Fail to initialize network.");
             return false;
         }
-        ret = localManager.initialize(config);
-        if (!ret)
-        {
-            log.error("Fail to initialize local message manager.");
-            return false;
-        }
         componentsManager.setupComponents();
-		ret = tasksManager.initialize(config);
-        if (!ret)
-        {
-            log.error("Fail to initialize tasks manager.");
-            return false;
-        }
-		ret = jobsManager.initialize(config);
-        if (!ret)
-        {
-            log.error("Fail to initialize jobs manager.");
-            return false;
-        }
-		return true;
+        finishLoaded = true;
+		return awaitReady();
 	}
 	
 	public static void destroy()
 	{
-		if (printThread != null)
-			printThread.interrupt();
 		jobsManager.destroy();
 		tasksManager.destroy();
 		componentsManager.destroy();
@@ -116,6 +117,41 @@ public final class GridRuntime
 		nodesManager.destroy();
 		eventsManager.destroy();
 		ThreadUtils.shutdownAll();
+	}
+	
+	public static boolean awaitReady()
+	{
+	    return awaitReady(0, TimeUnit.MILLISECONDS);
+	}
+    
+    public static boolean awaitReady(long timeout, TimeUnit unit)
+    {
+        long time = unit.toMillis(timeout);
+        long st = System.currentTimeMillis();
+        try
+        {
+            for (;;)
+            {
+                if (isReady())
+                    return true;
+                if (timeout > 0 && System.currentTimeMillis() - st > time)
+                    break;
+                Thread.sleep(100);
+            }
+        }
+        catch (Exception e)
+        {
+            log.error(e.getMessage(), e);
+        }
+        return false;
+    }
+	
+	public static boolean isReady()
+	{
+	    if (finishLoaded && context().isReady())
+	        return true;
+	    else
+	        return false;
 	}
 	
 	public static String getLocalId()

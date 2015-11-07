@@ -3,27 +3,23 @@ package darks.grid.spring;
 import java.lang.reflect.Proxy;
 
 import darks.grid.RpcReduceHandler;
+import darks.grid.config.MethodConfig;
 
 public class JdkProxyBuilder implements ProxyBuilder
 {
 	
-	private RpcReduceHandler reducer;
+	private MethodConfig config;
 	
-	public JdkProxyBuilder()
+	public JdkProxyBuilder(MethodConfig config)
 	{
-		
-	}
-	
-	public JdkProxyBuilder(RpcReduceHandler reducer)
-	{
-		this.reducer = reducer;
+		this.config = config;
 	}
     
     @Override
     public Object build(Class<?> interfaceClass)
     {
         return Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),   
-            new Class<?>[]{interfaceClass}, new ProxyRpcInvocationHandler(reducer)); 
+            new Class<?>[]{interfaceClass}, new ProxyRpcInvocationHandler(config)); 
     }
     
 }

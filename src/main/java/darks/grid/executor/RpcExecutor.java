@@ -1,6 +1,7 @@
 package darks.grid.executor;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.FutureTask;
@@ -9,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import darks.grid.GridException;
 import darks.grid.GridRuntime;
 import darks.grid.beans.GridRpcBean;
 import darks.grid.beans.MethodResult;
@@ -30,16 +32,38 @@ public class RpcExecutor extends GridExecutor
 	
 	static Map<String, GridRpcBean> rpcMap = new ConcurrentHashMap<>();
 
+    public static boolean registerMethod(Method method, Class<?> targetClass, Object targetObject)
+    {
+        String uniqueName = ReflectUtils.getMethodUniqueName(method);
+        return registerMethod(uniqueName, method.getName(), targetClass, targetObject, method);
+    }
+    
+    public static boolean registerMethod(String methodName, Class<?>[] types, Class<?> targetClass, Object targetObject)
+    {
+        Class<?> clazz = targetObject == null ? targetClass : targetObject.getClass();
+        Method method = ReflectUtils.getDeepMethod(clazz, methodName, types);
+        if (method == null)
+            throw new GridException("Cannot find method " + methodName + " " + Arrays.toString(types));
+        String uniqueName = ReflectUtils.getMethodUniqueName(method);
+        return registerMethod(uniqueName, methodName, targetClass, targetObject, method);
+    }
+
 	public static boolean registerMethod(String uniqueName, Class<?> targetClass, Object targetObject)
 	{
-		return registerMethod(uniqueName, uniqueName, targetClass, targetObject);
+		return registerMethod(uniqueName, uniqueName, targetClass, targetObject, null);
 	}
+    
+    public static boolean registerMethod(String uniqueName, String methodName, Class<?> targetClass, Object targetObject)
+    {
+        return registerMethod(uniqueName, methodName, targetClass, targetObject, null);
+    }
 	
-	public static boolean registerMethod(String uniqueName, String methodName, Class<?> targetClass, Object targetObject)
+	public static boolean registerMethod(String uniqueName, String methodName, Class<?> targetClass, 
+	            Object targetObject, Method method)
 	{
-		if (!rpcMap.containsKey(methodName))
+		if (!rpcMap.containsKey(uniqueName))
 		{
-			GridRpcBean bean = new GridRpcBean(methodName, targetClass, targetObject);
+			GridRpcBean bean = new GridRpcBean(methodName, targetClass, targetObject, method);
 			rpcMap.put(uniqueName, bean);
 			return true;
 		}
@@ -48,13 +72,18 @@ public class RpcExecutor extends GridExecutor
 			return false;
 		}
 	}
-	
-	public static MethodResult callMethod(String uniqueName, Object[] params, MethodConfig config)
+
+    public static MethodResult callMethod(String uniqueName, Object[] params, MethodConfig config) {
+        Class<?>[] types = ReflectUtils.getObjectClasses(params);
+        return callMethod(uniqueName, params, types, config);
+    }
+
+    public static MethodResult callMethod(String uniqueName, Object[] params, Class<?>[] types, MethodConfig config)
 	{
 	    if (config == null)
 	        config = new MethodConfig();
 	    config.fixType();
-	    MethodRequest request = new MethodRequest(uniqueName, params, config);
+	    MethodRequest request = new MethodRequest(uniqueName, params, types, config);
 	    GridRpcTask task = new GridRpcTask(request);
 	    FutureTask<MethodResult> future = GridRuntime.tasks().executeTask(task);
 	    if (config.getResponseType() == ResponseType.NONE)
@@ -72,15 +101,22 @@ public class RpcExecutor extends GridExecutor
             return MethodResult.fail("Fail to call method " + uniqueName + ". Cause " + e.getMessage());
         }
 	}
+
+    public static void asyncCallMethod(String uniqueName, Object[] params, MethodConfig config,
+                                       TaskResultListener<MethodResult> listener)
+    {
+        Class<?>[] types = ReflectUtils.getObjectClasses(params);
+        asyncCallMethod(uniqueName, params, types, config, listener);
+    }
     
-    public static void asyncCallMethod(String uniqueName, Object[] params, MethodConfig config, 
-                        TaskResultListener<MethodResult> listenr)
+    public static void asyncCallMethod(String uniqueName, Object[] params, Class<?>[] types, MethodConfig config,
+                        TaskResultListener<MethodResult> listener)
     {
         if (config == null)
             config = new MethodConfig();
         config.fixType();
-        MethodRequest request = new MethodRequest(uniqueName, params, config);
-        GridRpcTask task = new GridRpcTask(request, listenr);
+        MethodRequest request = new MethodRequest(uniqueName, params, types, config);
+        GridRpcTask task = new GridRpcTask(request, listener);
         ThreadUtils.submitTask(task);
     }
 	
@@ -106,11 +142,25 @@ public class RpcExecutor extends GridExecutor
 		}
 		try
         {
-	        Class<?>[] paramsTypes = ReflectUtils.getObjectClasses(job.getParams());
-	        Method method = ReflectUtils.getDeepMethod(obj.getClass(), bean.getMethodName(), paramsTypes);
+		    Method method = bean.getMethod();
+		    if (method == null)
+		    {
+		        synchronized (bean)
+                {
+		            method = bean.getMethod();
+		            if (method == null)
+		            {
+    	                Class<?>[] paramsTypes = job.getTypes();
+    	                if (paramsTypes == null)
+    	                    paramsTypes = ReflectUtils.getObjectClasses(job.getParams());
+    	                method = ReflectUtils.getDeepMethod(obj.getClass(), bean.getMethodName(), paramsTypes);
+    	                bean.setMethod(method);
+		            }
+                }
+		    }
 	        if (method == null)
                 return rep.failed(MethodJobReply.ERR_GET_CLASS_METHOD, 
-                    "Fail to get deep method " + bean.getMethodName() + " from " + obj.getClass() + " [" + paramsTypes + "]");
+                    "Fail to get deep method " + bean.getMethodName() + " from " + obj.getClass() + " [" + Arrays.toString(job.getTypes()) + "]");
 	        if (!method.isAccessible())
 	        	method.setAccessible(true);
 	        Object retObj = ReflectUtils.invokeMethod(obj, method, job.getParams());

@@ -47,7 +47,6 @@ public class GridNodesManager implements GridManager
 		addressMap.put(node.context().getServerAddress(), localNodeId);
 		sessionIdMap.put(session.getId(), localNodeId);
 		GridRuntime.events().publish(GridEvent.NODE_JOIN, node);
-		log.info("Join local node " + node.toSimpleString());
 	}
 	
 	public synchronized void addRemoteNode(String nodeId, GridSession session, GridContext context)
@@ -74,7 +73,6 @@ public class GridNodesManager implements GridManager
 		addressMap.put(node.context().getServerAddress(), nodeId);
 		sessionIdMap.put(session.getId(), nodeId);
 		GridRuntime.events().publish(GridEvent.NODE_JOIN, node);
-		log.info("Join remote node " + node.toSimpleString());
 	}
 	
 	public GridNode getLocalNode()

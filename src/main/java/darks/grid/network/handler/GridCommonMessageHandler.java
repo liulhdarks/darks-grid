@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import darks.grid.GridRuntime;
+import darks.grid.beans.GridEvent;
 import darks.grid.beans.GridMessage;
 import darks.grid.beans.meta.JoinMeta;
 import darks.grid.network.GridSessionFactory;
@@ -41,8 +42,7 @@ public class GridCommonMessageHandler extends ChannelHandlerAdapter
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception
 	{
-		JoinMeta meta = new JoinMeta(GridRuntime.getLocalId(), GridRuntime.context());
-		ctx.writeAndFlush(new GridMessage(meta, GridMessage.MSG_JOIN));
+        GridRuntime.events().publish(GridEvent.CONNECT_ACTIVE, ctx.channel());
 		super.channelActive(ctx);
 	}
 

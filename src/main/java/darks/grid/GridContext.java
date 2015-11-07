@@ -42,6 +42,14 @@ public class GridContext implements Serializable, GridManager
 	{
 		
 	}
+	
+	public synchronized boolean isReady()
+	{
+	    if (localNodeId == null || serverAddress == null)
+	        return false;
+	    else
+	        return true;
+	}
 
 	public long getStartupTime()
 	{
@@ -63,12 +71,12 @@ public class GridContext implements Serializable, GridManager
 		this.startupNanoTime = startupNanoTime;
 	}
 
-	public String getLocalNodeId()
+	public synchronized String getLocalNodeId()
 	{
 		return localNodeId;
 	}
 
-	public void setLocalNodeId(String localNodeId)
+	public synchronized void setLocalNodeId(String localNodeId)
 	{
 		this.localNodeId = localNodeId;
 	}
@@ -83,12 +91,12 @@ public class GridContext implements Serializable, GridManager
 		this.clusterName = clusterName;
 	}
 
-	public InetSocketAddress getServerAddress()
+	public synchronized InetSocketAddress getServerAddress()
 	{
 		return serverAddress;
 	}
 
-	public void setServerAddress(InetSocketAddress serverAddress)
+	public synchronized void setServerAddress(InetSocketAddress serverAddress)
 	{
 		this.serverAddress = serverAddress;
 	}

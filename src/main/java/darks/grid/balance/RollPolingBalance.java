@@ -55,9 +55,9 @@ public class RollPolingBalance extends GridBalance
 				@Override
 				public int compare(GridNode node1, GridNode node2)
 				{
-					float cpu1 = node1.getMachineInfo().getSystemCpuUsage();
+					float cpu1 = node1.getMachineInfo() == null ? 1.f : node1.getMachineInfo().getSystemCpuUsage();
 					cpu1 = cpu1 < 0 ? 0.f : cpu1;
-					float cpu2 = node2.getMachineInfo().getSystemCpuUsage();
+					float cpu2 = node2.getMachineInfo() == null ? 1.f : node2.getMachineInfo().getSystemCpuUsage();
 					cpu2 = cpu2 < 0 ? 0.f : cpu2;
 					return Float.compare(cpu1, cpu2);
 				}

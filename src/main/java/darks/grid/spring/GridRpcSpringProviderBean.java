@@ -30,8 +30,9 @@ public class GridRpcSpringProviderBean implements ApplicationContextAware, Initi
 		Method[] methods = serviceInterface.getMethods();
 		for (Method method : methods)
 		{
-	        String methodName = ReflectUtils.getMethodUniqueName(method);
-			RpcExecutor.registerMethod(methodName, method.getName(), target.getClass(), target);
+//	        String methodName = ReflectUtils.getMethodUniqueName(method);
+	        RpcExecutor.registerMethod(method, target.getClass(), target);
+//			RpcExecutor.registerMethod(methodName, method.getName(), target.getClass(), target);
 		}
 	}
 

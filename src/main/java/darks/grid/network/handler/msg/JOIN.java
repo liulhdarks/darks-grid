@@ -26,14 +26,19 @@ public class JOIN implements GridMessageHandler
 	{
 		JoinMeta meta = msg.getData();
 		meta.setSession(session);
+        String nodeId = meta.getNodeId();
+        if (nodeId == null)
+        {
+            log.error("Invalid node id from " + meta);
+            return;
+        }
 		if (!GridRuntime.context().getClusterName().equals(meta.context().getClusterName()))
 		{
-			log.info("Refuse " + meta.context().getClusterName() + " cluster request join." + meta);
+			log.warn("Refuse " + meta.context().getClusterName() + " cluster request join." + meta);
 			meta.getSession().close();
 			return;
 		}
-		String nodeId = meta.getNodeId();
-		synchronized (nodeId)
+		synchronized (nodeId.intern())
 		{
 			GridNode node = GridRuntime.nodes().getNode(nodeId);
 			if (node != null)
@@ -51,7 +56,7 @@ public class JOIN implements GridMessageHandler
 			{
 				long localTime = GridRuntime.context().getStartupTime();
 				long remoteTime = meta.context().getStartupTime();
-				if (localTime > remoteTime)
+				if (localTime < remoteTime)
 				{
 					log.warn("Channel from " + nodeId + " has repeat " + count + " connections.Deal by local.");
 					handleRepeatChannel(meta, msg);

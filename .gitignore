@@ -6,6 +6,8 @@ bin
 *.log
 *.txt
 *.exe
+.idea
+*.iml
 /target/
 .settings
 .classpath

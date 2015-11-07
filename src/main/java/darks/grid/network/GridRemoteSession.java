@@ -2,12 +2,17 @@ package darks.grid.network;
 
 import java.net.SocketAddress;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import darks.grid.GridRuntime;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 
 public class GridRemoteSession implements GridSession
 {
+    
+    private static final Logger log = LoggerFactory.getLogger(GridRemoteSession.class);
 	
 	Channel channel;
 	
@@ -28,10 +33,18 @@ public class GridRemoteSession implements GridSession
 	@Override
 	public boolean sendMessage(Object msg)
 	{
-		if (channel == null || !channel.isActive())
+		if (channel == null || !channel.isActive() || !channel.isWritable())
 			return false;
-		channel.writeAndFlush(msg);
-		return true;
+		try
+        {
+	        channel.writeAndFlush(msg);
+	        return true;
+        }
+        catch (Exception e)
+        {
+            log.error("Fail to send remote message. Cause " + e.getMessage(), e);
+            return false;
+        }
 	}
 
 	@Override
@@ -52,6 +65,8 @@ public class GridRemoteSession implements GridSession
 			int count = 0;
 			do
 			{
+			    if (!channel.isActive() || !channel.isWritable())
+			        return false;
 				ChannelFuture future = channel.writeAndFlush(msg).sync();
 				ret = future.isSuccess();
 				if (ret)
@@ -61,17 +76,17 @@ public class GridRemoteSession implements GridSession
 			while (count < failRetryCount && failRetry);
 			return ret;
 		}
-		catch (InterruptedException e)
+		catch (Exception e)
 		{
-			e.printStackTrace();
+		    log.error("Fail to send remote sync message. Cause " + e.getMessage(), e);
 			return false;
 		}
 	}
 
 	@Override
-	public void close()
+	public synchronized void close()
 	{
-		if (channel != null)
+		if (channel != null && channel.isActive() && channel.isOpen())
 			channel.close();
 		GridSessionFactory.removeSessionCache(channel);
 	}

@@ -2,6 +2,8 @@ package darks.grid.config;
 
 import java.io.Serializable;
 
+import darks.grid.RpcReduceHandler;
+
 public class MethodConfig implements Serializable
 {
     
@@ -17,11 +19,13 @@ public class MethodConfig implements Serializable
         NONE, ALL, SINGLE
     }
     
-    CallType callType = CallType.ALL;
+    private CallType callType = CallType.ALL;
     
-    ResponseType responseType = ResponseType.ALL;
+    private ResponseType responseType = ResponseType.ALL;
     
-    int timeoutSeconds = 0;
+    private int timeoutSeconds = 0;
+    
+    private transient RpcReduceHandler reducerHandler;
     
     public MethodConfig()
     {
@@ -30,13 +34,13 @@ public class MethodConfig implements Serializable
     
     public void fixType()
     {
-        if (responseType != ResponseType.NONE)
-        {
-            if (callType == CallType.ALL)
-                responseType = ResponseType.ALL;
-            else
-                responseType = ResponseType.SINGLE;
-        }
+//        if (responseType != ResponseType.NONE)
+//        {
+//            if (callType == CallType.ALL)
+//                responseType = ResponseType.ALL;
+//            else
+//                responseType = ResponseType.SINGLE;
+//        }
     }
 
     public CallType getCallType()
@@ -68,12 +72,24 @@ public class MethodConfig implements Serializable
     {
         this.timeoutSeconds = timeoutSeconds;
     }
+    
+
+    public RpcReduceHandler getReducerHandler()
+    {
+        return reducerHandler;
+    }
+
+    public void setReducerHandler(RpcReduceHandler reducerHandler)
+    {
+        this.reducerHandler = reducerHandler;
+    }
 
     @Override
     public String toString()
     {
         return "MethodConfig [callType=" + callType + ", responseType=" + responseType + ", timeoutSeconds="
-            + timeoutSeconds + "]";
+            + timeoutSeconds + ", reducerHandler=" + reducerHandler + "]";
     }
+
     
 }

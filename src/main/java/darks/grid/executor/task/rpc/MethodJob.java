@@ -16,6 +16,8 @@ public class MethodJob extends GridJob
 	private String uniqueName;
 	
 	private Object[] params;
+
+    private Class<?>[] types;
 	
 	private MethodConfig methodConfig;
 	
@@ -29,6 +31,7 @@ public class MethodJob extends GridJob
 		super(taskId);
 		this.uniqueName = request.getUniqueName();
 		this.params = request.getParams();
+        this.types = request.getTypes();
 		this.methodConfig = request.getMethodConfig();
 		setFailRedo(false);
 	}
@@ -64,13 +67,23 @@ public class MethodJob extends GridJob
 		this.methodConfig = methodConfig;
 	}
 
-	@Override
-	public String toString()
-	{
-		return "MethodJob [uniqueName=" + uniqueName + ", params=" + Arrays.toString(params)
-				+ ", methodConfig=" + methodConfig + "]";
-	}
+    public Class<?>[] getTypes()
+    {
+        return types;
+    }
 
+    public void setTypes(Class<?>[] types)
+    {
+        this.types = types;
+    }
 
-	
+    @Override
+    public String toString() {
+        return "MethodJob{" +
+                "uniqueName='" + uniqueName + '\'' +
+                ", params=" + Arrays.toString(params) +
+                ", types=" + Arrays.toString(types) +
+                ", methodConfig=" + methodConfig +
+                '}';
+    }
 }

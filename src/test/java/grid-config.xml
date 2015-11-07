@@ -30,5 +30,5 @@
 
 	<alive interval="300000"/>
 	
-	<TCPPING hosts="localhost:[7800-7803]" interval="300000"/>
+	<TCPPING hosts="localhost:[7800-7810]" interval="300000"/>
 </grid>

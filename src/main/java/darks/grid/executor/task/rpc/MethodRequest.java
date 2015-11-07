@@ -16,6 +16,8 @@ public class MethodRequest implements Serializable
 	private String uniqueName;
 	
 	private Object[] params;
+
+    private Class<?>[] types;
 	
 	private MethodConfig methodConfig;
 	
@@ -26,11 +28,12 @@ public class MethodRequest implements Serializable
 
 
 
-    public MethodRequest(String uniqueName, Object[] params, MethodConfig methodConfig)
+    public MethodRequest(String uniqueName, Object[] params, Class<?>[] types, MethodConfig methodConfig)
     {
         super();
         this.uniqueName = uniqueName;
         this.params = params;
+        this.types = types;
         this.methodConfig = methodConfig;
     }
 
@@ -74,14 +77,23 @@ public class MethodRequest implements Serializable
         this.methodConfig = methodConfig;
     }
 
+    public Class<?>[] getTypes()
+    {
+        return types;
+    }
 
+    public void setTypes(Class<?>[] types)
+    {
+        this.types = types;
+    }
 
-	@Override
-	public String toString()
-	{
-		return "MethodRequest [uniqueName=" + uniqueName + ", params=" + Arrays.toString(params)
-				+ ", methodConfig=" + methodConfig + "]";
-	}
-
-
+    @Override
+    public String toString() {
+        return "MethodRequest{" +
+                "uniqueName='" + uniqueName + '\'' +
+                ", params=" + Arrays.toString(params) +
+                ", types=" + Arrays.toString(types) +
+                ", methodConfig=" + methodConfig +
+                '}';
+    }
 }

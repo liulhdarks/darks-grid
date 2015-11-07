@@ -4,6 +4,9 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
 import darks.grid.RpcReduceHandler;
+import darks.grid.config.MethodConfig;
+import darks.grid.config.MethodConfig.CallType;
+import darks.grid.config.MethodConfig.ResponseType;
 import darks.grid.utils.ReflectUtils;
 
 public class GridRpcSpringConsumerBean<T> implements FactoryBean<T>, InitializingBean
@@ -14,6 +17,8 @@ public class GridRpcSpringConsumerBean<T> implements FactoryBean<T>, Initializin
     private String proxy = "jdk";
     
     private Class<? extends RpcReduceHandler> reducer;
+    
+    private MethodConfig config = new MethodConfig();
     
     @Override
     public void afterPropertiesSet()
@@ -28,10 +33,9 @@ public class GridRpcSpringConsumerBean<T> implements FactoryBean<T>, Initializin
     {
         if ("jdk".equals(proxy))
         {
-        	RpcReduceHandler handler = null;
         	if (reducer != null)
-        		handler = ReflectUtils.newInstance(reducer);
-            ProxyBuilder builder = new JdkProxyBuilder(handler);
+        	    config.setReducerHandler(ReflectUtils.newInstance(reducer));
+            ProxyBuilder builder = new JdkProxyBuilder(config);
             return (T)builder.build(target);
         }
         return null;
@@ -78,5 +82,20 @@ public class GridRpcSpringConsumerBean<T> implements FactoryBean<T>, Initializin
 	{
 		this.reducer = reducer;
 	}
+
+    public void setCallType(String callType)
+    {
+        config.setCallType(CallType.valueOf(callType.toUpperCase()));
+    }
+
+    public void setResponseType(String responseType)
+    {
+        config.setResponseType(ResponseType.valueOf(responseType.toUpperCase()));
+    }
+
+    public void setTimeoutSeconds(int timeoutSeconds)
+    {
+        config.setTimeoutSeconds(timeoutSeconds);
+    }
 
 }
