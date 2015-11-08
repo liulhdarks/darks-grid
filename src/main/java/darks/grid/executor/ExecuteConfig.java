@@ -3,6 +3,7 @@ package darks.grid.executor;
 import java.io.Serializable;
 
 import darks.grid.RpcReduceHandler;
+import darks.grid.balance.GridBalance;
 
 public class ExecuteConfig implements Serializable
 {
@@ -26,6 +27,8 @@ public class ExecuteConfig implements Serializable
     private int timeoutSeconds = 0;
     
     private transient RpcReduceHandler reducerHandler;
+    
+    private transient GridBalance balance;
     
     public ExecuteConfig()
     {
@@ -84,12 +87,21 @@ public class ExecuteConfig implements Serializable
         this.reducerHandler = reducerHandler;
     }
 
+    public GridBalance getBalance()
+    {
+        return balance;
+    }
+
+    public void setBalance(GridBalance balance)
+    {
+        this.balance = balance;
+    }
+
     @Override
     public String toString()
     {
-        return "MethodConfig [callType=" + callType + ", responseType=" + responseType + ", timeoutSeconds="
-            + timeoutSeconds + ", reducerHandler=" + reducerHandler + "]";
+        return "ExecuteConfig [callType=" + callType + ", responseType=" + responseType + ", timeoutSeconds="
+            + timeoutSeconds + "]";
     }
 
-    
 }

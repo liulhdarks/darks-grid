@@ -5,13 +5,11 @@ import java.util.Collection;
 import java.util.List;
 
 import darks.grid.beans.MethodResult;
-import darks.grid.executor.ExecuteConfig;
-import darks.grid.executor.ExecuteConfig.CallType;
 import darks.grid.executor.job.GridJob;
 import darks.grid.executor.job.JobResult;
-import darks.grid.executor.task.mapred.MapReduceTask;
+import darks.grid.executor.task.mapred.MapReduceTaskAdapter;
 
-public class GridRpcTask extends MapReduceTask<RpcRequest, MethodResult>
+public class GridRpcTask extends MapReduceTaskAdapter<RpcRequest, MethodResult>
 {
      
     public GridRpcTask()
@@ -20,14 +18,10 @@ public class GridRpcTask extends MapReduceTask<RpcRequest, MethodResult>
     }
 
     @Override
-    public Collection<? extends GridJob> map(int nodeSize, RpcRequest request)
+    public Collection<? extends GridJob> split(int jobsCount, RpcRequest request)
     {
-        ExecuteConfig config = request.getConfig();
-        int jobCount = nodeSize;
-        if (config.getCallType() == CallType.SINGLE)
-            jobCount = 1;
-        List<GridRpcJob> jobs = new ArrayList<GridRpcJob>(jobCount);
-        for (int i = 0; i < jobCount; i++)
+        List<GridRpcJob> jobs = new ArrayList<GridRpcJob>(jobsCount);
+        for (int i = 0; i < jobsCount; i++)
         {
             GridRpcJob job = new GridRpcJob(request);
             jobs.add(job);

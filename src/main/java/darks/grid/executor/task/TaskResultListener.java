@@ -1,8 +1,8 @@
 package darks.grid.executor.task;
 
-public interface TaskResultListener<T>
+public interface TaskResultListener<R>
 {
 
-    public T handle(T result);
+    public R handle(R result);
     
 }

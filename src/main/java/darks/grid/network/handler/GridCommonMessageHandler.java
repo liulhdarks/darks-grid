@@ -1,12 +1,5 @@
 package darks.grid.network.handler;
 
-import io.netty.channel.ChannelHandlerAdapter;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPromise;
-import io.netty.handler.timeout.IdleState;
-import io.netty.handler.timeout.IdleStateEvent;
-import io.netty.util.ReferenceCountUtil;
-
 import java.io.IOException;
 
 import org.slf4j.Logger;
@@ -15,10 +8,15 @@ import org.slf4j.LoggerFactory;
 import darks.grid.GridRuntime;
 import darks.grid.beans.GridEvent;
 import darks.grid.beans.GridMessage;
-import darks.grid.beans.meta.JoinMeta;
 import darks.grid.network.GridSessionFactory;
 import darks.grid.network.handler.msg.GridMessageHandler;
 import darks.grid.network.handler.msg.MessageHandlerFactory;
+import io.netty.channel.ChannelHandlerAdapter;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPromise;
+import io.netty.handler.timeout.IdleState;
+import io.netty.handler.timeout.IdleStateEvent;
+import io.netty.util.ReferenceCountUtil;
 
 public class GridCommonMessageHandler extends ChannelHandlerAdapter
 {
@@ -42,7 +40,7 @@ public class GridCommonMessageHandler extends ChannelHandlerAdapter
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception
 	{
-        GridRuntime.events().publish(GridEvent.CONNECT_ACTIVE, ctx.channel());
+        GridRuntime.events().publish(GridEvent.CONNECT_ACTIVE, GridSessionFactory.getSession(ctx.channel()));
 		super.channelActive(ctx);
 	}
 

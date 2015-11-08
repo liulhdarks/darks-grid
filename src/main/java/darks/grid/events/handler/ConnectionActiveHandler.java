@@ -10,6 +10,7 @@ import darks.grid.beans.GridEvent;
 import darks.grid.beans.GridMessage;
 import darks.grid.beans.meta.JoinMeta;
 import darks.grid.events.GridEventHandler;
+import darks.grid.network.GridSession;
 import io.netty.channel.Channel;
 
 public class ConnectionActiveHandler extends GridEventHandler
@@ -23,12 +24,11 @@ public class ConnectionActiveHandler extends GridEventHandler
     public void handle(GridEvent event)
         throws Exception
     {
-        Channel channel = event.getData();
+        GridSession session = event.getData();
         if (GridRuntime.awaitReady(AWAIT_READY_TIMEOUT, TimeUnit.SECONDS))
         {
             JoinMeta meta = new JoinMeta(GridRuntime.getLocalId(), GridRuntime.context());
-            if (channel.isActive() && channel.isWritable())
-                channel.writeAndFlush(new GridMessage(meta, GridMessage.MSG_JOIN));
+            session.sendSyncMessage(new GridMessage(meta, GridMessage.MSG_JOIN));
         }
         else
         {

@@ -43,6 +43,12 @@ public class JOIN implements GridMessageHandler
 			GridNode node = GridRuntime.nodes().getNode(nodeId);
 			if (node != null)
 			{
+	            if (node.getSession().getId().equals(session.getId()))
+	            {
+	                log.warn("Ignore repeat join request from " + node.getId());
+	                handleNewChannel(meta, msg, false);
+	                return;
+	            }
 				if (node.getSession().isActive())
 				{
 					meta.getSession().close();

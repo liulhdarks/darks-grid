@@ -1,10 +1,15 @@
 package darks.grid.executor.job;
 
-import darks.grid.beans.meta.BaseMeta;
+import java.io.Serializable;
+import java.util.List;
+
+import darks.grid.executor.ExecuteConfig;
+import darks.grid.executor.ExecuteConfig.ResponseType;
 import darks.grid.executor.task.GridTask;
 import darks.grid.executor.task.GridTask.TaskType;
+import darks.grid.utils.UUIDUtils;
 
-public class GridJob extends BaseMeta
+public abstract class GridJob implements Serializable
 {
 
 	/**
@@ -12,28 +17,37 @@ public class GridJob extends BaseMeta
 	 */
 	private static final long serialVersionUID = -6904973711082130126L;
 
-	private String taskId;
+	private String jobId = UUIDUtils.newUUID();
+
+    private String taskId;
 	
 	private TaskType taskType;
 	
 	private boolean failRedo = true;
+	
+	private boolean callback = true;
 	
 	public GridJob()
 	{
 		
 	}
 
-	public GridJob(GridTask task)
-	{
-		this.taskId = task.getId();
-		this.taskType = task.getTaskType();
-	}
-
-    public void setTask(GridTask task)
+    public void setTask(GridTask task, ExecuteConfig config)
     {
         this.taskId = task.getId();
         this.taskType = task.getTaskType();
+        this.callback = config.getResponseType() != ResponseType.NONE;
     }
+    
+    public abstract Object execute();
+    
+    public abstract <P> P getParameter();
+    
+    public abstract <P> P getParameter(int pos);
+    
+    public abstract List<Object> getParameterList();
+    
+    public abstract boolean isEmpty();
 
 	public String getTaskId()
 	{
@@ -47,9 +61,8 @@ public class GridJob extends BaseMeta
 	
 	public String getJobId()
 	{
-		return getMetaId();
+		return jobId;
 	}
-	
 
 	public boolean isFailRedo()
 	{
@@ -70,12 +83,22 @@ public class GridJob extends BaseMeta
     {
         this.taskType = taskType;
     }
+    
+    public boolean isCallback()
+    {
+        return callback;
+    }
+
+    public void setCallback(boolean callback)
+    {
+        this.callback = callback;
+    }
 
     @Override
     public String toString()
     {
-        return "GridJob [taskId=" + taskId + ", taskType=" + taskType + ", failRedo=" + failRedo + "]";
+        return "GridJob [jobId=" + jobId + ", taskId=" + taskId + ", taskType=" + taskType + ", failRedo=" + failRedo
+            + ", callback=" + callback + "]";
     }
 
-	
 }

@@ -2,16 +2,13 @@ package darks.grid.executor.task;
 
 import java.util.concurrent.Callable;
 
+import darks.grid.executor.ExecuteConfig;
 import darks.grid.executor.job.GridJob;
+import darks.grid.executor.task.GridTask.TaskType;
 import darks.grid.executor.task.mapred.MapReduceTask;
 
 public abstract class TaskExecutor<T, R>  implements Callable<R>
 {
-
-    public enum TaskType
-    {
-        RPC, MAPRED
-    }
     
     protected String taskId;
     
@@ -23,13 +20,16 @@ public abstract class TaskExecutor<T, R>  implements Callable<R>
     
     protected GridJobFuture future = null; 
     
-    public TaskExecutor(TaskType taskType, MapReduceTask<T, R> task, T paramters)
+    private ExecuteConfig config;
+    
+    public TaskExecutor(TaskType taskType, MapReduceTask<T, R> task, T paramters, ExecuteConfig config)
     {
         this.taskType = taskType;
         this.task = task;
         this.paramters = paramters;
         this.taskId = task.getId();
         this.future = new GridJobFuture(this);
+        this.config = config;
     }
     
     @Override
@@ -66,6 +66,12 @@ public abstract class TaskExecutor<T, R>  implements Callable<R>
         return future;
     }
     
+    
+    public ExecuteConfig getConfig()
+    {
+        return config;
+    }
+
     public String toSimpleString()
     {
         StringBuilder buf = new StringBuilder();

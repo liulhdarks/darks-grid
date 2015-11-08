@@ -2,10 +2,9 @@ package darks.grid.executor.task.rpc;
 
 import java.util.Arrays;
 
-import darks.grid.executor.ExecuteConfig;
-import darks.grid.executor.job.GridJob;
+import darks.grid.executor.job.GridJobAdapter;
 
-public class GridRpcJob extends GridJob
+public class GridRpcJob extends GridJobAdapter
 {
 
 	/**
@@ -19,8 +18,6 @@ public class GridRpcJob extends GridJob
 
     private Class<?>[] types;
 	
-	private ExecuteConfig config;
-	
 	public GridRpcJob()
 	{
 		setFailRedo(false);
@@ -31,12 +28,17 @@ public class GridRpcJob extends GridJob
 		this.uniqueName = request.getUniqueName();
 		this.params = request.getParams();
         this.types = request.getTypes();
-		this.config = request.getConfig();
 		setFailRedo(false);
 	}
-
 	
-	public String getUniqueName()
+	
+	@Override
+    public Object execute()
+    {
+	    return RpcMethodInvoker.invoke(this);
+    }
+
+    public String getUniqueName()
 	{
 		return uniqueName;
 	}
@@ -55,17 +57,6 @@ public class GridRpcJob extends GridJob
 	{
 		this.params = params;
 	}
-	
-
-    public ExecuteConfig getConfig()
-    {
-        return config;
-    }
-
-    public void setConfig(ExecuteConfig config)
-    {
-        this.config = config;
-    }
 
     public Class<?>[] getTypes()
     {
@@ -81,7 +72,7 @@ public class GridRpcJob extends GridJob
     public String toString()
     {
         return "GridRpcJob [uniqueName=" + uniqueName + ", params=" + Arrays.toString(params) + ", types="
-            + Arrays.toString(types) + ", config=" + config + "]";
+            + Arrays.toString(types) + "]";
     }
     
 }

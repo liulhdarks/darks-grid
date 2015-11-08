@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,8 @@ public class GridNodesManager implements GridManager
 {
 
 	private static final Logger log = LoggerFactory.getLogger(GridNodesManager.class);
+    
+    private List<GridNode> nodesList = new CopyOnWriteArrayList<GridNode>();
 	
 	private Map<String, GridNode> nodesMap = new ConcurrentHashMap<String, GridNode>();
 	
@@ -45,10 +48,7 @@ public class GridNodesManager implements GridManager
 		String localNodeId = NodeId.localId();
 		GridRuntime.context().setLocalNodeId(localNodeId);
 		GridNode node = new GridNode(localNodeId, session, GridRuntime.context(), GridNodeType.TYPE_LOCAL);
-		nodesMap.put(localNodeId, node);
-		addressMap.put(node.context().getServerAddress(), localNodeId);
-		sessionIdMap.put(session.getId(), localNodeId);
-		GridRuntime.events().publish(GridEvent.NODE_JOIN, node);
+        addNode(session, node);
 	}
 	
 	public synchronized void addRemoteNode(String nodeId, GridSession session, GridContext context)
@@ -71,10 +71,17 @@ public class GridNodesManager implements GridManager
 			}
 		}
 		GridNode node = new GridNode(nodeId, session, context, GridNodeType.TYPE_REMOTE);
-		nodesMap.put(nodeId, node);
-		addressMap.put(node.context().getServerAddress(), nodeId);
-		sessionIdMap.put(session.getId(), nodeId);
-		GridRuntime.events().publish(GridEvent.NODE_JOIN, node);
+		addNode(session, node);
+	}
+	
+	private void addNode(GridSession session, GridNode node)
+	{
+	    String nodeId = node.getId();
+	    nodesMap.put(nodeId, node);
+        nodesList.add(node);
+        addressMap.put(node.context().getServerAddress(), nodeId);
+        sessionIdMap.put(session.getId(), nodeId);
+        GridRuntime.events().publish(GridEvent.NODE_JOIN, node);
 	}
 	
 	public GridNode getLocalNode()
@@ -115,6 +122,7 @@ public class GridNodesManager implements GridManager
 		GridNode node = nodesMap.remove(nodeId);
 		if (node !=null)
 		{
+		    nodesList.remove(node);
 			addressMap.remove(node.context().getServerAddress());
 			sessionIdMap.remove(node.getSession().getId());
 		}
@@ -123,9 +131,10 @@ public class GridNodesManager implements GridManager
 	
 	public synchronized GridNode removeNode(GridNode node)
 	{
-		GridNode rNode = GridRuntime.nodes().removeNode(node.getId());
+		GridNode rNode = removeNode(node.getId());
 		if (rNode == null)
 		{
+            nodesList.remove(node);
 			addressMap.remove(node.context().getServerAddress());
 			sessionIdMap.remove(node.getSession().getId());
 			rNode = node;
@@ -141,10 +150,10 @@ public class GridNodesManager implements GridManager
 	public synchronized GridNode removeNode(GridSession session)
 	{
 		GridNode node = null;
-		String nodeId = GridRuntime.nodes().getNodeId(session.getId());
+		String nodeId = getNodeId(session.getId());
 		if (nodeId != null)
 		{
-			node = GridRuntime.nodes().removeNode(nodeId);
+			node = removeNode(nodeId);
 			if (node != null)
 			{
 				node.getSession().close();
@@ -172,7 +181,12 @@ public class GridNodesManager implements GridManager
 		return sessionIdMap.get(sessionId);
 	}
 	
-	public List<GridNode> getSnapshotNodes()
+	public List<GridNode> getNodesList()
+    {
+        return nodesList;
+    }
+
+    public List<GridNode> getSnapshotNodes()
 	{
 	    List<GridNode> nodesList = new ArrayList<GridNode>(nodesMap.size());
 	    for (Entry<String, GridNode> entry : nodesMap.entrySet())

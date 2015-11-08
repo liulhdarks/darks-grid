@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 import darks.grid.balance.GridBalance;
+import darks.grid.balance.RollPolingBalance;
 import darks.grid.beans.GridNode;
 import darks.grid.executor.job.GridJob;
 import darks.grid.executor.job.JobResult;
@@ -13,10 +14,6 @@ import darks.grid.utils.UUIDUtils;
 public abstract class MapReduceTask<T, R> extends GridTask
 {
 
-    private List<GridNode> nodes = null;
-    
-    private int nodeIndex = 0;
-    
     public MapReduceTask()
     {
         super(TaskType.MAPRED);
@@ -27,33 +24,17 @@ public abstract class MapReduceTask<T, R> extends GridTask
         super(taskType);
     }
 
-    public void initialize(List<GridNode> nodes)
+    public boolean initialize(List<GridNode> nodes)
     {
-        this.nodes = nodes;
-        this.nodeIndex = 0;
+        return initialize(nodes, new RollPolingBalance(nodes));
     }
+
+    public abstract boolean initialize(List<GridNode> nodes, GridBalance balance);
     
-    public Collection<? extends GridJob> map(int nodeSize, T arg)
-    {
-        return null;
-    }
+    public abstract Collection<? extends GridJob> split(int nodeSize, T arg);
     
-    public R reduce(List<JobResult> results)
-    {
-        return null;
-    }
+    public abstract R reduce(List<JobResult> results);
     
-    public GridNode nextNode()
-    {
-        if (nodes == null)
-            return null;
-        int size = nodes.size();
-        return nodes.get(nodeIndex++ % size);
-    }
-    
-    public List<GridNode> getNodes()
-    {
-        return nodes;
-    }
+    public abstract GridNode map(GridJob job);
     
 }

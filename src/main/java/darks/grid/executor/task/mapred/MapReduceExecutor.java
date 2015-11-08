@@ -6,20 +6,26 @@ import java.util.List;
 import darks.grid.GridRuntime;
 import darks.grid.beans.GridMessage;
 import darks.grid.beans.GridNode;
+import darks.grid.executor.ExecuteConfig;
+import darks.grid.executor.ExecuteConfig.CallType;
 import darks.grid.executor.job.GridJob;
 import darks.grid.executor.job.GridJobStatus;
 import darks.grid.executor.job.JobResult;
 import darks.grid.executor.job.JobStatusType;
+import darks.grid.executor.task.GridTask.TaskType;
 import darks.grid.executor.task.TaskExecutor;
+import darks.grid.executor.task.TaskResultListener;
 
 public class MapReduceExecutor<T, R> extends TaskExecutor<T, R>
 {
 
+    private TaskResultListener<R> listener;
     
     public MapReduceExecutor(MapReduceTask<T, R> task,
-        T paramters)
+        T paramters, ExecuteConfig config, TaskResultListener<R> listener)
     {
-        super(TaskType.MAPRED, task, paramters);
+        super(TaskType.MAPRED, task, paramters, config);
+        this.listener = listener;
     }
 
     @Override
@@ -27,16 +33,24 @@ public class MapReduceExecutor<T, R> extends TaskExecutor<T, R>
     {
         List<GridNode> nodesList = GridRuntime.nodes().getSnapshotNodes();
         task.initialize(nodesList);
-        Collection<? extends GridJob> jobs = task.map(nodesList.size(), paramters);
+        ExecuteConfig config = getConfig();
+        int jobCount = nodesList.size();
+        if (config.getCallType() == CallType.SINGLE)
+            jobCount = 1;
+        Collection<? extends GridJob> jobs = task.split(jobCount, paramters);
         for (GridJob job : jobs)
         {
-            job.setTask(task);
+            job.setTask(task, config);
             executeJob(job);
         }
         future.await();
         GridRuntime.tasks().completeTask(getTaskId());
         List<JobResult> jobResults = future.getList();
-        return task.reduce(jobResults);
+        R ret = task.reduce(jobResults);
+        if (listener != null)
+            return listener.handle(ret);
+        else
+            return ret;
     }
 
     @Override
@@ -47,7 +61,7 @@ public class MapReduceExecutor<T, R> extends TaskExecutor<T, R>
 
     private boolean executeJob(GridJob job)
     {
-        GridNode node = task.nextNode();
+        GridNode node = task.map(job);
         if (node != null)
             executeJobOnNode(node, job);
         return true;
