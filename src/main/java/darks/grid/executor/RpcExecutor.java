@@ -15,9 +15,7 @@ import darks.grid.GridRuntime;
 import darks.grid.beans.GridRpcMethod;
 import darks.grid.beans.MethodResult;
 import darks.grid.executor.ExecuteConfig.ResponseType;
-import darks.grid.executor.task.GridJobReply;
 import darks.grid.executor.task.TaskResultListener;
-import darks.grid.executor.task.rpc.GridRpcJob;
 import darks.grid.executor.task.rpc.GridRpcTask;
 import darks.grid.executor.task.rpc.RpcRequest;
 import darks.grid.utils.ReflectUtils;
@@ -115,7 +113,6 @@ public class RpcExecutor extends GridExecutor
         config.fixType();
         RpcRequest request = new RpcRequest(uniqueName, params, types);
         GridRpcTask task = new GridRpcTask();
-        //TODO listener
         GridRuntime.tasks().executeMapReduceTask(task, request, config, listener);
     }
 

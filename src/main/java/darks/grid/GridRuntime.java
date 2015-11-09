@@ -9,7 +9,7 @@ import darks.grid.config.GridConfiguration;
 import darks.grid.events.GridEventsManager;
 import darks.grid.executor.job.GridJobManager;
 import darks.grid.executor.task.GridTaskManager;
-import darks.grid.network.GridNetworkCenter;
+import darks.grid.network.GridNetworkManager;
 import darks.grid.network.local.GridLocalMessageManager;
 import darks.grid.utils.ThreadUtils;
 
@@ -20,7 +20,7 @@ public final class GridRuntime
 
 	static GridConfiguration config;
 	
-	static GridNetworkCenter network;
+	static GridNetworkManager network;
 	
 	static GridNodesManager nodesManager;
 	
@@ -47,7 +47,7 @@ public final class GridRuntime
 	{
 		GridRuntime.config = config;
 		context = new GridContext();
-		network = new GridNetworkCenter();
+		network = new GridNetworkManager();
 		nodesManager = new GridNodesManager();
 		componentsManager = new GridComponentManager();
 		tasksManager = new GridTaskManager();
@@ -164,7 +164,7 @@ public final class GridRuntime
 		return config;
 	}
 
-	public static GridNetworkCenter network()
+	public static GridNetworkManager network()
 	{
 		return network;
 	}

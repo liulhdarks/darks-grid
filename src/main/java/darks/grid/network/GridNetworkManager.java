@@ -13,7 +13,7 @@ import darks.grid.beans.meta.JoinMeta;
 import darks.grid.config.GridConfiguration;
 import darks.grid.utils.ThreadUtils;
 
-public class GridNetworkCenter implements GridManager
+public class GridNetworkManager implements GridManager
 {
 	
 	private GridMessageServer messageServer;
@@ -24,7 +24,7 @@ public class GridNetworkCenter implements GridManager
 	
 	private ThreadLocal<GridMessageClient> clientLocal = new ThreadLocal<>();
 	
-	public GridNetworkCenter()
+	public GridNetworkManager()
 	{
 		
 	}

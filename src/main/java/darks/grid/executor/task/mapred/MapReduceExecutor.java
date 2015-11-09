@@ -8,6 +8,7 @@ import darks.grid.beans.GridMessage;
 import darks.grid.beans.GridNode;
 import darks.grid.executor.ExecuteConfig;
 import darks.grid.executor.ExecuteConfig.CallType;
+import darks.grid.executor.ExecuteConfig.ResponseType;
 import darks.grid.executor.job.GridJob;
 import darks.grid.executor.job.GridJobStatus;
 import darks.grid.executor.job.JobResult;
@@ -31,9 +32,9 @@ public class MapReduceExecutor<T, R> extends TaskExecutor<T, R>
     @Override
     protected R execute()
     {
-        List<GridNode> nodesList = GridRuntime.nodes().getSnapshotNodes();
-        task.initialize(nodesList);
         ExecuteConfig config = getConfig();
+        List<GridNode> nodesList = GridRuntime.nodes().getSnapshotNodes();
+        task.initialize(nodesList, config.getBalance());
         int jobCount = nodesList.size();
         if (config.getCallType() == CallType.SINGLE)
             jobCount = 1;
@@ -43,6 +44,8 @@ public class MapReduceExecutor<T, R> extends TaskExecutor<T, R>
             job.setTask(task, config);
             executeJob(job);
         }
+        if (config.getResponseType() == ResponseType.NONE)
+        	return null;
         future.await();
         GridRuntime.tasks().completeTask(getTaskId());
         List<JobResult> jobResults = future.getList();

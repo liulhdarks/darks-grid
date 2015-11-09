@@ -1,9 +1,14 @@
 package darks.grid.spring;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
 import darks.grid.RpcReduceHandler;
+import darks.grid.balance.GridBalance;
+import darks.grid.balance.RollPolingBalance;
 import darks.grid.executor.ExecuteConfig;
 import darks.grid.executor.ExecuteConfig.CallType;
 import darks.grid.executor.ExecuteConfig.ResponseType;
@@ -20,12 +25,20 @@ public class GridRpcSpringConsumerBean<T> implements FactoryBean<T>, Initializin
     
     private ExecuteConfig config = new ExecuteConfig();
     
+    private Class<? extends GridBalance> balance = RollPolingBalance.class;
+    
+    private Set<String> targetMethods = new HashSet<>();
+    
     @Override
     public void afterPropertiesSet()
         throws Exception
     {
         if (!"jdk".equals(proxy))
             proxy = "jdk";
+    	if (reducer != null)
+    	    config.setReducerHandler(ReflectUtils.newInstance(reducer));
+    	if (balance != null)
+    	    config.setBalance(ReflectUtils.newInstance(balance));
     }
 
     @Override
@@ -33,9 +46,7 @@ public class GridRpcSpringConsumerBean<T> implements FactoryBean<T>, Initializin
     {
         if ("jdk".equals(proxy))
         {
-        	if (reducer != null)
-        	    config.setReducerHandler(ReflectUtils.newInstance(reducer));
-            ProxyBuilder builder = new JdkProxyBuilder(config);
+            ProxyBuilder builder = new JdkProxyBuilder(config, targetMethods);
             return (T)builder.build(target);
         }
         return null;
@@ -98,4 +109,23 @@ public class GridRpcSpringConsumerBean<T> implements FactoryBean<T>, Initializin
         config.setTimeoutSeconds(timeoutSeconds);
     }
 
+	public Class<? extends GridBalance> getBalance()
+	{
+		return balance;
+	}
+
+	public void setBalance(Class<? extends GridBalance> balance)
+	{
+		this.balance = balance;
+	}
+
+	public Set<String> getTargetMethods()
+	{
+		return targetMethods;
+	}
+
+	public void setTargetMethods(Set<String> targetMethods)
+	{
+		this.targetMethods = targetMethods;
+	}
 }

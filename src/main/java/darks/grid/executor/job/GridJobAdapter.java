@@ -28,13 +28,6 @@ public abstract class GridJobAdapter extends GridJob
         }
     }
 
-    @Override
-    public Object execute()
-    {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     @SuppressWarnings("unchecked")
     @Override
     public <P> P getParameter()
