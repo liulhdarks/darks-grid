@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <grid>
-
+	<!-- 
 	<component name="testcom" class="darks.grid.test.TestComponent"/> 
-
+ 	-->
 	<cluster cluster_name="KELUDEAPS" />
 	
 	<task jobs_exec_count="30"/>
@@ -31,6 +31,6 @@
 	<alive interval="60000"/>
 	
 	<TCPPING hosts="localhost:[7800-7805]" interval="300000"/>
-
-	<testcom interval="60000"/>
+	
+	<!-- <testcom interval="60000"/> -->
 </grid>

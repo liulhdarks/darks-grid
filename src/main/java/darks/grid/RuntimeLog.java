@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import darks.grid.beans.GridComponent;
 import darks.grid.utils.MachineUtils;
+import darks.grid.utils.StringUtils;
 
 public class RuntimeLog extends GridComponent
 {
@@ -33,8 +34,13 @@ public class RuntimeLog extends GridComponent
 		}
 		if (jvmInfo)
 		{
-			buf.append("Direct Memory:").append(MachineUtils.getReservedDirectMemory())
-				.append('/').append(MachineUtils.getMaxDirectMemory()).append('\n');
+			Runtime jvmRuntime = Runtime.getRuntime();
+			buf.append("Direct-mem:").append(StringUtils.memorySize(MachineUtils.getReservedDirectMemory()))
+				.append('/').append(StringUtils.memorySize(MachineUtils.getMaxDirectMemory())).append('\t')
+				.append("Heap-men:").append(StringUtils.memorySize(jvmRuntime.totalMemory() - jvmRuntime.freeMemory())).append('/')
+				.append(StringUtils.memorySize(jvmRuntime.totalMemory())).append('/')
+				.append(StringUtils.memorySize(jvmRuntime.maxMemory()))
+				.append('\n');
 			buf.append("-------------------------------------------------------------\n");
 		}
 		if (taskInfo)

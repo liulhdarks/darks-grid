@@ -24,4 +24,21 @@ public final class StringUtils
 	    return String.format("%.2f", v) + "%";
 	}
 	
+	public static String memorySize(long bytesSize)
+	{
+		if (bytesSize < 1024)
+		{
+			return stringBuffer(bytesSize, 'B');
+		}
+		else if (bytesSize < 1024 * 1024)
+		{
+			float kb = (float) bytesSize / 1024.f;
+			return stringBuffer(String.format("%.2f", kb), "KB");
+		}
+		else
+		{
+			float mb = (float) bytesSize / 1024.f / 1024.f;
+			return stringBuffer(String.format("%.2f", mb), "MB");
+		}
+	}
 }

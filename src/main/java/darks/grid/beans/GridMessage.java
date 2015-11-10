@@ -23,6 +23,8 @@ public class GridMessage implements Serializable, Cloneable, ReferenceCounted
     public static final int MSG_MR_REQUEST = 2001;
     
     public static final int MSG_MR_RESPONSE = 2002;
+    
+    public static final int MSG_EVENT = 3001;
 	
 	private String id;
 	

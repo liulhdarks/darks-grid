@@ -26,6 +26,7 @@ public final class MessageHandlerFactory
 		handlersMap.put(GridMessage.MSG_HEART_ALIVE_REPLY, new HEART_ALIVE());
 		handlersMap.put(GridMessage.MSG_MR_REQUEST, new JOB_EXEC());
 		handlersMap.put(GridMessage.MSG_MR_RESPONSE, new JOB_EXEC_REPLY());
+		handlersMap.put(GridMessage.MSG_EVENT, new EVENT_TRIGGER());
 	}
 	
 	private MessageHandlerFactory()

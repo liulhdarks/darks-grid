@@ -88,6 +88,17 @@ public class GridNode implements Serializable
 		return session.sendSyncMessage(obj);
 	}
 	
+	public boolean publishEvent(String type, Object data)
+	{
+		return publishEvent(type, data, false);
+	} 
+	
+	public boolean publishEvent(String type, Object data, boolean sync)
+	{
+		GridEvent event = new GridEvent(data, type);
+		return GridRuntime.events().publish(this, event, sync);
+	} 
+	
 	public String getId()
 	{
 		return id;
@@ -162,7 +173,7 @@ public class GridNode implements Serializable
 	{
 		return StringUtils.stringBuffer(id, 
 				"  [", GridNodeType.valueOf(nodeType),']',
-				' ', context.getServerAddress(), 
+				' ', String.format("%21s", context.getServerAddress().toString()), 
 				' ', GridNodeStatus.valueOf(this),
 				' ', String.format("%8d", System.currentTimeMillis() - heartAliveTime.get()),
 				'\t', StringUtils.percent(context.getMachineInfo().getSystemCpuUsage()), 
