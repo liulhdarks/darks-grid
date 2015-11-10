@@ -9,7 +9,6 @@ import org.springframework.context.ApplicationContextAware;
 
 import darks.grid.GridException;
 import darks.grid.executor.RpcExecutor;
-import darks.grid.utils.ReflectUtils;
 
 public class GridRpcSpringProviderBean implements ApplicationContextAware, InitializingBean
 {
@@ -30,9 +29,7 @@ public class GridRpcSpringProviderBean implements ApplicationContextAware, Initi
 		Method[] methods = serviceInterface.getMethods();
 		for (Method method : methods)
 		{
-//	        String methodName = ReflectUtils.getMethodUniqueName(method);
 	        RpcExecutor.registerMethod(method, target.getClass(), target);
-//			RpcExecutor.registerMethod(methodName, method.getName(), target.getClass(), target);
 		}
 	}
 

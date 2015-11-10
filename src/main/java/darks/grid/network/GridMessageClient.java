@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import darks.grid.GridRuntime;
 import darks.grid.config.NetworkConfig;
 import darks.grid.network.handler.GridClientMessageHandler;
+import darks.grid.utils.ThreadUtils;
 
 public class GridMessageClient extends GridMessageDispatcher
 {
@@ -58,7 +59,7 @@ public class GridMessageClient extends GridMessageDispatcher
 			log.info("Initialize message client.");
             NetworkConfig config = GridRuntime.config().getNetworkConfig();
             int workerNum = config.getClientWorkerThreadNumber();
-		    workerGroup = new NioEventLoopGroup(workerNum, threadExecutor);
+		    workerGroup = new NioEventLoopGroup(workerNum, ThreadUtils.getThreadFactory());
 			bootstrap = new Bootstrap();
 			bootstrap.group(workerGroup).channel(NioSocketChannel.class)
 					.option(ChannelOption.TCP_NODELAY, config.isTcpNodelay())

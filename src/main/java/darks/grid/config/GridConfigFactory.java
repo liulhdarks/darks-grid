@@ -107,7 +107,7 @@ public final class GridConfigFactory
 	        throw new GridException("Invalid component name " + labelName + " to register configuration.");
         if (className == null || "".equals(className.trim()))
             throw new GridException("Invalid component class " + className + " to register configuration.");
-        config.getComponentConfig().putParamClass(labelName, className);
+        config.getComponentConfig().putParamClass(labelName.toLowerCase(), className);
 	}
     
     private static void parseCustomComponent(GridConfiguration config, Element el)

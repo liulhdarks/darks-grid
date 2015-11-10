@@ -15,7 +15,6 @@ public class RollPolingBalance extends GridBalance
 	
 	public RollPolingBalance()
 	{
-		this.nodesList = GridRuntime.nodes().getNodesList();
 	}
     
     public RollPolingBalance(List<GridNode> nodesList)
@@ -26,6 +25,8 @@ public class RollPolingBalance extends GridBalance
 	@Override
 	public GridNode getBalanceNode()
 	{
+		if (nodesList == null)
+			initNodes();
 		if (nodesList == null || nodesList.isEmpty())
 			return null;
 		int len = nodesList.size();
@@ -39,5 +40,14 @@ public class RollPolingBalance extends GridBalance
 		}
 		while (tryCount < len && !node.isAlive());
 		return node;
+	}
+	
+	private synchronized boolean initNodes()
+	{
+		if (nodesList == null)
+		{
+			this.nodesList = GridRuntime.nodes().getNodesList();
+		}
+		return nodesList != null;
 	}
 }

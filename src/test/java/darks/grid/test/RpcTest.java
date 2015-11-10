@@ -9,11 +9,11 @@ import io.netty.util.ResourceLeakDetector.Level;
 import org.junit.Test;
 
 import darks.grid.GridRuntime;
-import darks.grid.beans.MethodResult;
 import darks.grid.config.GridConfigFactory;
 import darks.grid.config.GridConfiguration;
 import darks.grid.executor.ExecuteConfig;
 import darks.grid.executor.RpcExecutor;
+import darks.grid.executor.task.rpc.RpcResult;
 import darks.grid.utils.MachineUtils;
 import darks.grid.utils.ThreadUtils;
 
@@ -49,7 +49,7 @@ public class RpcTest
 		while (scan.hasNext())
 		{
 			String cmd = scan.next();
-			MethodResult result = null;
+			RpcResult result = null;
 			if ("print".equals(cmd))
 			{
 				result = RpcExecutor.callMethod("print", null, new ExecuteConfig());
@@ -98,7 +98,7 @@ public class RpcTest
 			int a = rand.nextInt(100);
 			int b = rand.nextInt(100);
 			long st = System.currentTimeMillis();
-			MethodResult result = RpcExecutor.callMethod("add", new Object[]{a, b}, new ExecuteConfig());
+			RpcResult result = RpcExecutor.callMethod("add", new Object[]{a, b}, new ExecuteConfig());
 			System.out.println("==========>" + i + " " + result + " cost:" + (System.currentTimeMillis() - st));
 			ThreadUtils.threadSleep(10);
 		}

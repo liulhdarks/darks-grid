@@ -5,6 +5,7 @@ import io.netty.channel.Channel;
 import java.net.SocketAddress;
 
 import darks.grid.GridRuntime;
+import darks.grid.utils.ChannelUtils;
 
 public class GridLocalSession implements GridSession
 {
@@ -22,7 +23,7 @@ public class GridLocalSession implements GridSession
 	@Override
 	public String getId()
 	{
-		return channel.id().asShortText();
+		return ChannelUtils.getChannelId(channel);
 	}
 
 	@Override

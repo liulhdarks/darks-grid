@@ -48,14 +48,19 @@ public class GridNetworkManager implements GridManager
 	
 	public boolean tryJoinAddress(InetSocketAddress address)
 	{
-		GridMessageClient client = clientLocal.get();
-		if (client == null)
+		synchronized (mutex)
 		{
-			client = new GridMessageClient(ThreadUtils.getThrealPool());
-			client.initialize();
-			clientLocal.set(client);
+			if (GridRuntime.nodes().contains(address))
+				return true;
+			GridMessageClient client = clientLocal.get();
+			if (client == null)
+			{
+				client = new GridMessageClient(ThreadUtils.getThrealPool());
+				client.initialize();
+				clientLocal.set(client);
+			}
+			return client.connect(address);
 		}
-		return client.connect(address);
 	}
 
 	public int addWaitJoin(String nodeId, JoinMeta meta)

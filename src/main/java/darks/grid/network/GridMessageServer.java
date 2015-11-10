@@ -58,8 +58,8 @@ public class GridMessageServer extends GridMessageDispatcher
 		    NetworkConfig config = GridRuntime.config().getNetworkConfig();
 		    int bossNum = Runtime.getRuntime().availableProcessors() * config.getServerBossThreadDelta();
 		    int workerNum = config.getServerWorkerThreadNumber();
-		    bossGroup = new NioEventLoopGroup(bossNum, threadExecutor);
-		    workerGroup = new NioEventLoopGroup(workerNum, threadExecutor);
+		    bossGroup = new NioEventLoopGroup(bossNum);
+		    workerGroup = new NioEventLoopGroup(workerNum);
 			super.initialize();
 			bootstrap = new ServerBootstrap();
 			bootstrap.group(bossGroup, workerGroup)

@@ -10,9 +10,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import darks.grid.beans.MethodResult;
 import darks.grid.executor.ExecuteConfig;
 import darks.grid.executor.RpcExecutor;
+import darks.grid.executor.task.rpc.RpcResult;
 import darks.grid.utils.ReflectUtils;
 
 public class ProxyRpcInvocationHandler implements InvocationHandler
@@ -40,7 +40,7 @@ public class ProxyRpcInvocationHandler implements InvocationHandler
     	if (!matchTargetMethod(method.getName()))
     		return method.invoke(proxy, args);
         String methodName = ReflectUtils.getMethodUniqueName(method);
-        MethodResult result = RpcExecutor.callMethod(methodName, args, method.getParameterTypes(), config);
+        RpcResult result = RpcExecutor.callMethod(methodName, args, method.getParameterTypes(), config);
         if (!result.isSuccess())
         {
         	log.error("Fail to invoke method " + methodName + ". Cause " + result.getErrorMessage());

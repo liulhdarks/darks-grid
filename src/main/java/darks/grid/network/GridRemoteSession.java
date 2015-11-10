@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import darks.grid.GridRuntime;
+import darks.grid.utils.ChannelUtils;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 
@@ -27,7 +28,7 @@ public class GridRemoteSession implements GridSession
 	@Override
 	public String getId()
 	{
-		return channel.id().asShortText();
+		return ChannelUtils.getChannelId(channel);
 	}
 
 	@Override

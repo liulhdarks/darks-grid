@@ -1,9 +1,9 @@
-package darks.grid.beans;
+package darks.grid.executor.task.rpc;
 
 import java.io.Serializable;
 import java.util.List;
 
-public class MethodResult implements Serializable, Cloneable
+public class RpcResult implements Serializable, Cloneable
 {
     private static final long serialVersionUID = 747642688611619579L;
 
@@ -13,19 +13,19 @@ public class MethodResult implements Serializable, Cloneable
     
     private boolean success = true;
     
-    public MethodResult()
+    public RpcResult()
     {
         
     }
     
-    public MethodResult(List<Object> result)
+    public RpcResult(List<Object> result)
     {
         this.result = result;
     }
     
-    public static MethodResult fail(String error)
+    public static RpcResult fail(String error)
     {
-        MethodResult result = new MethodResult();
+        RpcResult result = new RpcResult();
         result.errorMessage = error;
         result.success = false;
         return result;

@@ -172,21 +172,6 @@ public class GridMessage implements Serializable, Cloneable, ReferenceCounted
 		return this;
 	}
 
-
-	@Override
-	public ReferenceCounted touch()
-	{
-		return this;
-	}
-
-
-	@Override
-	public ReferenceCounted touch(Object hint)
-	{
-		return this;
-	}
-
-
 	@Override
 	public boolean release()
 	{

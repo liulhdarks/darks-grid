@@ -1,14 +1,20 @@
 package darks.grid.utils;
 
+import io.netty.util.concurrent.DefaultThreadFactory;
+import io.netty.util.concurrent.MultithreadEventExecutorGroup;
+
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.ThreadFactory;
 
 public final class ThreadUtils
 {
 	
 	private static ExecutorService threalPool = Executors.newCachedThreadPool();
+	
+	private static ThreadFactory threadFactory = new DefaultThreadFactory(MultithreadEventExecutorGroup.class);
 	
 	private ThreadUtils()
 	{
@@ -52,6 +58,9 @@ public final class ThreadUtils
 		return threalPool;
 	}
 	
-	
+	public static ThreadFactory getThreadFactory()
+	{
+		return threadFactory;
+	}
 	
 }

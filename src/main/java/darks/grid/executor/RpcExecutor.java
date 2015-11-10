@@ -13,10 +13,10 @@ import org.slf4j.LoggerFactory;
 import darks.grid.GridException;
 import darks.grid.GridRuntime;
 import darks.grid.beans.GridRpcMethod;
-import darks.grid.beans.MethodResult;
 import darks.grid.executor.ExecuteConfig.ResponseType;
 import darks.grid.executor.task.TaskResultListener;
 import darks.grid.executor.task.rpc.GridRpcTask;
+import darks.grid.executor.task.rpc.RpcResult;
 import darks.grid.executor.task.rpc.RpcRequest;
 import darks.grid.utils.ReflectUtils;
 
@@ -59,6 +59,7 @@ public class RpcExecutor extends GridExecutor
 	{
 		if (!rpcMap.containsKey(uniqueName))
 		{
+			log.info("Register method unique " + uniqueName);
 			GridRpcMethod bean = new GridRpcMethod(methodName, targetClass, targetObject, method);
 			rpcMap.put(uniqueName, bean);
 			return true;
@@ -69,21 +70,21 @@ public class RpcExecutor extends GridExecutor
 		}
 	}
 
-    public static MethodResult callMethod(String uniqueName, Object[] params, ExecuteConfig config) {
+    public static RpcResult callMethod(String uniqueName, Object[] params, ExecuteConfig config) {
         Class<?>[] types = ReflectUtils.getObjectClasses(params);
         return callMethod(uniqueName, params, types, config);
     }
 
-    public static MethodResult callMethod(String uniqueName, Object[] params, Class<?>[] types, ExecuteConfig config)
+    public static RpcResult callMethod(String uniqueName, Object[] params, Class<?>[] types, ExecuteConfig config)
 	{
 	    if (config == null)
 	        config = new ExecuteConfig();
 	    config.fixType();
 	    RpcRequest request = new RpcRequest(uniqueName, params, types);
 	    GridRpcTask task = new GridRpcTask();
-	    FutureTask<MethodResult> future = GridRuntime.tasks().executeMapReduceTask(task, request, config, null);
+	    FutureTask<RpcResult> future = GridRuntime.tasks().executeMapReduceTask(task, request, config, null);
 	    if (config.getResponseType() == ResponseType.NONE)
-	        return new MethodResult();
+	        return new RpcResult();
 	    try
         {
 	        if (config.getTimeoutSeconds() <= 0)
@@ -94,19 +95,19 @@ public class RpcExecutor extends GridExecutor
         catch (Exception e)
         {
             log.error(e.getMessage(), e);
-            return MethodResult.fail("Fail to call method " + uniqueName + ". Cause " + e.getMessage());
+            return RpcResult.fail("Fail to call method " + uniqueName + ". Cause " + e.getMessage());
         }
 	}
 
     public static void asyncCallMethod(String uniqueName, Object[] params, ExecuteConfig config,
-                                       TaskResultListener<MethodResult> listener)
+                                       TaskResultListener<RpcResult> listener)
     {
         Class<?>[] types = ReflectUtils.getObjectClasses(params);
         asyncCallMethod(uniqueName, params, types, config, listener);
     }
     
     public static void asyncCallMethod(String uniqueName, Object[] params, Class<?>[] types, ExecuteConfig config,
-                        TaskResultListener<MethodResult> listener)
+                        TaskResultListener<RpcResult> listener)
     {
         if (config == null)
             config = new ExecuteConfig();

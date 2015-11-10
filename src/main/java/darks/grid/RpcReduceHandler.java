@@ -1,10 +1,10 @@
 package darks.grid;
 
-import darks.grid.beans.MethodResult;
+import darks.grid.executor.task.rpc.RpcResult;
 
 public interface RpcReduceHandler
 {
 
-	public Object reduce(MethodResult result);
+	public Object reduce(RpcResult result);
 	
 }
