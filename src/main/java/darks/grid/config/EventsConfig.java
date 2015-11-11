@@ -43,5 +43,12 @@ public class EventsConfig
 	{
 		this.eventConsumerNumber = eventConsumerNumber;
 	}
+
+	@Override
+	public String toString()
+	{
+		return "EventsConfig [useBlockQueue=" + useBlockQueue + ", blockQueueMaxNumber="
+				+ blockQueueMaxNumber + ", eventConsumerNumber=" + eventConsumerNumber + "]";
+	}
 	
 }

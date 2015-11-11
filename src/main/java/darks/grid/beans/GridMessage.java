@@ -32,7 +32,7 @@ public class GridMessage implements Serializable, Cloneable, ReferenceCounted
 	
 	private int type;
 	
-	private boolean success;
+	private boolean success = true;
 	
 	private String sourceId;
 	

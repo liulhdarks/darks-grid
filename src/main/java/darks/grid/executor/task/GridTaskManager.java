@@ -35,7 +35,7 @@ public class GridTaskManager implements GridManager
 	}
 
 	public <T, R> FutureTask<R> executeMapReduceTask(MapReduceTask<T, R> task, T args, 
-	        ExecuteConfig config, TaskResultListener<R> listener)
+	        ExecuteConfig config, TaskResultListener listener)
 	{
 	    TaskExecutor<T, R> executor = new MapReduceExecutor<T, R>(task, args, config, listener);
 		doingTasksMap.put(task.getId(), executor);

@@ -70,6 +70,8 @@ public class GridRemoteSession implements GridSession
 			        return false;
 				ChannelFuture future = channel.writeAndFlush(msg).sync();
 				ret = future.isSuccess();
+				if (log.isDebugEnabled())
+					log.debug("Send " + msg + " to " + channel.remoteAddress() + " ret:" + ret);
 				if (ret)
 					break;
 				count++;

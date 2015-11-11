@@ -3,15 +3,14 @@ package darks.grid.spring;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import darks.grid.executor.ExecuteConfig;
 import darks.grid.executor.RpcExecutor;
+import darks.grid.executor.task.TaskResultListener;
 import darks.grid.executor.task.rpc.RpcResult;
 import darks.grid.utils.ReflectUtils;
 
@@ -20,17 +19,20 @@ public class ProxyRpcInvocationHandler implements InvocationHandler
 	
 	private static final Logger log = LoggerFactory.getLogger(ProxyRpcInvocationHandler.class);
 	
-
-	private ExecuteConfig config;
+	ExecuteConfig config = null;
 	
-	private Set<String> targetMethods;
+	Set<String> targetMethods = null;
 	
-	private Map<String, Boolean> cacheMatch = new ConcurrentHashMap<String, Boolean>();
+	TaskResultListener taskResultListener = null;
 	
-	public ProxyRpcInvocationHandler(ExecuteConfig config, Set<String> targetMethods)
+	boolean asyncInvoke = false;
+	
+	public ProxyRpcInvocationHandler(RpcProxyBean proxyBean)
 	{
-		this.config = config;
-		this.targetMethods = targetMethods;
+		config = proxyBean.getConfig();
+		targetMethods = proxyBean.getTargetMethods();
+		taskResultListener = proxyBean.getTaskResultListener();
+		asyncInvoke = proxyBean.isAsyncInvoke();
 	} 
     
     @Override
@@ -40,34 +42,40 @@ public class ProxyRpcInvocationHandler implements InvocationHandler
     	if (!matchTargetMethod(method.getName()))
     		return method.invoke(proxy, args);
         String methodName = ReflectUtils.getMethodUniqueName(method);
+        if (asyncInvoke)
+        {
+        	RpcExecutor.asyncCallMethod(methodName, args, method.getParameterTypes(), config, taskResultListener);
+        	return null;
+        }
         RpcResult result = RpcExecutor.callMethod(methodName, args, method.getParameterTypes(), config);
         if (!result.isSuccess())
         {
         	log.error("Fail to invoke method " + methodName + ". Cause " + result.getErrorMessage());
         }
+        Object finalResult = null;
         if (config.getReducerHandler() != null)
         {
-        	return config.getReducerHandler().reduce(result);
+        	finalResult = config.getReducerHandler().reduce(result);
         }
         else
         {
         	if (method.getReturnType().equals(Object.class))
         	{
-                return result.getResult();
+        		finalResult = result.getResult();
         	}
         	else
         	{
         		List<Object> list = result.getResult();
-        		return (list == null || list.isEmpty()) ? null : list.get(0);
+        		finalResult = (list == null || list.isEmpty()) ? null : list.get(0);
         	}
         }
+        if (taskResultListener != null)
+        	taskResultListener.handle(finalResult);
+        return finalResult;
     }
     
     private boolean matchTargetMethod(String methodName)
     {
-    	Boolean oldRet = cacheMatch.get(methodName);
-    	if (oldRet != null)
-    		return oldRet;
     	boolean ret = false;
     	if (targetMethods == null 
     			|| targetMethods.isEmpty() 
@@ -75,11 +83,6 @@ public class ProxyRpcInvocationHandler implements InvocationHandler
     	{
     		ret = true;
     	}
-    	else
-    	{
-    		//TODO regex
-    	}
-    	cacheMatch.put(methodName, ret);
     	return ret;
     }
     

@@ -1,6 +1,5 @@
 package darks.grid.spring;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.beans.factory.FactoryBean;
@@ -9,9 +8,9 @@ import org.springframework.beans.factory.InitializingBean;
 import darks.grid.RpcReduceHandler;
 import darks.grid.balance.GridBalance;
 import darks.grid.balance.RollPolingBalance;
-import darks.grid.executor.ExecuteConfig;
 import darks.grid.executor.ExecuteConfig.CallType;
 import darks.grid.executor.ExecuteConfig.ResponseType;
+import darks.grid.executor.task.TaskResultListener;
 import darks.grid.utils.ReflectUtils;
 
 public class GridRpcSpringConsumerBean<T> implements FactoryBean<T>, InitializingBean
@@ -19,34 +18,42 @@ public class GridRpcSpringConsumerBean<T> implements FactoryBean<T>, Initializin
 
     private Class<T> target;
     
-    private String proxy = "jdk";
+    private String proxy = ProxyBuilder.JDK_PROXY_TYPE;
     
     private Class<? extends RpcReduceHandler> reducer;
     
-    private ExecuteConfig config = new ExecuteConfig();
-    
     private Class<? extends GridBalance> balance = RollPolingBalance.class;
     
-    private Set<String> targetMethods = new HashSet<>();
+    private Class<? extends TaskResultListener> taskResultListener;
+    
+    private RpcProxyBean proxyBean = new RpcProxyBean();
     
     @Override
     public void afterPropertiesSet()
         throws Exception
     {
-        if (!"jdk".equals(proxy))
-            proxy = "jdk";
+        if (!ProxyBuilder.JDK_PROXY_TYPE.equals(proxy) 
+        		&& !ProxyBuilder.JAVASSIST_PROXY_TYPE.equals(proxy))
+            proxy = ProxyBuilder.JDK_PROXY_TYPE;
     	if (reducer != null)
-    	    config.setReducerHandler(ReflectUtils.newInstance(reducer));
+    		proxyBean.getConfig().setReducerHandler(ReflectUtils.newInstance(reducer));
     	if (balance != null)
-    	    config.setBalance(ReflectUtils.newInstance(balance));
+    		proxyBean.getConfig().setBalance(ReflectUtils.newInstance(balance));
+    	if (taskResultListener != null)
+    		proxyBean.setTaskResultListener(ReflectUtils.newInstance(taskResultListener));
     }
 
     @Override
     public T getObject() throws Exception
     {
-        if ("jdk".equals(proxy))
+        if (ProxyBuilder.JDK_PROXY_TYPE.equals(proxy))
         {
-            ProxyBuilder builder = new JdkProxyBuilder(config, targetMethods);
+            ProxyBuilder builder = new JdkProxyBuilder(proxyBean);
+            return (T)builder.build(target);
+        }
+        else  if (ProxyBuilder.JAVASSIST_PROXY_TYPE.equals(proxy))
+        {
+            ProxyBuilder builder = new JavassistProxyBuilder(proxyBean);
             return (T)builder.build(target);
         }
         return null;
@@ -96,17 +103,17 @@ public class GridRpcSpringConsumerBean<T> implements FactoryBean<T>, Initializin
 
     public void setCallType(String callType)
     {
-        config.setCallType(CallType.valueOf(callType.toUpperCase()));
+    	proxyBean.getConfig().setCallType(CallType.valueOf(callType.toUpperCase()));
     }
 
     public void setResponseType(String responseType)
     {
-        config.setResponseType(ResponseType.valueOf(responseType.toUpperCase()));
+    	proxyBean.getConfig().setResponseType(ResponseType.valueOf(responseType.toUpperCase()));
     }
 
-    public void setTimeoutSeconds(int timeoutSeconds)
+    public void setTimeout(int timeout)
     {
-        config.setTimeoutSeconds(timeoutSeconds);
+    	proxyBean.getConfig().setTimeout(timeout);
     }
 
 	public Class<? extends GridBalance> getBalance()
@@ -121,11 +128,31 @@ public class GridRpcSpringConsumerBean<T> implements FactoryBean<T>, Initializin
 
 	public Set<String> getTargetMethods()
 	{
-		return targetMethods;
+		return proxyBean.getTargetMethods();
 	}
 
 	public void setTargetMethods(Set<String> targetMethods)
 	{
-		this.targetMethods = targetMethods;
+		proxyBean.setTargetMethods(targetMethods);
+	}
+
+	public Class<? extends TaskResultListener> getTaskResultListener()
+	{
+		return taskResultListener;
+	}
+
+	public void setTaskResultListener(Class<? extends TaskResultListener> taskResultListener)
+	{
+		this.taskResultListener = taskResultListener;
+	}
+	
+	public boolean isAsyncInvoke()
+	{
+		return proxyBean.isAsyncInvoke();
+	}
+
+	public void setAsyncInvoke(boolean asyncInvoke)
+	{
+		this.proxyBean.setAsyncInvoke(asyncInvoke);
 	}
 }

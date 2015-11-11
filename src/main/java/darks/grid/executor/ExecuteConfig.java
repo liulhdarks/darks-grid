@@ -24,7 +24,7 @@ public class ExecuteConfig implements Serializable
     
     private ResponseType responseType = ResponseType.ALL;
     
-    private int timeoutSeconds = 0;
+    private int timeout = 0;
     
     private transient RpcReduceHandler reducerHandler;
     
@@ -66,18 +66,17 @@ public class ExecuteConfig implements Serializable
         this.responseType = responseType;
     }
 
-    public int getTimeoutSeconds()
-    {
-        return timeoutSeconds;
-    }
+    public int getTimeout()
+	{
+		return timeout;
+	}
 
-    public void setTimeoutSeconds(int timeoutSeconds)
-    {
-        this.timeoutSeconds = timeoutSeconds;
-    }
-    
+	public void setTimeout(int timeout)
+	{
+		this.timeout = timeout;
+	}
 
-    public RpcReduceHandler getReducerHandler()
+	public RpcReduceHandler getReducerHandler()
     {
         return reducerHandler;
     }
@@ -97,11 +96,11 @@ public class ExecuteConfig implements Serializable
         this.balance = balance;
     }
 
-    @Override
-    public String toString()
-    {
-        return "ExecuteConfig [callType=" + callType + ", responseType=" + responseType + ", timeoutSeconds="
-            + timeoutSeconds + "]";
-    }
+	@Override
+	public String toString()
+	{
+		return "ExecuteConfig [callType=" + callType + ", responseType=" + responseType
+				+ ", timeout=" + timeout + "]";
+	}
 
 }

@@ -2,6 +2,7 @@ package darks.grid.executor.task.mapred;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import darks.grid.GridRuntime;
 import darks.grid.beans.GridMessage;
@@ -20,10 +21,10 @@ import darks.grid.executor.task.TaskResultListener;
 public class MapReduceExecutor<T, R> extends TaskExecutor<T, R>
 {
 
-    private TaskResultListener<R> listener;
+    private TaskResultListener listener;
     
     public MapReduceExecutor(MapReduceTask<T, R> task,
-        T paramters, ExecuteConfig config, TaskResultListener<R> listener)
+        T paramters, ExecuteConfig config, TaskResultListener listener)
     {
         super(TaskType.MAPRED, task, paramters, config);
         this.listener = listener;
@@ -46,14 +47,13 @@ public class MapReduceExecutor<T, R> extends TaskExecutor<T, R>
         }
         if (config.getResponseType() == ResponseType.NONE)
         	return null;
-        future.await();
+        future.await(config.getTimeout(), TimeUnit.MILLISECONDS);
         GridRuntime.tasks().completeTask(getTaskId());
         List<JobResult> jobResults = future.getList();
         R ret = task.reduce(jobResults);
         if (listener != null)
-            return listener.handle(ret);
-        else
-            return ret;
+            listener.handle(ret);
+        return ret;
     }
 
     @Override

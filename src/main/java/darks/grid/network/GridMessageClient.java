@@ -2,6 +2,7 @@ package darks.grid.network;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -80,21 +81,21 @@ public class GridMessageClient extends GridMessageDispatcher
 	}
 
 
-	public boolean connect(String host, int port)
+	public Channel connect(String host, int port)
 	{
 		return connect(new InetSocketAddress(host, port));
 	}
 
-	public boolean connect(SocketAddress address)
+	public Channel connect(SocketAddress address)
 	{
 		if (bootstrap == null)
-			return false;
+			return null;
 		try
 		{
 			ChannelFuture f = bootstrap.connect(address).sync();
-			channel = f.channel();
+			Channel channel = f.channel();
 			log.info("Succeed to connect " + address);
-			return true;
+			return channel;
 		}
 		catch (Exception e)
 		{
@@ -102,7 +103,7 @@ public class GridMessageClient extends GridMessageDispatcher
 				log.error("Fail to connect " + address);
 			else
 				log.error(e.getMessage(), e);
-			return false;
+			return null;
 		}
 	}
 

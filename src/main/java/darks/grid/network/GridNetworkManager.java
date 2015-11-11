@@ -6,11 +6,13 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
 
 import darks.grid.GridManager;
 import darks.grid.GridRuntime;
 import darks.grid.beans.meta.JoinMeta;
 import darks.grid.config.GridConfiguration;
+import darks.grid.utils.SyncPool;
 import darks.grid.utils.ThreadUtils;
 
 public class GridNetworkManager implements GridManager
@@ -48,7 +50,10 @@ public class GridNetworkManager implements GridManager
 	
 	public boolean tryJoinAddress(InetSocketAddress address)
 	{
-		synchronized (mutex)
+		Lock lock = SyncPool.lock(address);
+		if (!lock.tryLock())
+			return false;
+		try
 		{
 			if (GridRuntime.nodes().contains(address))
 				return true;
@@ -59,8 +64,13 @@ public class GridNetworkManager implements GridManager
 				client.initialize();
 				clientLocal.set(client);
 			}
-			return client.connect(address);
+			return client.connect(address) != null;
 		}
+		finally
+		{
+			lock.unlock();
+		}
+		
 	}
 
 	public int addWaitJoin(String nodeId, JoinMeta meta)

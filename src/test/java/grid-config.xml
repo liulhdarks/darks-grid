@@ -6,6 +6,8 @@
 	<cluster cluster_name="KELUDEAPS" />
 	
 	<task jobs_exec_count="30"/>
+
+	<events event_consumer_number="8"/>
 	
 	<log interval="120000" 
 		nodes_info="true" 
@@ -21,7 +23,7 @@
 		tcp_keep_alive="true"
 		tcp_reuse_addr="false"
 		recv_timeout="50000"
-		connect_timeout="3000"
+		connect_timeout="2000"
 		server_worker_thread_number="4"
 		server_boss_thread_delta="2"
 		client_worker_thread_number="4"

@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import darks.grid.executor.job.GridJobStatus;
 import darks.grid.executor.job.JobResult;
 import darks.grid.executor.job.JobStatusType;
-import darks.grid.executor.task.mapred.MapReduceTask;
 import darks.grid.utils.ThreadUtils;
 
 public class GridJobFuture extends GridFuture<JobResult>

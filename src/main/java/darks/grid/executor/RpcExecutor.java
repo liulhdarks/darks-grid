@@ -87,10 +87,10 @@ public class RpcExecutor extends GridExecutor
 	        return new RpcResult();
 	    try
         {
-	        if (config.getTimeoutSeconds() <= 0)
+	        if (config.getTimeout() <= 0)
 	            return future.get();
 	        else
-	            return future.get(config.getTimeoutSeconds(), TimeUnit.SECONDS);
+	            return future.get(config.getTimeout(), TimeUnit.MILLISECONDS);
         }
         catch (Exception e)
         {
@@ -100,14 +100,14 @@ public class RpcExecutor extends GridExecutor
 	}
 
     public static void asyncCallMethod(String uniqueName, Object[] params, ExecuteConfig config,
-                                       TaskResultListener<RpcResult> listener)
+                                       TaskResultListener listener)
     {
         Class<?>[] types = ReflectUtils.getObjectClasses(params);
         asyncCallMethod(uniqueName, params, types, config, listener);
     }
     
     public static void asyncCallMethod(String uniqueName, Object[] params, Class<?>[] types, ExecuteConfig config,
-                        TaskResultListener<RpcResult> listener)
+                        TaskResultListener listener)
     {
         if (config == null)
             config = new ExecuteConfig();

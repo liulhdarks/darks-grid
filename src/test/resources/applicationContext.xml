@@ -12,6 +12,7 @@
 		<property name="target" value="darks.grid.test.spring.RpcComputer"/>
         <property name="reducer" value="darks.grid.test.spring.RpcComputerReduceHandler"/>
         <property name="callType" value="all"/>
+        <property name="proxy" value="jdk"/>
 	</bean>
 	
 	<bean id="rpcComputerImpl" class="darks.grid.test.spring.RpcComputerImpl"/>
