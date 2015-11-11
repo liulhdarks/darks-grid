@@ -20,21 +20,21 @@ public final class GridRuntime
 
 	static GridConfiguration config;
 	
-	static GridNetworkManager network;
+	static GridNetworkManager network = new GridNetworkManager();
 	
-	static GridNodesManager nodesManager;
+	static GridNodesManager nodesManager = new GridNodesManager();
 	
-	static GridContext context;
+	static GridContext context = new GridContext();
 	
-	static GridComponentManager componentsManager;
+	static GridComponentManager componentsManager = new GridComponentManager();
 	
-	static GridTaskManager tasksManager;
+	static GridTaskManager tasksManager = new GridTaskManager();
 	
-	static GridJobManager jobsManager;
+	static GridJobManager jobsManager = new GridJobManager();
 	
-	static GridLocalMessageManager localManager;
+	static GridLocalMessageManager localManager = new GridLocalMessageManager();
 	
-	static GridEventsManager eventsManager;
+	static GridEventsManager eventsManager = new GridEventsManager();
 	
 	static volatile boolean finishLoaded = false;
 	
@@ -46,14 +46,6 @@ public final class GridRuntime
 	public static boolean initialize(GridConfiguration config)
 	{
 		GridRuntime.config = config;
-		context = new GridContext();
-		network = new GridNetworkManager();
-		nodesManager = new GridNodesManager();
-		componentsManager = new GridComponentManager();
-		tasksManager = new GridTaskManager();
-		jobsManager = new GridJobManager();
-		localManager = new GridLocalMessageManager();
-		eventsManager = new GridEventsManager();
 		boolean ret = context.initialize(config);
 		if (!ret)
 		{

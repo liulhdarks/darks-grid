@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import darks.grid.beans.GridComponent;
+import darks.grid.utils.GridStatistic;
 import darks.grid.utils.MachineUtils;
 import darks.grid.utils.StringUtils;
 
@@ -37,20 +38,33 @@ public class RuntimeLog extends GridComponent
 			Runtime jvmRuntime = Runtime.getRuntime();
 			buf.append("Direct-mem:").append(StringUtils.memorySize(MachineUtils.getReservedDirectMemory()))
 				.append('/').append(StringUtils.memorySize(MachineUtils.getMaxDirectMemory())).append('\t')
-				.append("Heap-men:").append(StringUtils.memorySize(jvmRuntime.totalMemory() - jvmRuntime.freeMemory())).append('/')
-				.append(StringUtils.memorySize(jvmRuntime.totalMemory())).append('/')
-				.append(StringUtils.memorySize(jvmRuntime.maxMemory()))
-				.append('\n');
+				.append("Heap-men:").append(StringUtils.memorySize(jvmRuntime.totalMemory() - jvmRuntime.freeMemory()))
+				.append('/').append(StringUtils.memorySize(jvmRuntime.totalMemory()));
+			if (jvmRuntime.totalMemory() != jvmRuntime.maxMemory())
+				buf.append('/').append(StringUtils.memorySize(jvmRuntime.maxMemory()));
+			buf.append(' ').append("Avg-Delay:").append(GridStatistic.getAvgDelay())
+				.append(' ').append("Max-Delay:").append(GridStatistic.getMaxDelay())
+				.append(' ').append("Avg-LDelay:").append(GridStatistic.getAvgLocalDelay())
+				.append(' ').append("Max-LDelay:").append(GridStatistic.getMaxLocalDelay());
+			buf.append('\n');
 			buf.append("-------------------------------------------------------------\n");
 		}
 		if (taskInfo)
 		{
-			buf.append(GridRuntime.tasks().toSimgleString()).append('\n');
+			long taskCount = GridStatistic.getTaskCount();
+			String info = GridRuntime.tasks().toSimgleString().trim();
+			buf.append("Tasks(").append(taskCount).append("):\n");
+			if (!"".equals(info))
+				buf.append(info).append('\n');
 			buf.append("-------------------------------------------------------------\n");
 		}
 		if (execJobInfo)
 		{
-			buf.append(GridRuntime.jobs().toExecuteJobsString()).append('\n');
+			long jobCount = GridStatistic.getJobCount();
+			String info = GridRuntime.jobs().toExecuteJobsString().trim();
+			buf.append("Jobs(").append(jobCount).append("):\n");
+			if (!"".equals(info))
+				buf.append(info).append('\n');
 		}
 		buf.append("=============================================================\n");
 		log.info(buf.toString());

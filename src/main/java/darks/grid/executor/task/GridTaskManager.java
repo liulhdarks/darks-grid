@@ -10,6 +10,7 @@ import darks.grid.config.GridConfiguration;
 import darks.grid.executor.ExecuteConfig;
 import darks.grid.executor.task.mapred.MapReduceExecutor;
 import darks.grid.executor.task.mapred.MapReduceTask;
+import darks.grid.utils.GridStatistic;
 import darks.grid.utils.ThreadUtils;
 
 public class GridTaskManager implements GridManager
@@ -37,6 +38,7 @@ public class GridTaskManager implements GridManager
 	public <T, R> FutureTask<R> executeMapReduceTask(MapReduceTask<T, R> task, T args, 
 	        ExecuteConfig config, TaskResultListener listener)
 	{
+		GridStatistic.incrementTaskCount();
 	    TaskExecutor<T, R> executor = new MapReduceExecutor<T, R>(task, args, config, listener);
 		doingTasksMap.put(task.getId(), executor);
 		return (FutureTask<R>) ThreadUtils.submitTask(executor);

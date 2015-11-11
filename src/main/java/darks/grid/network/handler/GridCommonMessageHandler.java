@@ -17,6 +17,7 @@ import darks.grid.beans.GridMessage;
 import darks.grid.network.GridSessionFactory;
 import darks.grid.network.handler.msg.GridMessageHandler;
 import darks.grid.network.handler.msg.MessageHandlerFactory;
+import darks.grid.utils.GridStatistic;
 
 public class GridCommonMessageHandler extends SimpleChannelInboundHandler<GridMessage>
 {
@@ -61,11 +62,13 @@ public class GridCommonMessageHandler extends SimpleChannelInboundHandler<GridMe
 	{
 		if (log.isDebugEnabled())
 			log.debug("Channel read:" + msg);
+		long arriveTime = System.currentTimeMillis();
 		GridMessageHandler handler = MessageHandlerFactory.getHandler(msg);
 		if (handler != null)
 		{
 			handler.handler(GridSessionFactory.getSession(ctx.channel()), msg);
 		}
+		GridStatistic.incrementDelay(arriveTime - msg.getTimestamp());
 	}
 
 	@Override

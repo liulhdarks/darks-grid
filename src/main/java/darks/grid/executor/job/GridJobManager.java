@@ -11,6 +11,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import darks.grid.GridManager;
 import darks.grid.beans.GridNode;
 import darks.grid.config.GridConfiguration;
+import darks.grid.utils.GridStatistic;
 
 public class GridJobManager implements GridManager
 {
@@ -44,6 +45,7 @@ public class GridJobManager implements GridManager
 	
 	public void addExecuteJob(JobExecutor job)
 	{
+		GridStatistic.incrementJobCount();
 		Map<String, JobExecutor> jobsMap = getExecuteJobs(job.getTaskId());
 		jobsMap.put(job.getJobId(), job);
 		threadPool.execute(job);

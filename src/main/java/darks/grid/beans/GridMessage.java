@@ -38,6 +38,8 @@ public class GridMessage implements Serializable, Cloneable, ReferenceCounted
 	
 	private int sourceType;
 	
+	private long timestamp = System.currentTimeMillis();
+	
 	AtomicInteger cnt = new AtomicInteger(0);
 
 	public GridMessage()
@@ -143,12 +145,25 @@ public class GridMessage implements Serializable, Cloneable, ReferenceCounted
 		this.sourceType = sourceType;
 	}
 
+	public long getTimestamp()
+	{
+		return timestamp;
+	}
+
+
+	public void setTimestamp(long timestamp)
+	{
+		this.timestamp = timestamp;
+	}
+
 
 	@Override
 	public String toString()
 	{
-		return "GridMessage [id=" + id + ", data=" + data + ", type=" + type + ", success="
-				+ success + ", sourceId=" + sourceId + ", sourceType=" + sourceType + "]";
+		return "GridMessage [id=" + id + ", data=" + data + ", type=" + type
+				+ ", success=" + success + ", sourceId=" + sourceId
+				+ ", sourceType=" + sourceType + ", timestamp=" + timestamp
+				+ "]";
 	}
 
 
