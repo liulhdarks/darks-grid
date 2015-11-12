@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import darks.grid.RpcReduceHandler;
 import darks.grid.balance.GridBalance;
+import darks.grid.balance.RollPolingBalance;
 
 public class ExecuteConfig implements Serializable
 {
@@ -28,7 +29,7 @@ public class ExecuteConfig implements Serializable
     
     private transient RpcReduceHandler reducerHandler;
     
-    private transient GridBalance balance;
+    private transient GridBalance balance = new RollPolingBalance();
     
     public ExecuteConfig()
     {

@@ -27,7 +27,9 @@ public class GridCommonMessageHandler extends SimpleChannelInboundHandler<GridMe
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception
 	{
-		if (cause instanceof IOException && cause.getMessage().indexOf("远程主机强迫关闭") >= 0)
+		if (cause instanceof IOException 
+				&& (cause.getMessage().indexOf("远程主机强迫关闭") >= 0
+						|| cause.getMessage().indexOf("Connection reset by peer") >= 0))
 		{
 		    log.warn("Miss connection " + ctx.channel().remoteAddress());
 			GridRuntime.nodes().removeNode(GridSessionFactory.getSession(ctx.channel()));
@@ -60,9 +62,9 @@ public class GridCommonMessageHandler extends SimpleChannelInboundHandler<GridMe
 	@Override
 	public void channelRead0(ChannelHandlerContext ctx, GridMessage msg) throws Exception
 	{
+		long arriveTime = System.currentTimeMillis();
 		if (log.isDebugEnabled())
 			log.debug("Channel read:" + msg);
-		long arriveTime = System.currentTimeMillis();
 		GridMessageHandler handler = MessageHandlerFactory.getHandler(msg);
 		if (handler != null)
 		{

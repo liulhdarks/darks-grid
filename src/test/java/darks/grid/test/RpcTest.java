@@ -117,6 +117,8 @@ public class RpcTest
 		
 		public String print()
 		{
+			System.out.println("wait print ");
+			ThreadUtils.threadSleep(10000);
 			System.out.println("Execute print " + MachineUtils.getProcessId());
 			return MachineUtils.getProcessId();
 		}

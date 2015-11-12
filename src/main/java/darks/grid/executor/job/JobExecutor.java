@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import darks.grid.GridRuntime;
 import darks.grid.beans.GridMessage;
 import darks.grid.network.GridSession;
+import darks.grid.utils.GridStatistic;
 
 public abstract class JobExecutor implements Runnable
 {
@@ -20,11 +21,14 @@ public abstract class JobExecutor implements Runnable
 	
 	private JobStatusType statusType;
 	
+	private long timestamp = System.currentTimeMillis();
+	
 	public JobExecutor(GridSession session, GridMessage msg)
 	{
 		this.session = session;
 		this.msg = msg;
 		this.job = msg.getData();
+		GridStatistic.addWaitJobCount(1);
 	}
 
 	@Override
@@ -32,6 +36,9 @@ public abstract class JobExecutor implements Runnable
 	{
 		try
 		{
+			long delay = System.currentTimeMillis() - timestamp;
+			GridStatistic.incrementJobDelay(delay);
+			GridStatistic.addWaitJobCount(-1);
 			statusType = JobStatusType.DOING;
 			execute(session, msg, job);
 			statusType = JobStatusType.SUCCESS;

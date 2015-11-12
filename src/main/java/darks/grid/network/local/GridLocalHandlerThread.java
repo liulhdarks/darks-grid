@@ -2,7 +2,7 @@ package darks.grid.network.local;
 
 import io.netty.channel.Channel;
 
-import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,16 +14,17 @@ import darks.grid.network.GridSession;
 import darks.grid.network.GridSessionFactory;
 import darks.grid.network.handler.msg.GridMessageHandler;
 import darks.grid.network.handler.msg.MessageHandlerFactory;
+import darks.grid.utils.GridStatistic;
 
 public class GridLocalHandlerThread extends Thread
 {
 	private static Logger log = LoggerFactory.getLogger(GridLocalHandlerThread.class);
 	
-	private Queue<Object> messageQueue;
+	private BlockingQueue<Object> messageQueue;
 	
 	private volatile boolean destroyed = false;
 	
-	public GridLocalHandlerThread(Queue<Object> messageQueue)
+	public GridLocalHandlerThread(BlockingQueue<Object> messageQueue)
 	{
 		this.messageQueue = messageQueue;
 	}
@@ -35,17 +36,13 @@ public class GridLocalHandlerThread extends Thread
 			while (!destroyed && !isInterrupted())
 			{
 				long st = System.currentTimeMillis();
-				Object obj = null;
-				while ((obj = messageQueue.poll()) != null)
+				Object obj = messageQueue.take();
+				handlerMessage(obj);
+				if (System.currentTimeMillis() - st > 10000)
 				{
-					handlerMessage(obj);
-					if (System.currentTimeMillis() - st > 3000)
-					{
-						st = System.currentTimeMillis();
-						Thread.sleep(5);
-					}
+					st = System.currentTimeMillis();
+					Thread.sleep(0);
 				}
-				Thread.sleep(10);
 			}
 		}
 		catch (Exception e)
@@ -64,6 +61,7 @@ public class GridLocalHandlerThread extends Thread
 	{
 		try
 		{
+			long arriveTime = System.currentTimeMillis();
 			GridMessage message = (GridMessage) obj;
 			if (log.isDebugEnabled())
 				log.debug("Local read:" + message);
@@ -75,6 +73,7 @@ public class GridLocalHandlerThread extends Thread
 				GridSession session = localNode == null ? GridSessionFactory.getLocalSession(channel) : localNode.getSession();
 				handler.handler(session, message);
 			}
+			GridStatistic.incrementLocalDelay(arriveTime - message.getTimestamp());
 		}
 		catch (Exception e)
 		{

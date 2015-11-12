@@ -45,7 +45,7 @@ public class GridLocalSession implements GridSession
 		int count = 0;
 		do
 		{
-			ret = GridRuntime.local().offerMessage(msg);
+			ret = GridRuntime.local().offerSyncMessage(msg);
 			if (ret)
 				break;
 			count++;

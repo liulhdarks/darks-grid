@@ -19,9 +19,9 @@ public class NodeLeaveHandler extends GridEventHandler
 		GridNode node = event.getData();
 		if (node != null)
 		{	
+			log.info("Grid node " + node.getId() + " " + node.context().getServerAddress() + " quit.");
 			node.setQuit(true);
 			GridRuntime.jobs().removeNodeAllJobs(node.getId());
-			log.info("Grid node " + node.getId() + " " + node.context().getServerAddress() + " quit.");
 		}
 		else
 		{

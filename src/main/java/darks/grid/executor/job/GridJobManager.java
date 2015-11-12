@@ -1,6 +1,8 @@
 package darks.grid.executor.job;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -9,8 +11,10 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import darks.grid.GridManager;
+import darks.grid.GridRuntime;
 import darks.grid.beans.GridNode;
 import darks.grid.config.GridConfiguration;
+import darks.grid.executor.task.TaskExecutor;
 import darks.grid.utils.GridStatistic;
 
 public class GridJobManager implements GridManager
@@ -74,7 +78,22 @@ public class GridJobManager implements GridManager
 	public void removeNodeAllJobs(String nodeId)
 	{
 		Map<String, GridJob> jobsMap = getNodeJobs(nodeId);
-		jobsMap.clear();
+		if (jobsMap != null && !jobsMap.isEmpty())
+		{
+			Set<String> uniqueTask = new HashSet<>();
+			for (Entry<String, GridJob> entry : jobsMap.entrySet())
+			{
+				GridJob job = entry.getValue();
+				uniqueTask.add(job.getTaskId());
+			}
+			jobsMap.clear();
+			for (String taskId : uniqueTask)
+			{
+				TaskExecutor<?, ?> taskExec = (TaskExecutor<?, ?>)GridRuntime.tasks().getTaskExecutor(taskId);
+				if (taskExec != null)
+					taskExec.signalStatusCheck();
+			}
+		}
 	}
 	
 	public Map<String, GridJob> getNodeJobs(String nodeId)
@@ -143,5 +162,10 @@ public class GridJobManager implements GridManager
 		{
 			lock.unlock();
 		}
+	}
+	
+	public int getRunningJobsCount()
+	{
+		return execJobsMap.size();
 	}
 }

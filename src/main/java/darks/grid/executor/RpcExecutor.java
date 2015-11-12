@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,6 +92,10 @@ public class RpcExecutor extends GridExecutor
 	            return future.get();
 	        else
 	            return future.get(config.getTimeout(), TimeUnit.MILLISECONDS);
+        }
+        catch (TimeoutException e)
+        {
+            return RpcResult.fail("Fail to call method " + uniqueName + ". Cause timeout " + config.getTimeout());
         }
         catch (Exception e)
         {

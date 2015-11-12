@@ -13,7 +13,8 @@
 		nodes_info="true" 
 	    task_info="true" 
 	    exec_job_info="true" 
-	    jvm_info="true"/>
+	    jvm_info="true"
+	    stat_info="true"/>
 
 	<network 
 		bind_host=""

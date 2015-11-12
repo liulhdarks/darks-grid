@@ -22,6 +22,8 @@ public class RuntimeLog extends GridComponent
 	private boolean execJobInfo = true;
 	
 	private boolean jvmInfo = true;
+	
+	private boolean statInfo = true;
 
 	@Override
 	protected void execute() throws Exception
@@ -42,10 +44,20 @@ public class RuntimeLog extends GridComponent
 				.append('/').append(StringUtils.memorySize(jvmRuntime.totalMemory()));
 			if (jvmRuntime.totalMemory() != jvmRuntime.maxMemory())
 				buf.append('/').append(StringUtils.memorySize(jvmRuntime.maxMemory()));
-			buf.append(' ').append("Avg-Delay:").append(GridStatistic.getAvgDelay())
+			buf.append('\n');
+			buf.append("-------------------------------------------------------------\n");
+		}
+		if (statInfo)
+		{
+			buf.append("Avg-Delay:").append(GridStatistic.getAvgDelay())
 				.append(' ').append("Max-Delay:").append(GridStatistic.getMaxDelay())
 				.append(' ').append("Avg-LDelay:").append(GridStatistic.getAvgLocalDelay())
 				.append(' ').append("Max-LDelay:").append(GridStatistic.getMaxLocalDelay());
+			buf.append('\n');
+			buf.append("Avg-JobW-Delay:").append(GridStatistic.getAvgJobWaitDelay())
+				.append(' ').append("Max-JobW-Delay:").append(GridStatistic.getMaxJobWaitDelay())
+				.append(' ').append("Cur-JobW-Count:").append(GridStatistic.getCurJobWaitCount())
+				.append(' ').append("Run-Job-Count:").append(GridRuntime.jobs().getRunningJobsCount());
 			buf.append('\n');
 			buf.append("-------------------------------------------------------------\n");
 		}
@@ -108,6 +120,16 @@ public class RuntimeLog extends GridComponent
 	public void setNodesInfo(boolean nodesInfo)
 	{
 		this.nodesInfo = nodesInfo;
+	}
+
+	public boolean isStatInfo()
+	{
+		return statInfo;
+	}
+
+	public void setStatInfo(boolean statInfo)
+	{
+		this.statInfo = statInfo;
 	}
 
 }

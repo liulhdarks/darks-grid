@@ -50,6 +50,11 @@ public abstract class TaskExecutor<T, R>  implements Callable<R>
     {
         future.replyStatus(reply);
     }
+    
+    public void signalStatusCheck()
+    {
+    	future.signalStatusCheck();
+    }
 
     public TaskType getTaskType()
     {

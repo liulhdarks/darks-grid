@@ -13,6 +13,12 @@ public final class GridStatistic
 	static AtomicLong messageLocalDelay = new AtomicLong(0);
 	static AtomicLong messageLocalCount = new AtomicLong(0);
 	
+	static AtomicLong jobWaitDelay = new AtomicLong(0);
+	static AtomicLong jobWaitDelayCount = new AtomicLong(0);
+	static AtomicLong jobWaitMaxDelay = new AtomicLong(0);
+	
+	static AtomicLong jobWaitCount = new AtomicLong(0);
+	
 	static AtomicLong taskCount = new AtomicLong(0);
 	static AtomicLong jobCount = new AtomicLong(0);
 	
@@ -21,8 +27,29 @@ public final class GridStatistic
 		
 	}
 	
+	public static void addWaitJobCount(long delta)
+	{
+		jobWaitCount.getAndAdd(delta);
+	}
+	
+	public static void incrementJobDelay(long delay)
+	{
+		if (delay < 0)
+			return;
+		jobWaitDelay.getAndAdd(delay);
+		jobWaitDelayCount.getAndIncrement();
+		while (true) {
+            long current = jobWaitMaxDelay.get();
+            long next = Math.max(delay, current);
+            if (jobWaitMaxDelay.compareAndSet(current, next))
+                break;
+        }
+	}
+	
 	public static void incrementDelay(long delay)
 	{
+		if (delay < 0)
+			return;
 		messageDelay.getAndAdd(delay);
 		messageCount.getAndIncrement();
 		while (true) {
@@ -35,6 +62,8 @@ public final class GridStatistic
 	
 	public static void incrementLocalDelay(long delay)
 	{
+		if (delay < 0)
+			return;
 		messageLocalDelay.getAndAdd(delay);
 		messageLocalCount.getAndIncrement();
 		while (true) {
@@ -87,5 +116,22 @@ public final class GridStatistic
 	public static long getTaskCount()
 	{
 		return taskCount.get();
+	}
+	
+	public static long getAvgJobWaitDelay()
+	{
+		long delay = jobWaitDelay.get();
+		long count = jobWaitDelayCount.get();
+		return count == 0 ? 0 : (delay / count);
+	}
+	
+	public static long getMaxJobWaitDelay()
+	{
+		return jobWaitMaxDelay.get();
+	}
+	
+	public static long getCurJobWaitCount()
+	{
+		return jobWaitCount.get();
 	}
 }

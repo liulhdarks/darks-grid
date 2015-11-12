@@ -2,8 +2,8 @@ package darks.grid.network.local;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +17,7 @@ public class GridLocalMessageManager implements GridManager
 	
 	private static final Logger log = LoggerFactory.getLogger(GridLocalMessageManager.class);
 
-	private Queue<Object> messageQueue = new ConcurrentLinkedQueue<>();
+	private BlockingQueue<Object> messageQueue = new LinkedBlockingQueue<>();
 	
 	private List<GridLocalHandlerThread> handlers = new ArrayList<>();
 	
@@ -55,6 +55,19 @@ public class GridLocalMessageManager implements GridManager
 	public boolean offerMessage(Object obj)
 	{
 		return messageQueue.offer(obj);
+	}
+	
+	public boolean offerSyncMessage(Object obj)
+	{
+		try
+		{
+			messageQueue.put(obj);
+			return true;
+		}
+		catch (InterruptedException e)
+		{
+			return false;
+		}
 	}
 	
 }
