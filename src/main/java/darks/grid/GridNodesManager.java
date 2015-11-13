@@ -19,11 +19,16 @@ package darks.grid;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,9 +49,15 @@ public class GridNodesManager implements GridManager
 	
 	private Map<String, GridNode> nodesMap = new ConcurrentHashMap<String, GridNode>();
 	
+	private ConcurrentSkipListSet<GridNode> nodesSet = new ConcurrentSkipListSet<>(new NodeComparator());
+	
 	private Map<SocketAddress, String> addressMap = new ConcurrentHashMap<SocketAddress, String>();
 	
 	private Map<String, String> sessionIdMap = new ConcurrentHashMap<String, String>();
+	
+	private AtomicBoolean snapshotChange = new AtomicBoolean(true);
+	
+	private List<GridNode> nodesSnapshotList = null;
 	
 	@Override
 	public synchronized boolean initialize(GridConfiguration config)
@@ -90,14 +101,16 @@ public class GridNodesManager implements GridManager
 		addNode(session, node);
 	}
 	
-	private void addNode(GridSession session, GridNode node)
+	private synchronized void addNode(GridSession session, GridNode node)
 	{
 	    String nodeId = node.getId();
 	    nodesMap.put(nodeId, node);
         nodesList.add(node);
+        nodesSet.add(node);
         addressMap.put(node.context().getServerAddress(), nodeId);
         sessionIdMap.put(session.getId(), nodeId);
         GridRuntime.events().publish(GridEvent.NODE_JOIN, node);
+        snapshotChange.set(true);
 	}
 	
 	public GridNode getLocalNode()
@@ -139,9 +152,11 @@ public class GridNodesManager implements GridManager
 		if (node !=null)
 		{
 		    nodesList.remove(node);
+		    nodesSet.remove(node);
 			addressMap.remove(node.context().getServerAddress());
 			sessionIdMap.remove(node.getSession().getId());
 		}
+        snapshotChange.set(true);
 		return node;
 	}
 	
@@ -151,6 +166,7 @@ public class GridNodesManager implements GridManager
 		if (rNode == null)
 		{
             nodesList.remove(node);
+		    nodesSet.remove(node);
 			addressMap.remove(node.context().getServerAddress());
 			sessionIdMap.remove(node.getSession().getId());
 			rNode = node;
@@ -160,6 +176,7 @@ public class GridNodesManager implements GridManager
 			rNode.getSession().close();
 			GridRuntime.events().publish(GridEvent.NODE_LEAVE, rNode);
 		}
+        snapshotChange.set(true);
 		return rNode;
 	}
 	
@@ -176,6 +193,7 @@ public class GridNodesManager implements GridManager
 				GridRuntime.events().publish(GridEvent.NODE_LEAVE, node);
 			}
 		}
+        snapshotChange.set(true);
 		return node;
 	}
 	
@@ -202,16 +220,19 @@ public class GridNodesManager implements GridManager
         return nodesList;
     }
 
-    public List<GridNode> getSnapshotNodes()
+    public synchronized List<GridNode> getSnapshotNodes()
 	{
-	    List<GridNode> nodesList = new ArrayList<GridNode>(nodesMap.size());
-	    for (Entry<String, GridNode> entry : nodesMap.entrySet())
-	    {
-	        GridNode node = entry.getValue();
-	        if (node.isAlive())
-	            nodesList.add(node);
-	    }
-	    return nodesList;
+    	if (snapshotChange.get())
+    	{
+        	nodesSnapshotList = new ArrayList<GridNode>(nodesSet.size());
+    	    for (GridNode node : nodesSet)
+    	    {
+    	        if (node.isAlive())
+    	        	nodesSnapshotList.add(node);
+    	    }
+    	    snapshotChange.getAndSet(false);
+    	}
+	    return nodesSnapshotList;
 	}
 
 	public Map<String, GridNode> getNodesMap()
@@ -224,4 +245,29 @@ public class GridNodesManager implements GridManager
 		return addressMap;
 	}
 	
+	class NodeComparator implements Comparator<GridNode>
+	{
+
+		@Override
+		public int compare(GridNode o1, GridNode o2)
+		{
+
+			long t1 = o1.context().getStartupTime();
+			long t2 = o2.context().getStartupTime();
+			int ret = (int)(t1 - t2);
+			if (ret == 0)
+			{
+				t1 = o1.context().getStartupNanoTime();
+				t2 = o2.context().getStartupNanoTime();
+				ret = (int) (t1 - t2);
+				if (ret == 0)
+					return o1.getId().compareTo(o2.getId());
+				else
+					return ret;
+			}
+			else
+				return ret;
+		}
+		
+	}
 }

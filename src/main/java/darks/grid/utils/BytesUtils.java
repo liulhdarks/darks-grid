@@ -10,6 +10,17 @@ public final class BytesUtils
 	
 	private static final Logger log = LoggerFactory.getLogger(BytesUtils.class);
 
+    private static final char[] HEXDUMP_TABLE = new char[256 * 4];
+
+    static 
+    {
+        final char[] DIGITS = "0123456789abcdef".toCharArray();
+        for (int i = 0; i < 256; i ++) {
+            HEXDUMP_TABLE[ i << 1     ] = DIGITS[i >>> 4 & 0x0F];
+            HEXDUMP_TABLE[(i << 1) + 1] = DIGITS[i       & 0x0F];
+        }
+    }
+    
 	private BytesUtils()
 	{
 
@@ -52,5 +63,36 @@ public final class BytesUtils
 		}
 		return hexValue.toString();
 	}
+	
+	/**
+     * Returns a <a href="http://en.wikipedia.org/wiki/Hex_dump">hex dump</a>
+     * of the specified byte array.
+     */
+    public static String hexDump(byte[] array) {
+        return hexDump(array, 0, array.length);
+    }
 
+    /**
+     * Returns a <a href="http://en.wikipedia.org/wiki/Hex_dump">hex dump</a>
+     * of the specified byte array's sub-region.
+     */
+    public static String hexDump(byte[] array, int fromIndex, int length) {
+        if (length < 0) {
+            throw new IllegalArgumentException("length: " + length);
+        }
+        if (length == 0) {
+            return "";
+        }
+
+        int endIndex = fromIndex + length;
+        char[] buf = new char[length << 1];
+
+        int srcIdx = fromIndex;
+        int dstIdx = 0;
+        for (; srcIdx < endIndex; srcIdx ++, dstIdx += 2) {
+            System.arraycopy(HEXDUMP_TABLE, (array[srcIdx] & 0xFF) << 1, buf, dstIdx, 2);
+        }
+
+        return new String(buf);
+    }
 }

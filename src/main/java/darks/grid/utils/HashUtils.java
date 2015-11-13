@@ -123,39 +123,39 @@ public class HashUtils
     
     public static void main(String[] args)
     {
-    	int[] vs = new int[]{32, 64, 11968, 61, 131, 137, 244};
+    	String[] vs = new String[]{"a7652ffcbdb64116735f2989c2b4883e", "f636bc1c611e17d9f758269fd66e81cd"};
     	System.out.println("RSHash------------------------------");
-    	for (int v : vs)
+    	for (String v : vs)
         	System.out.println(v + " " + RSHash(String.valueOf(v)));
     	System.out.println("JSHash------------------------------");
-    	for (int v : vs)
+    	for (String v : vs)
         	System.out.println(v + " " + JSHash(String.valueOf(v)));
     	System.out.println("PJWHash------------------------------");
-    	for (int v : vs)
+    	for (String v : vs)
         	System.out.println(v + " " + PJWHash(String.valueOf(v)));
     	System.out.println("ELFHash------------------------------");
-    	for (int v : vs)
+    	for (String v : vs)
         	System.out.println(v + " " + ELFHash(String.valueOf(v)));
     	System.out.println("BKDRHash------------------------------");
-    	for (int v : vs)
+    	for (String v : vs)
         	System.out.println(v + " " + BKDRHash(String.valueOf(v)));
     	System.out.println("SDBMHash------------------------------");
-    	for (int v : vs)
+    	for (String v : vs)
         	System.out.println(v + " " + SDBMHash(String.valueOf(v)));
     	System.out.println("DJBHash------------------------------");
-    	for (int v : vs)
+    	for (String v : vs)
         	System.out.println(v + " " + DJBHash(String.valueOf(v)));
     	System.out.println("DEKHash------------------------------");
-    	for (int v : vs)
+    	for (String v : vs)
         	System.out.println(v + " " + DEKHash(String.valueOf(v)));
     	System.out.println("BPHash------------------------------");
-    	for (int v : vs)
+    	for (String v : vs)
         	System.out.println(v + " " + BPHash(String.valueOf(v)));
     	System.out.println("FNVHash------------------------------");
-    	for (int v : vs)
+    	for (String v : vs)
         	System.out.println(v + " " + FNVHash(String.valueOf(v)));
     	System.out.println("APHash------------------------------");
-    	for (int v : vs)
+    	for (String v : vs)
         	System.out.println(v + " " + APHash(String.valueOf(v)));
     }
 }

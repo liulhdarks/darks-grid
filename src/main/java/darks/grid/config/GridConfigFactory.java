@@ -102,6 +102,10 @@ public final class GridConfigFactory
                 {
                     parseAttrForObject(el, config.getEventsConfig());
                 }
+                else if ("storage".equalsIgnoreCase(el.getNodeName()))
+                {
+                    parseAttrForObject(el, config.getStorageConfig());
+                }
                 else if ("component".equalsIgnoreCase(el.getNodeName()))
                 {
                     parseComponent(config, el);

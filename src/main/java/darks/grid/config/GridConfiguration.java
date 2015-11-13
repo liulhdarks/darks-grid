@@ -23,6 +23,8 @@ public class GridConfiguration implements Serializable
 
 	private static final long serialVersionUID = -7262144727436897611L;
 	
+	private String clusterName = "DEFAULT";
+	
 	private NetworkConfig networkConfig = new NetworkConfig();
 	
 	private ComponentConfig componentConfig = new ComponentConfig();
@@ -31,7 +33,7 @@ public class GridConfiguration implements Serializable
 	
 	private TaskConfig taskConfig = new TaskConfig();
 	
-	private String clusterName = "DEFAULT";
+	private StorageConfig storageConfig = new StorageConfig();
     
 	public GridConfiguration()
 	{
@@ -41,6 +43,11 @@ public class GridConfiguration implements Serializable
 	public String getClusterName()
 	{
 		return clusterName;
+	}
+
+	public StorageConfig getStorageConfig()
+	{
+		return storageConfig;
 	}
 
 	public void setClusterName(String clusterName)
@@ -71,10 +78,10 @@ public class GridConfiguration implements Serializable
 	@Override
 	public String toString()
 	{
-		return "GridConfiguration [networkConfig=" + networkConfig + ", componentConfig="
-				+ componentConfig + ", eventsConfig=" + eventsConfig + ", taskConfig=" + taskConfig
-				+ ", clusterName=" + clusterName + "]";
+		return "GridConfiguration [clusterName=" + clusterName + ", networkConfig=" + networkConfig
+				+ ", componentConfig=" + componentConfig + ", eventsConfig=" + eventsConfig
+				+ ", taskConfig=" + taskConfig + ", storageConfig=" + storageConfig + "]";
 	}
-	
+
 	
 }

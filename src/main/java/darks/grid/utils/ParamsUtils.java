@@ -118,7 +118,7 @@ public final class ParamsUtils
 	
 	public static void main(String[] args)
 	{
-		String hosts = "10.12.13.5-15:[8000-8005],10.12.5-7.10-12:9000";
+		String hosts = "10.176.102.92-93:[12120-12122],10.176.122.115-116:[12120-12122]";
 		Collection<InetSocketAddress> list = parseAddress(hosts);
 		System.out.println(list.size());
 		for (InetSocketAddress addr : list)
