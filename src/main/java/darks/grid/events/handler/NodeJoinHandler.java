@@ -19,6 +19,7 @@ package darks.grid.events.handler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import darks.grid.GridRuntime;
 import darks.grid.beans.GridEvent;
 import darks.grid.beans.GridNode;
 import darks.grid.events.GridEventHandler;
@@ -33,6 +34,8 @@ public class NodeJoinHandler extends GridEventHandler
 	{
 		GridNode node = event.getData();
 		log.info("Join node " + node.toSimpleString());
+		if (!node.isLocal())
+			GridRuntime.storage().cacheHistoryNodes(node.context().getServerAddress());
 	}
 
 }

@@ -26,11 +26,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import darks.grid.GridManager;
 import darks.grid.GridRuntime;
 import darks.grid.beans.GridNode;
 import darks.grid.config.GridConfiguration;
 import darks.grid.executor.task.TaskExecutor;
+import darks.grid.manager.GridManager;
 import darks.grid.utils.GridStatistic;
 
 public class GridJobManager implements GridManager

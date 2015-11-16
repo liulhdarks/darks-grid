@@ -59,6 +59,8 @@ public class NetworkConfig
     
     private int sendFailRetry = 3;
     
+    private int connectFailRetry = 3;
+    
     private boolean cacheHistoryNodes = true;
     
     public NetworkConfig()
@@ -281,6 +283,16 @@ public class NetworkConfig
 	{
 		this.cacheHistoryNodes = cacheHistoryNodes;
 	}
+	
+	public int getConnectFailRetry()
+	{
+		return connectFailRetry;
+	}
+
+	public void setConnectFailRetry(int connectFailRetry)
+	{
+		this.connectFailRetry = connectFailRetry;
+	}
 
 	@Override
 	public String toString()
@@ -296,8 +308,8 @@ public class NetworkConfig
 				+ ", serverBossThreadDelta=" + serverBossThreadDelta
 				+ ", clientWorkerThreadNumber=" + clientWorkerThreadNumber + ", nodesExpireTime="
 				+ nodesExpireTime + ", localMsgHandlerNumber=" + localMsgHandlerNumber
-				+ ", sendFailRetry=" + sendFailRetry + ", cacheHistoryNodes=" + cacheHistoryNodes
-				+ "]";
+				+ ", sendFailRetry=" + sendFailRetry + ", connectFailRetry=" + connectFailRetry
+				+ ", cacheHistoryNodes=" + cacheHistoryNodes + "]";
 	}
 
 }

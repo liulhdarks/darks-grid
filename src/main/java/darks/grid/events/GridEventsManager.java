@@ -26,12 +26,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import darks.grid.GridManager;
 import darks.grid.GridRuntime;
 import darks.grid.beans.GridEvent;
 import darks.grid.beans.GridMessage;
 import darks.grid.beans.GridNode;
 import darks.grid.config.GridConfiguration;
+import darks.grid.manager.GridManager;
 
 public class GridEventsManager implements GridManager
 {

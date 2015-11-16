@@ -18,12 +18,15 @@ package darks.grid.network.discovery;
 
 import java.net.InetSocketAddress;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import darks.grid.GridNodesManager;
 import darks.grid.GridRuntime;
+import darks.grid.manager.GridNodesManager;
 import darks.grid.utils.ParamsUtils;
 
 public class TCPPING extends GridDiscovery
@@ -45,11 +48,31 @@ public class TCPPING extends GridDiscovery
 	@Override
 	public void findNodes()
 	{
+		Set<InetSocketAddress> tryAddrs = new HashSet<>();
 		GridNodesManager nodesManager = GridRuntime.nodes();
 		if (tryAddressList != null)
 		{
-			log.info("TCPPING try to ping address " + tryAddressList.size());
 			for (InetSocketAddress address : tryAddressList)
+			{
+				if (nodesManager.contains(address))
+					continue;
+				tryAddrs.add(address);
+			}
+		}
+		List<InetSocketAddress> cacheAddrs = GridRuntime.storage().getCacheHistoryNodes();
+		if (cacheAddrs != null)
+		{
+			for (InetSocketAddress address : cacheAddrs)
+			{
+				if (nodesManager.contains(address))
+					continue;
+				tryAddrs.add(address);
+			}
+		}
+		if (!tryAddrs.isEmpty())
+		{
+			log.info("TCPPING try to ping address " + tryAddrs.size());
+			for (InetSocketAddress address : tryAddrs)
 			{
 				if (nodesManager.contains(address))
 					continue;

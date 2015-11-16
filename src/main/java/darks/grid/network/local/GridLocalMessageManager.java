@@ -24,8 +24,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import darks.grid.GridManager;
 import darks.grid.config.GridConfiguration;
+import darks.grid.manager.GridManager;
 import darks.grid.utils.ThreadUtils;
 
 public class GridLocalMessageManager implements GridManager

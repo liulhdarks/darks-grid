@@ -16,6 +16,8 @@
  */
 package darks.grid.events.handler;
 
+import java.net.InetSocketAddress;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +25,7 @@ import darks.grid.GridRuntime;
 import darks.grid.beans.GridEvent;
 import darks.grid.beans.GridNode;
 import darks.grid.events.GridEventHandler;
+import darks.grid.utils.ThreadUtils;
 
 public class NodeLeaveHandler extends GridEventHandler
 {
@@ -38,10 +41,25 @@ public class NodeLeaveHandler extends GridEventHandler
 			log.info("Grid node " + node.getId() + " " + node.context().getServerAddress() + " quit.");
 			node.setQuit(true);
 			GridRuntime.jobs().removeNodeAllJobs(node.getId());
+			retryConnect(node);
 		}
 		else
 		{
 			log.error("Unknown grid node quit." + event);
+		}
+	}
+	
+	private void retryConnect(GridNode node)
+	{
+		InetSocketAddress address = node.context().getServerAddress();
+		int retryCount = GridRuntime.config().getNetworkConfig().getConnectFailRetry();
+		for (int i = 0; i < retryCount; i++)
+		{
+			log.info("Reconnect remote address " + address);
+			if (!GridRuntime.nodes().contains(address) 
+					&& GridRuntime.network().tryJoinAddress(address))
+				break;
+			ThreadUtils.threadSleep(1000);
 		}
 	}
 

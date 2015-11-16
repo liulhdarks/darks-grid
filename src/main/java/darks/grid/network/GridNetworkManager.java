@@ -24,10 +24,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 
-import darks.grid.GridManager;
 import darks.grid.GridRuntime;
 import darks.grid.beans.meta.JoinMeta;
 import darks.grid.config.GridConfiguration;
+import darks.grid.manager.GridManager;
 import darks.grid.utils.SyncPool;
 import darks.grid.utils.ThreadUtils;
 

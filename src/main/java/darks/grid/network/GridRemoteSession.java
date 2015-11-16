@@ -97,7 +97,9 @@ public class GridRemoteSession implements GridSession
 		}
 		catch (Exception e)
 		{
-		    log.error("Fail to send remote sync message. Cause " + e.getMessage(), e);
+		    log.error("Fail to send remote sync message.[" + 
+		    			channel.remoteAddress() + "/active:" + channel.isActive() + 
+		    			"] Cause " + e.getMessage(), e);
 			return false;
 		}
 	}

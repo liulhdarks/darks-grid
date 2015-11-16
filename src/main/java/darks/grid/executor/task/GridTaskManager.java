@@ -21,11 +21,11 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.FutureTask;
 
-import darks.grid.GridManager;
 import darks.grid.config.GridConfiguration;
 import darks.grid.executor.ExecuteConfig;
 import darks.grid.executor.task.mapred.MapReduceExecutor;
 import darks.grid.executor.task.mapred.MapReduceTask;
+import darks.grid.manager.GridManager;
 import darks.grid.utils.GridStatistic;
 import darks.grid.utils.ThreadUtils;
 
