@@ -87,11 +87,32 @@ public class GridEventsManager implements GridManager
 	
 	public boolean publish(GridNode node, GridEvent event, boolean sync)
 	{
-		GridMessage message = new GridMessage(event, GridMessage.MSG_EVENT);
-		if (sync)
-			return node.sendSyncMessage(message);
+		if (node.isLocal())
+		{
+			if (sync)
+			{
+				try
+				{
+					eventQueue.put(event);
+					return true;
+				}
+				catch (Exception e)
+				{
+					log.error(e.getMessage(), e);
+					return false;
+				}
+			}
+			else
+				return eventQueue.offer(event);
+		}
 		else
-			return node.sendMessage(message);
+		{
+			GridMessage message = new GridMessage(event, GridMessage.MSG_EVENT);
+			if (sync)
+				return node.sendSyncMessage(message);
+			else
+				return node.sendMessage(message);
+		}
 	}
 	
 	public boolean publishAll(String type, Object obj)
@@ -104,10 +125,26 @@ public class GridEventsManager implements GridManager
 		List<GridNode> nodes = GridRuntime.nodes().getNodesList();
 		for (GridNode node : nodes)
 		{
-			if (node.isAlive())
+			if (!node.isLocal() && node.isAlive())
 				publish(node, event, true);
 		}
 		return eventQueue.offer(event);
+	}
+	
+	public boolean publishOthers(String type, Object obj)
+	{
+		return publishOthers(new GridEvent(obj, type));
+	}
+	
+	public boolean publishOthers(GridEvent event)
+	{
+		List<GridNode> nodes = GridRuntime.nodes().getNodesList();
+		for (GridNode node : nodes)
+		{
+			if (!node.isLocal() && node.isAlive())
+				publish(node, event, true);
+		}
+		return true;
 	}
 	
 	public void addHandler(String eventType, GridEventHandler handler)

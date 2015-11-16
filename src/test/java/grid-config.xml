@@ -31,10 +31,12 @@
 		server_boss_thread_delta="2"
 		client_worker_thread_number="4"
 		nodes_expire_time="600000"
-		cache_history_nodes="true"
+		cache_history_nodes="false"
 		/>
 
 	<alive interval="60000"/>
+
+	<MERGE interval="300000"/>
 	
 	<TCPPING hosts="localhost:[7800-7805]" interval="300000"/>
 	

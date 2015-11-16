@@ -25,6 +25,7 @@ public class GridEvent implements Serializable, Cloneable
     public static final String CONNECT_ACTIVE = "connect_active";
 	public static final String NODE_JOIN = "node_join";
 	public static final String NODE_LEAVE = "node_leave";
+	public static final String MERGE_NODES = "merge_nodes";
 	
 	/**
 	 * 

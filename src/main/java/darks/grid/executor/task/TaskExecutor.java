@@ -96,7 +96,7 @@ public abstract class TaskExecutor<T, R>  implements Callable<R>
     public String toSimpleString()
     {
         StringBuilder buf = new StringBuilder();
-        buf.append(getTaskId()).append('\n');
+        buf.append("Task:").append(getTaskId()).append('\n');
         buf.append(future.toSimpleString("     "));
         return buf.toString();
     }

@@ -32,6 +32,8 @@ public abstract class GridComponent extends Thread implements Serializable, Clon
     
     private int interval = 1000;
     
+    private int delay = 0;
+    
     public GridComponent()
     {
         
@@ -43,6 +45,8 @@ public abstract class GridComponent extends Thread implements Serializable, Clon
         try
         {
             log.info("Grid component " + getClass() + " startup.");
+            if (delay > 0)
+                Thread.sleep(delay);
             while (isRunning())
             {
                 execute();
@@ -88,5 +92,15 @@ public abstract class GridComponent extends Thread implements Serializable, Clon
     {
         this.interval = interval;
     }
+
+	public int getDelay()
+	{
+		return delay;
+	}
+
+	public void setDelay(int delay)
+	{
+		this.delay = delay;
+	}
     
 }

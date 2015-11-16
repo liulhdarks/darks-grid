@@ -31,8 +31,8 @@ import darks.grid.RuntimeLog;
 import darks.grid.beans.GridComponent;
 import darks.grid.config.ComponentConfig;
 import darks.grid.config.GridConfiguration;
-import darks.grid.manager.GridManager;
 import darks.grid.network.NodesHeartAlive;
+import darks.grid.network.discovery.MERGE_NODES;
 import darks.grid.network.discovery.TCPPING;
 import darks.grid.utils.ReflectUtils;
 
@@ -52,6 +52,7 @@ public class GridComponentManager implements GridManager
         systemCompConfig.put("tcpping", TCPPING.class);
         systemCompConfig.put("alive", NodesHeartAlive.class);
         systemCompConfig.put("log", RuntimeLog.class);
+        systemCompConfig.put("merge", MERGE_NODES.class);
     }
     
     public GridComponentManager()

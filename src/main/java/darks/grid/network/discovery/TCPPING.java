@@ -19,6 +19,7 @@ package darks.grid.network.discovery;
 import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -48,7 +49,7 @@ public class TCPPING extends GridDiscovery
 	@Override
 	public void findNodes()
 	{
-		Set<InetSocketAddress> tryAddrs = new HashSet<>();
+		Set<InetSocketAddress> tryAddrs = new LinkedHashSet<>();
 		GridNodesManager nodesManager = GridRuntime.nodes();
 		if (tryAddressList != null)
 		{
