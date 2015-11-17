@@ -18,9 +18,7 @@ package darks.grid.network.discovery;
 
 import java.net.InetSocketAddress;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -60,7 +58,7 @@ public class TCPPING extends GridDiscovery
 				tryAddrs.add(address);
 			}
 		}
-		List<InetSocketAddress> cacheAddrs = GridRuntime.storage().getCacheHistoryNodes();
+		Collection<InetSocketAddress> cacheAddrs = GridRuntime.storage().getCacheHistoryNodes();
 		if (cacheAddrs != null)
 		{
 			for (InetSocketAddress address : cacheAddrs)

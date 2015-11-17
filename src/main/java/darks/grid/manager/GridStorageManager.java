@@ -20,7 +20,10 @@ package darks.grid.manager;
 import java.io.File;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import darks.grid.config.GridConfiguration;
 import darks.grid.utils.FileUtils;
@@ -63,12 +66,12 @@ public class GridStorageManager implements GridManager
 		FileUtils.appendLine(historyNodesFile, addr);
 	}
 	
-	public synchronized List<InetSocketAddress> getCacheHistoryNodes()
+	public synchronized Collection<InetSocketAddress> getCacheHistoryNodes()
 	{
 		if (historyNodesFile.exists())
 		{
 			List<String> addresses = FileUtils.readLineToList(historyNodesFile);
-			List<InetSocketAddress> result = new ArrayList<>(addresses.size());
+			Set<InetSocketAddress> result = new HashSet<>(addresses.size());
 			for (String addr : addresses)
 			{
 				String[] datas = addr.split(":");
