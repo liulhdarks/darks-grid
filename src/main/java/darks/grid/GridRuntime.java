@@ -23,11 +23,13 @@ import org.slf4j.LoggerFactory;
 
 import darks.grid.config.GridConfiguration;
 import darks.grid.events.GridEventsManager;
+import darks.grid.executor.RpcExecutor;
 import darks.grid.executor.job.GridJobManager;
 import darks.grid.executor.task.GridTaskManager;
 import darks.grid.manager.GridComponentManager;
 import darks.grid.manager.GridNodesManager;
 import darks.grid.manager.GridStorageManager;
+import darks.grid.master.GridMasterManager;
 import darks.grid.network.GridNetworkManager;
 import darks.grid.network.local.GridLocalMessageManager;
 import darks.grid.utils.ThreadUtils;
@@ -38,6 +40,8 @@ public final class GridRuntime
     private static final Logger log = LoggerFactory.getLogger(GridRuntime.class);
 
 	static GridConfiguration config;
+	
+	static GridMasterManager masterManager = new GridMasterManager();
 	
 	static GridStorageManager storageManager = new GridStorageManager();
 	
@@ -73,10 +77,17 @@ public final class GridRuntime
             log.error("Fail to initialize grid context.");
             return false;
 		}
+		RpcExecutor.registerSystemMethod();
 		ret = storageManager.initialize(config);
         if (!ret)
         {
             log.error("Fail to initialize storage manager.");
+            return false;
+        }
+		ret = masterManager.initialize(config);
+        if (!ret)
+        {
+            log.error("Fail to initialize master manager.");
             return false;
         }
 		ret = eventsManager.initialize(config);
@@ -135,6 +146,7 @@ public final class GridRuntime
 		network.destroy();
 		nodesManager.destroy();
 		eventsManager.destroy();
+		masterManager.destroy();
 		storageManager.destroy();
 		ThreadUtils.shutdownAll();
 	}

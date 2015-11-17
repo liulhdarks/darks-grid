@@ -23,6 +23,7 @@ import com.sun.management.OperatingSystemMXBean;
 
 import darks.grid.utils.MachineUtils;
 
+@SuppressWarnings("restriction")
 public class MachineInfo implements Serializable
 {
 

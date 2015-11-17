@@ -35,7 +35,7 @@ import darks.grid.GridContext;
 import darks.grid.GridRuntime;
 import darks.grid.beans.GridEvent;
 import darks.grid.beans.GridNode;
-import darks.grid.beans.GridNodeType;
+import darks.grid.beans.GridNode.GridNodeType;
 import darks.grid.beans.NodeId;
 import darks.grid.config.GridConfiguration;
 import darks.grid.network.GridSession;
@@ -78,18 +78,18 @@ public class GridNodesManager implements GridManager
         addNode(session, node);
 	}
 	
-	public synchronized void addRemoteNode(String nodeId, GridSession session, GridContext context)
+	public synchronized GridNode addRemoteNode(String nodeId, GridSession session, GridContext context)
 	{
 		GridNode oldNode = nodesMap.get(nodeId);
 		if (oldNode != null)
 		{
 			if (oldNode.getSession().getId().equals(session.getId()))
-				return;
+				return oldNode;
 			if (oldNode.getSession().isActive())
 			{
 				session.close();
 				//TODO re-add node to remote
-				return;
+				return oldNode;
 			}
 			else
 			{
@@ -99,6 +99,7 @@ public class GridNodesManager implements GridManager
 		}
 		GridNode node = new GridNode(nodeId, session, context, GridNodeType.TYPE_REMOTE);
 		addNode(session, node);
+		return node;
 	}
 	
 	private synchronized void addNode(GridSession session, GridNode node)

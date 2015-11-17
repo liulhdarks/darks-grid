@@ -1,5 +1,6 @@
 package darks.grid.utils;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 public final class GridStatistic
@@ -87,25 +88,29 @@ public final class GridStatistic
 	public static long getAvgLocalDelay()
 	{
 		long delay = messageLocalDelay.get();
+		delay = TimeUnit.NANOSECONDS.toMillis(delay);
 		long count = messageLocalCount.get();
 		return count == 0 ? 0 : (delay / count);
 	}
 	
 	public static long getMaxLocalDelay()
 	{
-		return messageLocalMaxDelay.get();
+		long ret = messageLocalMaxDelay.get();
+		return TimeUnit.NANOSECONDS.toMillis(ret);
 	}
 	
 	public static long getAvgDelay()
 	{
 		long delay = messageDelay.get();
+		delay = TimeUnit.NANOSECONDS.toMillis(delay);
 		long count = messageCount.get();
 		return count == 0 ? 0 : (delay / count);
 	}
 	
 	public static long getMaxDelay()
 	{
-		return messageMaxDelay.get();
+		long ret = messageMaxDelay.get();
+		return TimeUnit.NANOSECONDS.toMillis(ret);
 	}
 	
 	public static long getJobCount()
@@ -121,13 +126,15 @@ public final class GridStatistic
 	public static long getAvgJobWaitDelay()
 	{
 		long delay = jobWaitDelay.get();
+		delay = TimeUnit.NANOSECONDS.toMillis(delay);
 		long count = jobWaitDelayCount.get();
 		return count == 0 ? 0 : (delay / count);
 	}
 	
 	public static long getMaxJobWaitDelay()
 	{
-		return jobWaitMaxDelay.get();
+		long ret = jobWaitMaxDelay.get();
+		return TimeUnit.NANOSECONDS.toMillis(ret);
 	}
 	
 	public static long getCurJobWaitCount()

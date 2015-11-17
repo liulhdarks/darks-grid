@@ -16,27 +16,26 @@
  */
 package darks.grid.beans;
 
-import darks.grid.GridException;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-public class GridNodeType
+public abstract class GridFuture<V>
 {
+
+	public abstract boolean isSuccess();
+
+	public abstract boolean await();
 	
-	public static final int TYPE_LOCAL = 1;
-	private static final String TYPE_LOCAL_STR = "L";
+	public abstract boolean await(int timeout, TimeUnit unit);
 	
-	public static final int TYPE_REMOTE = 2;
-	private static final String TYPE_REMOTE_STR = "R";
-	
-	public static String valueOf(int type)
+	public V get()
 	{
-		switch (type)
-		{
-		case TYPE_LOCAL:
-			return TYPE_LOCAL_STR;
-		case TYPE_REMOTE:
-			return TYPE_REMOTE_STR;
-		default:
-			throw new GridException("Invalid grid node type " + type);
-		}
+		List<V> list = getList();
+		if (list != null && !list.isEmpty())
+			return list.get(0);
+		else
+			return null;
 	}
+	
+	public abstract List<V> getList();
 }

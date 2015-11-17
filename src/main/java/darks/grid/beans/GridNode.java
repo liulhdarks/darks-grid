@@ -17,10 +17,12 @@
 package darks.grid.beans;
 
 import java.io.Serializable;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 import darks.grid.GridContext;
+import darks.grid.GridException;
 import darks.grid.GridRuntime;
 import darks.grid.network.GridSession;
 import darks.grid.utils.StringUtils;
@@ -39,9 +41,13 @@ public class GridNode implements Serializable
 	
 	private int nodeType;
 	
+	private volatile boolean master;
+	
 	private GridContext context;
 	
 	private AtomicLong heartAliveTime = null;
+	
+	private AtomicLong pingDelay = new AtomicLong(0);
 	
 	private AtomicReference<MachineInfo> machineInfo = new AtomicReference<>();
 	
@@ -175,7 +181,17 @@ public class GridNode implements Serializable
     	this.machineInfo.getAndSet(machineInfo);
     }
     
-    public boolean isQuit()
+    public long getPingDelay()
+	{
+		return pingDelay.get();
+	}
+
+	public void setPingDelay(long pingDelay)
+	{
+		this.pingDelay.getAndSet(pingDelay);
+	}
+
+	public boolean isQuit()
 	{
 		return quit;
 	}
@@ -184,26 +200,46 @@ public class GridNode implements Serializable
 	{
 		this.quit = quit;
 	}
+	
+	public synchronized boolean isMaster()
+	{
+		return master;
+	}
+
+	public synchronized void setMaster(boolean master)
+	{
+		this.master = master;
+	}
 
 	public String toSimpleString()
 	{
+		String unit = "ms";
+		long delay = TimeUnit.NANOSECONDS.toMillis(pingDelay.get());
+		if (delay == 0)
+		{
+			delay = pingDelay.get();
+			unit = "ns";
+		}
+		String flagMaster = master ? "[M]" : "   ";
 		return StringUtils.stringBuffer(id, 
-				"  [", GridNodeType.valueOf(nodeType),']',
-				' ', String.format("%21s", context.getServerAddress().toString()), 
+				"  [", GridNodeType.valueOf(nodeType),']', flagMaster,
+				' ', String.format("%-21s", context.getServerAddress().toString()), 
 				' ', GridNodeStatus.valueOf(this),
-				' ', String.format("%8d", System.currentTimeMillis() - heartAliveTime.get()),
+				' ', String.format("%-8d", System.currentTimeMillis() - heartAliveTime.get()),
 				'\t', StringUtils.percent(context.getMachineInfo().getSystemCpuUsage()), 
-				'\t', StringUtils.percent(context.getMachineInfo().getUsedTotalMemoryUsage()));
-	}
-
-	@Override
-	public String toString()
-	{
-		return "GridNode [id=" + id + ", nodeType=" + nodeType + ", context=" + context
-				+ ", heartAliveTime=" + heartAliveTime + "]";
+				'\t', StringUtils.percent(context.getMachineInfo().getUsedTotalMemoryUsage()),
+				' ', delay, unit);
 	}
 
     @Override
+	public String toString()
+	{
+		return "GridNode [id=" + id + ", nodeType=" + nodeType + ", context=" + context
+				+ ", heartAliveTime=" + heartAliveTime + ", pingDelay=" + pingDelay
+				+ ", machineInfo=" + machineInfo + ", quit=" + quit + "]";
+	}
+
+	@Override
     public int hashCode()
     {
         final int prime = 31;
@@ -232,5 +268,49 @@ public class GridNode implements Serializable
         return true;
     }
 
-	
+    public static class GridNodeType
+    {
+    	
+    	public static final int TYPE_LOCAL = 1;
+    	private static final String TYPE_LOCAL_STR = "L";
+    	
+    	public static final int TYPE_REMOTE = 2;
+    	private static final String TYPE_REMOTE_STR = "R";
+    	
+    	public static String valueOf(int type)
+    	{
+    		switch (type)
+    		{
+    		case TYPE_LOCAL:
+    			return TYPE_LOCAL_STR;
+    		case TYPE_REMOTE:
+    			return TYPE_REMOTE_STR;
+    		default:
+    			throw new GridException("Invalid grid node type " + type);
+    		}
+    	}
+    }
+    
+    public static class GridNodeStatus
+    {
+    	
+    	public static final int INVALID = 0;
+    	
+    	public static final int ACTIVE = 1;
+    	
+    	public static final int INACTIVE = 2;
+    	
+    	public static String valueOf(GridNode node)
+    	{
+    		GridSession session = node.getSession();
+    		if (session == null)
+    			return "INVALID";
+    		if (node.isAlive())
+    			return "ALIVE";
+    		if (session.isActive())
+    			return "ACTIVE";
+    		return "INACTIVE";
+    	}
+
+    }
 }

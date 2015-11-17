@@ -33,8 +33,9 @@ import darks.grid.beans.GridRpcMethod;
 import darks.grid.executor.ExecuteConfig.ResponseType;
 import darks.grid.executor.task.TaskResultListener;
 import darks.grid.executor.task.rpc.GridRpcTask;
-import darks.grid.executor.task.rpc.RpcResult;
 import darks.grid.executor.task.rpc.RpcRequest;
+import darks.grid.executor.task.rpc.RpcResult;
+import darks.grid.master.ElectRpcInvoker;
 import darks.grid.utils.ReflectUtils;
 
 
@@ -44,6 +45,12 @@ public class RpcExecutor extends GridExecutor
     private static final Logger log = LoggerFactory.getLogger(RpcExecutor.class);
 	
 	static Map<String, GridRpcMethod> rpcMap = new ConcurrentHashMap<>();
+	
+	public static void registerSystemMethod()
+	{
+		ElectRpcInvoker elect = new ElectRpcInvoker();
+		registerMethod("computeHealthy", new Class<?>[0], elect.getClass(), elect);
+	}
 
     public static boolean registerMethod(Method method, Class<?> targetClass, Object targetObject)
     {
@@ -87,7 +94,18 @@ public class RpcExecutor extends GridExecutor
 		}
 	}
 
-    public static RpcResult callMethod(String uniqueName, Object[] params, ExecuteConfig config) {
+    public static RpcResult callMethod(Class<?> targetClass, String methodName, Object[] params, ExecuteConfig config) 
+    {
+    	Class<?>[] types = ReflectUtils.getObjectClasses(params);
+    	Method method = ReflectUtils.getDeepMethod(targetClass, methodName, types);
+        if (method == null)
+            throw new GridException("Cannot find method " + methodName + " " + Arrays.toString(types));
+        String uniqueName = ReflectUtils.getMethodUniqueName(method);
+        return callMethod(uniqueName, params, types, config);
+    }
+
+    public static RpcResult callMethod(String uniqueName, Object[] params, ExecuteConfig config) 
+    {
         Class<?>[] types = ReflectUtils.getObjectClasses(params);
         return callMethod(uniqueName, params, types, config);
     }

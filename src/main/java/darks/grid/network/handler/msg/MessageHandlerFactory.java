@@ -50,7 +50,12 @@ public final class MessageHandlerFactory
 		
 	}
 	
-	private static void addHandlerClass(int type, Class<? extends GridMessageHandler> clazz)
+	public static void addHandler(int type, GridMessageHandler handler)
+	{
+		handlersMap.put(type, handler);
+	}
+	
+	public static void addHandlerClass(int type, Class<? extends GridMessageHandler> clazz)
 	{
 		try
 		{

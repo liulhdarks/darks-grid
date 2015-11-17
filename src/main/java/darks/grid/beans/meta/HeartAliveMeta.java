@@ -29,6 +29,10 @@ public class HeartAliveMeta extends BaseMeta
 	private String nodeId;
 	
 	private GridContext context;
+	
+	private long timestamp;
+
+	private long pingDelay;
 
 	public HeartAliveMeta()
 	{
@@ -66,11 +70,38 @@ public class HeartAliveMeta extends BaseMeta
 		this.context = context;
 	}
 
+	public GridContext getContext()
+	{
+		return context;
+	}
+
+
+	public long getTimestamp()
+	{
+		return timestamp;
+	}
+
+	public void setTimestamp(long timestamp)
+	{
+		this.timestamp = timestamp;
+	}
+
+	public long getPingDelay()
+	{
+		return pingDelay;
+	}
+
+	public void setPingDelay(long pingDelay)
+	{
+		this.pingDelay = pingDelay;
+	}
+
 	@Override
 	public String toString()
 	{
-		return "HeartAliveMeta [nodeId=" + nodeId + ", context=" + context + "]";
+		return "HeartAliveMeta [nodeId=" + nodeId + ", context=" + context + ", timestamp="
+				+ timestamp + ", pingDelay=" + pingDelay + "]";
 	}
-	
+
 	
 }

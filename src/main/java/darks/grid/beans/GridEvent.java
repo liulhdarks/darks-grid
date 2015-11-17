@@ -52,6 +52,7 @@ public class GridEvent implements Serializable, Cloneable
 		this.type = type;
 	}
 
+	@SuppressWarnings("unchecked")
 	public <T> T getData()
 	{
 		return (T) data;

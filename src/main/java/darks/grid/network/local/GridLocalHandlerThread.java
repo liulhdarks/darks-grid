@@ -49,9 +49,9 @@ public class GridLocalHandlerThread extends Thread
 	{
 		try
 		{
+			long st = System.currentTimeMillis();
 			while (!destroyed && !isInterrupted())
 			{
-				long st = System.currentTimeMillis();
 				Object obj = messageQueue.take();
 				handlerMessage(obj);
 				if (System.currentTimeMillis() - st > 10000)
@@ -77,7 +77,7 @@ public class GridLocalHandlerThread extends Thread
 	{
 		try
 		{
-			long arriveTime = System.currentTimeMillis();
+			long arriveTime = System.nanoTime();
 			GridMessage message = (GridMessage) obj;
 			if (log.isDebugEnabled())
 				log.debug("Local read:" + message);

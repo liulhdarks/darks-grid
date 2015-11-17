@@ -29,6 +29,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import darks.grid.beans.GridFuture;
 import darks.grid.executor.job.GridJobStatus;
 import darks.grid.executor.job.JobResult;
 import darks.grid.executor.job.JobStatusType;
@@ -122,11 +123,6 @@ public class GridJobFuture extends GridFuture<JobResult>
 		return success;
 	}
 
-	@Override
-	public boolean isCanceled()
-	{
-		return false;
-	}
 
 	@Override
 	public boolean await()

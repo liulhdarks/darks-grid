@@ -24,6 +24,8 @@ public class RpcResult implements Serializable, Cloneable
     private static final long serialVersionUID = 747642688611619579L;
 
     private List<Object> result;
+
+    private List<String> nodeIds;
     
     private String errorMessage;
     
@@ -53,7 +55,6 @@ public class RpcResult implements Serializable, Cloneable
         return result;
     }
 
-
     public void setResult(List<Object> result)
     {
         this.result = result;
@@ -82,12 +83,22 @@ public class RpcResult implements Serializable, Cloneable
     {
         this.success = success;
     }
+    
+	public List<String> getNodeIds()
+	{
+		return nodeIds;
+	}
+
+	public void setNodeIds(List<String> nodeIds)
+	{
+		this.nodeIds = nodeIds;
+	}
 
 	@Override
 	public String toString()
 	{
-		return "MethodResult [result=" + result + ", errorMessage=" + errorMessage + ", success="
-				+ success + "]";
+		return "RpcResult [result=" + result + ", nodeIds=" + nodeIds + ", errorMessage="
+				+ errorMessage + ", success=" + success + "]";
 	}
-    
+
 }

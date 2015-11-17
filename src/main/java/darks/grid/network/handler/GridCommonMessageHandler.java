@@ -78,7 +78,7 @@ public class GridCommonMessageHandler extends SimpleChannelInboundHandler<GridMe
 	@Override
 	public void channelRead0(ChannelHandlerContext ctx, GridMessage msg) throws Exception
 	{
-		long arriveTime = System.currentTimeMillis();
+		long arriveTime = System.nanoTime();
 		if (log.isDebugEnabled())
 			log.debug("Channel read:" + msg);
 		GridMessageHandler handler = MessageHandlerFactory.getHandler(msg);

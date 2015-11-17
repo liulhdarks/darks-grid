@@ -36,26 +36,30 @@ public class HEART_ALIVE implements GridMessageHandler
 	@Override
 	public void handler(GridSession session, GridMessage msg) throws Exception
 	{
+		long arriveTime = System.nanoTime();
 		HeartAliveMeta meta = msg.getData();
 		String nodeId = meta.getNodeId();
 		GridNode node = GridRuntime.nodes().getNode(nodeId);
 		if (node == null)
 		{
-			GridRuntime.nodes().addRemoteNode(nodeId, session, meta.context());
+			node = GridRuntime.nodes().addRemoteNode(nodeId, session, meta.context());
 		}
 		else
 		{
 			node.setHeartAliveTime(System.currentTimeMillis());
 			node.context().setMachineInfo(meta.context().getMachineInfo());
 		}
+		node.setPingDelay(arriveTime - meta.getTimestamp());
 		//HEART ALIVE REPLY
 		if (msg.getType() == GridMessage.MSG_HEART_ALIVE)
 		{
+			
 			boolean valid = true;
 			try
 			{
 			    GridRuntime.context().getMachineInfo().update();
 				HeartAliveMeta replyMeta = new HeartAliveMeta(GridRuntime.context().getLocalNodeId(), GridRuntime.context());
+				replyMeta.setTimestamp(System.nanoTime());
 				GridMessage replyMsg = new GridMessage(replyMeta, GridMessage.MSG_HEART_ALIVE_REPLY, msg);
 				valid = session.sendSyncMessage(replyMsg);
 			}

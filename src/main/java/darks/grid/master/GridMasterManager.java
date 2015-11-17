@@ -14,30 +14,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package darks.grid.executor.task;
 
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+package darks.grid.master;
 
-public abstract class GridFuture<V>
+import java.util.Collections;
+
+import darks.grid.config.GridConfiguration;
+import darks.grid.manager.GridManager;
+
+public class GridMasterManager implements GridManager
 {
 
-	public abstract boolean isSuccess();
-
-	public abstract boolean isCanceled();
-	
-	public abstract boolean await();
-	
-	public abstract boolean await(int timeout, TimeUnit unit);
-	
-	public V get()
+	public void electMaster()
 	{
-		List<V> list = getList();
-		if (list != null && !list.isEmpty())
-			return list.get(0);
-		else
-			return null;
+		ElectionStrategy strategy = new ModeratorElectionStrategy();
+		strategy.elect();
 	}
 	
-	public abstract List<V> getList();
+	public void electSelfMaster(boolean force)
+	{
+		
+	}
+
+	@Override
+	public boolean initialize(GridConfiguration config)
+	{
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void destroy()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+	
 }

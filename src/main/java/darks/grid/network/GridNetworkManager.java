@@ -20,11 +20,13 @@ import io.netty.channel.Channel;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 
 import darks.grid.GridRuntime;
+import darks.grid.beans.GridNode;
 import darks.grid.beans.meta.JoinMeta;
 import darks.grid.config.GridConfiguration;
 import darks.grid.manager.GridManager;
@@ -62,6 +64,26 @@ public class GridNetworkManager implements GridManager
 	public void destroy()
 	{
 		messageServer.destroy();
+	}
+	
+	public void sendMessageToAll(Object obj)
+	{
+		List<GridNode> nodes = GridRuntime.nodes().getNodesList();
+		for (GridNode node : nodes)
+		{
+			if (node.isAlive())
+				node.sendSyncMessage(obj);
+		}
+	}
+	
+	public void sendMessageToOthers(Object obj)
+	{
+		List<GridNode> nodes = GridRuntime.nodes().getNodesList();
+		for (GridNode node : nodes)
+		{
+			if (!node.isLocal() && node.isAlive())
+				node.sendSyncMessage(obj);
+		}
 	}
 	
 	public boolean tryJoinAddress(InetSocketAddress address)

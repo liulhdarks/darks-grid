@@ -26,7 +26,6 @@ import darks.grid.GridRuntime;
 import darks.grid.beans.GridComponent;
 import darks.grid.beans.GridMessage;
 import darks.grid.beans.GridNode;
-import darks.grid.beans.GridNodeType;
 import darks.grid.beans.meta.HeartAliveMeta;
 
 public class NodesHeartAlive extends GridComponent
@@ -50,11 +49,11 @@ public class NodesHeartAlive extends GridComponent
 	protected void execute() throws Exception
 	{
 		Map<String, GridNode> nodesMap = GridRuntime.nodes().getNodesMap();
-		log.info("Start to monitor nodes.size:" + nodesMap.size());
+		log.info("Start to check " + nodesMap.size() + " nodes heart alive.");
 		for (Entry<String, GridNode> entry : nodesMap.entrySet())
 		{
 			GridNode node = entry.getValue();
-			if (node.getNodeType() == GridNodeType.TYPE_LOCAL)
+			if (node.isLocal())
 			{
 			    node.context().getMachineInfo().update();
                 continue;
@@ -77,6 +76,7 @@ public class NodesHeartAlive extends GridComponent
 		try
 		{
 			HeartAliveMeta meta = new HeartAliveMeta(GridRuntime.context().getLocalNodeId(), GridRuntime.context());
+			meta.setTimestamp(System.nanoTime());
 			GridMessage msg = new GridMessage(meta, GridMessage.MSG_HEART_ALIVE);
 			valid = node.sendSyncMessage(msg);
 		}

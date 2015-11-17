@@ -103,6 +103,7 @@ public final class ReflectUtils
             {
                 try
                 {
+                	types = (types == null || types.length == 0) ? null : types;
                 	method = clazz.getDeclaredMethod(methodName, types);
                     if (method == null)
                         clazz = clazz.getSuperclass();
