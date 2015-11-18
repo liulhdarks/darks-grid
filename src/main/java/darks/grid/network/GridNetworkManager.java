@@ -88,6 +88,8 @@ public class GridNetworkManager implements GridManager
 	
 	public boolean tryJoinAddress(InetSocketAddress address)
 	{
+		if (address == null)
+			return false;
 		Lock lock = SyncPool.lock(address);
 		if (!lock.tryLock())
 			return false;

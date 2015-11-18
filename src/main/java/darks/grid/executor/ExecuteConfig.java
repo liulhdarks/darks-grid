@@ -29,7 +29,7 @@ public class ExecuteConfig implements Serializable
 
     public enum CallType
     {
-        ALL, SINGLE
+        ALL, SINGLE, OTHERS
     }
     
     public enum ResponseType
@@ -50,17 +50,6 @@ public class ExecuteConfig implements Serializable
     public ExecuteConfig()
     {
         
-    }
-    
-    public void fixType()
-    {
-//        if (responseType != ResponseType.NONE)
-//        {
-//            if (callType == CallType.ALL)
-//                responseType = ResponseType.ALL;
-//            else
-//                responseType = ResponseType.SINGLE;
-//        }
     }
 
     public CallType getCallType()

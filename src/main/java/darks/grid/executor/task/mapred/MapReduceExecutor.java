@@ -20,6 +20,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import darks.grid.GridRuntime;
 import darks.grid.beans.GridMessage;
 import darks.grid.beans.GridNode;
@@ -36,6 +39,8 @@ import darks.grid.executor.task.TaskResultListener;
 
 public class MapReduceExecutor<T, R> extends TaskExecutor<T, R>
 {
+	
+	private static final Logger log = LoggerFactory.getLogger(MapReduceExecutor.class);
 
     private TaskResultListener listener;
     
@@ -80,10 +85,31 @@ public class MapReduceExecutor<T, R> extends TaskExecutor<T, R>
 
     private boolean executeJob(GridJob job)
     {
-        GridNode node = task.map(job);
+    	GridNode node = null;
+    	if (getConfig().getCallType() == CallType.OTHERS)
+    	{
+        	int nodeSize = GridRuntime.nodes().getNodesList().size();
+        	for (int i = 0; i < nodeSize; i++)
+        	{
+                node = task.map(job);
+                if (node != null && !node.isLocal())
+                	break;
+                node = null;
+        	}
+    	}
+    	else
+    	{
+            node = task.map(job);
+    	}
         if (node != null)
-            executeJobOnNode(node, job);
-        return true;
+        {
+            return executeJobOnNode(node, job);
+        }
+        else
+        {
+        	log.error("Cannot find execute node for job " + job);
+        	return false;
+        }
     }
 
     private boolean executeJobOnNode(GridNode node, GridJob job)

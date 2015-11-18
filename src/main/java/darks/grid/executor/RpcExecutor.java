@@ -49,7 +49,7 @@ public class RpcExecutor extends GridExecutor
 	public static void registerSystemMethod()
 	{
 		ElectRpcInvoker elect = new ElectRpcInvoker();
-		registerMethod("computeHealthy", new Class<?>[0], elect.getClass(), elect);
+		registerMethod("getNodeStatus", new Class<?>[0], elect.getClass(), elect);
 	}
 
     public static boolean registerMethod(Method method, Class<?> targetClass, Object targetObject)
@@ -114,7 +114,6 @@ public class RpcExecutor extends GridExecutor
 	{
 	    if (config == null)
 	        config = new ExecuteConfig();
-	    config.fixType();
 	    RpcRequest request = new RpcRequest(uniqueName, params, types);
 	    GridRpcTask task = new GridRpcTask();
 	    FutureTask<RpcResult> future = GridRuntime.tasks().executeMapReduceTask(task, request, config, null);
@@ -150,7 +149,6 @@ public class RpcExecutor extends GridExecutor
     {
         if (config == null)
             config = new ExecuteConfig();
-        config.fixType();
         RpcRequest request = new RpcRequest(uniqueName, params, types);
         GridRpcTask task = new GridRpcTask();
         GridRuntime.tasks().executeMapReduceTask(task, request, config, listener);

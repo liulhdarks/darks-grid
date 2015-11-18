@@ -223,7 +223,7 @@ public class GridNodesManager implements GridManager
 
     public synchronized List<GridNode> getSnapshotNodes()
 	{
-    	if (snapshotChange.get())
+    	if (snapshotChange.get() || nodesSnapshotList == null || nodesSnapshotList.isEmpty())
     	{
         	nodesSnapshotList = new ArrayList<GridNode>(nodesSet.size());
     	    for (GridNode node : nodesSet)

@@ -17,9 +17,11 @@
 
 package darks.grid.master;
 
-public abstract class ElectionStrategy
+public interface ElectionStrategy
 {
 
-	public abstract void elect();
+	public String elect();
+	
+	public String checkElect();
 	
 }

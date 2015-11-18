@@ -18,6 +18,8 @@ package darks.grid.manager;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
@@ -46,6 +48,8 @@ public class GridComponentManager implements GridManager
     private LinkedHashMap<String, GridComponent> componentsMap = new LinkedHashMap<String, GridComponent>();
     
     private ExecutorService threadPool = Executors.newCachedThreadPool();
+    
+    private List<GridComponent> runningComponents = new LinkedList<>();
     
     static
     {
@@ -110,10 +114,10 @@ public class GridComponentManager implements GridManager
     @Override
     public synchronized void destroy()
     {
-        for (Entry<String, GridComponent> entry : componentsMap.entrySet())
+        for (GridComponent component : runningComponents)
         {
-            GridComponent component = entry.getValue();
-            component.destroy();
+        	if (component != null)
+        		component.destroy();
         }
         threadPool.shutdownNow();
     }
@@ -122,9 +126,14 @@ public class GridComponentManager implements GridManager
     {
         for (Entry<String, GridComponent> entry : componentsMap.entrySet())
         {
-            GridComponent component = entry.getValue();
-            threadPool.execute(component);
+        	setupComponent(entry.getValue());
         }
+    }
+    
+    public synchronized void setupComponent(GridComponent component)
+    {
+        threadPool.execute(component);
+        runningComponents.add(component);
     }
     
     public synchronized void registerComponent(String name, GridComponent component)

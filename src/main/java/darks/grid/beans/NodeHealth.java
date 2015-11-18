@@ -44,7 +44,7 @@ public final class NodeHealth
 		
 	}
 	
-	public static int evaluateLocal()
+	public static int evaluateLocal(MachineInfo info)
 	{
 		GridNode localNode = null;
 		long pingDelaySum = 0;
@@ -69,11 +69,9 @@ public final class NodeHealth
 				(((float) (MAX_NETWORK_DELAY - remoteDelay) / (float) MAX_NETWORK_DELAY) * 100);
 		float localScore = MAX_NETWORK_DELAY <= localDelay ? 0 :
 				(((float) (MAX_NETWORK_DELAY - localDelay) / (float) MAX_NETWORK_DELAY) * 100);
-		MachineInfo info = localNode.context().getMachineInfo();
-		info.update();
 		float cpuUsage = info.getSystemCpuUsage();
 		float cpuScore = 100.f - cpuUsage * 100.f;
-		float memUsage = info.getUsedPhysicalMemoryUsage();
+		float memUsage = info.getUsedTotalMemoryUsage();
 		float menScore = 100.f - memUsage * 100.f;
 		int score = (int) (cpuScore * PROP_CPU + menScore * PROP_MEN + pingScore * PROP_PING +
 				remoteScore * PROP_REMOTE + localScore * PROP_LOCAL);

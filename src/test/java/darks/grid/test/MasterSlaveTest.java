@@ -34,8 +34,7 @@ public class MasterSlaveTest
         GridConfiguration config = GridConfigFactory.configure(this.getClass().getResourceAsStream("/grid-config.xml"));
 		GridRuntime.initialize(config);
 		ThreadUtils.threadSleep(3000);
-		GridMasterManager master = new GridMasterManager();
-		master.electMaster();
+		GridRuntime.master().electMaster();
 		while(true)
 		{
 			ThreadUtils.threadSleep(10000);

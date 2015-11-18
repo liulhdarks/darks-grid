@@ -235,5 +235,15 @@ public final class GridRuntime
 	{
 		return storageManager;
 	}
+
+	public static GridMasterManager master()
+	{
+		return masterManager;
+	}
+
+	public static GridComponentManager components()
+	{
+		return componentsManager;
+	}
 	
 }

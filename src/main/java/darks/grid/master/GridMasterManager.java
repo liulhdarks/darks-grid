@@ -17,37 +17,97 @@
 
 package darks.grid.master;
 
-import java.util.Collections;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import darks.grid.GridRuntime;
+import darks.grid.beans.GridEvent;
+import darks.grid.beans.meta.MasterMeta;
 import darks.grid.config.GridConfiguration;
 import darks.grid.manager.GridManager;
 
 public class GridMasterManager implements GridManager
 {
-
-	public void electMaster()
-	{
-		ElectionStrategy strategy = new ModeratorElectionStrategy();
-		strategy.elect();
-	}
 	
-	public void electSelfMaster(boolean force)
-	{
-		
-	}
+	private static final Logger log = LoggerFactory.getLogger(GridMasterManager.class);
+
+	private ElectionStrategy strategy = new ModeratorElectionStrategy();
+	
+	private Lock lock = new ReentrantLock();
+	
 
 	@Override
 	public boolean initialize(GridConfiguration config)
 	{
-		// TODO Auto-generated method stub
-		return false;
+		if (GridRuntime.config().isAutoMaster())
+		{
+			GridRuntime.components().setupComponent(new MasterChecker());
+		}
+		return true;
 	}
 
 	@Override
 	public void destroy()
 	{
-		// TODO Auto-generated method stub
 		
+	}
+	
+	public boolean checkMaster()
+	{
+		if (!GridRuntime.config().isAutoMaster())
+			return false;
+		if (!lock.tryLock())
+			return false;
+		try
+		{
+			return strategy.checkElect() != null;
+		}
+		catch (Exception e)
+		{
+			log.error(e.getMessage(), e);
+			return false;
+		}
+		finally
+		{
+			lock.unlock();
+		}
+	}
+	
+	public boolean electMaster()
+	{
+		if (!lock.tryLock())
+			return false;
+		try
+		{
+			String nodeId = strategy.elect();
+			return nodeId != null;
+		}
+		catch (Exception e)
+		{
+			log.error(e.getMessage(), e);
+			return false;
+		}
+		finally
+		{
+			lock.unlock();
+		}
+	}
+	
+	public boolean electSelfMaster(boolean force)
+	{
+		lock.lock();
+		try
+		{
+			MasterMeta meta = new MasterMeta(GridRuntime.getLocalId(), GridRuntime.context().getServerAddress());
+			return GridRuntime.events().publishAll(GridEvent.CONFIRM_MASTER, meta);
+		}
+		finally
+		{
+			lock.unlock();
+		}
 	}
 	
 }

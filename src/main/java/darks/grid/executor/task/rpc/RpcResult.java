@@ -55,6 +55,12 @@ public class RpcResult implements Serializable, Cloneable
         return result;
     }
 
+    @SuppressWarnings("unchecked")
+	public <T> List<T> getGenericResult()
+    {
+        return (List<T>)result;
+    }
+
     public void setResult(List<Object> result)
     {
         this.result = result;

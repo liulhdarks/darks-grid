@@ -41,7 +41,12 @@ public class NodeLeaveHandler extends GridEventHandler
 			log.info("Grid node " + node.getId() + " " + node.context().getServerAddress() + " quit.");
 			node.setQuit(true);
 			GridRuntime.jobs().removeNodeAllJobs(node.getId());
-			retryConnect(node);
+			if (retryConnect(node))
+			{
+				ThreadUtils.threadSleep(2000);
+				if (node.isMaster())
+					GridRuntime.master().checkMaster();
+			}
 		}
 		else
 		{
@@ -49,7 +54,7 @@ public class NodeLeaveHandler extends GridEventHandler
 		}
 	}
 	
-	private void retryConnect(GridNode node)
+	private boolean retryConnect(GridNode node)
 	{
 		InetSocketAddress address = node.context().getServerAddress();
 		int retryCount = GridRuntime.config().getNetworkConfig().getConnectFailRetry();
@@ -58,9 +63,10 @@ public class NodeLeaveHandler extends GridEventHandler
 			log.info("Reconnect remote address " + address);
 			if (!GridRuntime.nodes().contains(address) 
 					&& GridRuntime.network().tryJoinAddress(address))
-				break;
+				return true;
 			ThreadUtils.threadSleep(1000);
 		}
+		return false;
 	}
 
 }

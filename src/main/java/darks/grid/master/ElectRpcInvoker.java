@@ -17,13 +17,16 @@
 
 package darks.grid.master;
 
-import darks.grid.beans.NodeHealth;
+import darks.grid.GridRuntime;
+import darks.grid.beans.MachineInfo;
 
 public class ElectRpcInvoker
 {
 
-	public int computeHealthy()
+	public NodeStatus getNodeStatus()
 	{
-		return NodeHealth.evaluateLocal();
+		MachineInfo info = GridRuntime.context().getMachineInfo();
+		info.update();
+		return new NodeStatus(GridRuntime.getLocalId(), info);
 	}
 }

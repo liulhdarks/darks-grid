@@ -5,13 +5,14 @@
 	<!-- 
 	<component name="testcom" class="darks.grid.test.TestComponent"/> 
  	-->
-	<cluster cluster_name="KELUDEAPS" />
+	<cluster cluster_name="KELUDEAPS" 
+			auto_master="true"/>
 	
 	<task jobs_exec_count="30"/>
 
 	<events event_consumer_number="8"/>
 	
-	<log interval="120000" 
+	<log interval="60000" 
 		nodes_info="true" 
 	    task_info="true" 
 	    exec_job_info="true" 

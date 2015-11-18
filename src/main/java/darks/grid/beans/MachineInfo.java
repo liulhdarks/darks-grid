@@ -38,6 +38,8 @@ public class MachineInfo implements Serializable
     private float usedMaxMemoryUsage;
     
     private float usedTotalMemoryUsage;
+    
+    private int healthyScore = 100;
 
     public MachineInfo()
     {
@@ -55,6 +57,7 @@ public class MachineInfo implements Serializable
         usedTotalMemoryUsage = (float)((double) (totalMemory - freeMemory) / (double) totalMemory);
         processCpuUsage = (float) osmxb.getProcessCpuLoad();
         systemCpuUsage = (float) osmxb.getSystemCpuLoad();
+        healthyScore = NodeHealth.evaluateLocal(this);
     }
 
     public float getUsedPhysicalMemoryUsage()
@@ -107,12 +110,23 @@ public class MachineInfo implements Serializable
         this.usedTotalMemoryUsage = usedTotalMemoryUsage;
     }
 
-    @Override
-    public String toString()
-    {
-        return "MachineInfo [usedPhysicalMemoryUsage=" + usedPhysicalMemoryUsage + ", processCpuUsage="
-            + processCpuUsage + ", systemCpuUsage=" + systemCpuUsage + ", usedMaxMemoryUsage=" + usedMaxMemoryUsage
-            + ", usedTotalMemoryUsage=" + usedTotalMemoryUsage + "]";
-    }
+    public int getHealthyScore()
+	{
+		return healthyScore;
+	}
+
+	public void setHealthyScore(int healthyScore)
+	{
+		this.healthyScore = healthyScore;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "MachineInfo [usedPhysicalMemoryUsage=" + usedPhysicalMemoryUsage
+				+ ", processCpuUsage=" + processCpuUsage + ", systemCpuUsage=" + systemCpuUsage
+				+ ", usedMaxMemoryUsage=" + usedMaxMemoryUsage + ", usedTotalMemoryUsage="
+				+ usedTotalMemoryUsage + ", healthyScore=" + healthyScore + "]";
+	}
     
 }
