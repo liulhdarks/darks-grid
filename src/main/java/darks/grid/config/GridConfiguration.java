@@ -25,8 +25,6 @@ public class GridConfiguration implements Serializable
 	
 	private String clusterName = "DEFAULT";
 	
-	private boolean autoMaster = false;
-	
 	private NetworkConfig networkConfig = new NetworkConfig();
 	
 	private ComponentConfig componentConfig = new ComponentConfig();
@@ -36,6 +34,8 @@ public class GridConfiguration implements Serializable
 	private TaskConfig taskConfig = new TaskConfig();
 	
 	private StorageConfig storageConfig = new StorageConfig();
+	
+	private MasterConfig masterConfig = new MasterConfig();
     
 	public GridConfiguration()
 	{
@@ -78,23 +78,20 @@ public class GridConfiguration implements Serializable
 	}
 	
 
-	public boolean isAutoMaster()
+	
+	
+	public MasterConfig getMasterConfig()
 	{
-		return autoMaster;
-	}
-
-	public void setAutoMaster(boolean autoMaster)
-	{
-		this.autoMaster = autoMaster;
+		return masterConfig;
 	}
 
 	@Override
 	public String toString()
 	{
-		return "GridConfiguration [clusterName=" + clusterName + ", autoMaster=" + autoMaster
-				+ ", networkConfig=" + networkConfig + ", componentConfig=" + componentConfig
-				+ ", eventsConfig=" + eventsConfig + ", taskConfig=" + taskConfig
-				+ ", storageConfig=" + storageConfig + "]";
+		return "GridConfiguration [clusterName=" + clusterName + ", networkConfig=" + networkConfig
+				+ ", componentConfig=" + componentConfig + ", eventsConfig=" + eventsConfig
+				+ ", taskConfig=" + taskConfig + ", storageConfig=" + storageConfig
+				+ ", masterConfig=" + masterConfig + "]";
 	}
 	
 }

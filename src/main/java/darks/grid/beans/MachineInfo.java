@@ -60,62 +60,62 @@ public class MachineInfo implements Serializable
         healthyScore = NodeHealth.evaluateLocal(this);
     }
 
-    public float getUsedPhysicalMemoryUsage()
+    public synchronized float getUsedPhysicalMemoryUsage()
     {
         return usedPhysicalMemoryUsage;
     }
 
-    public void setUsedPhysicalMemoryUsage(float usedPhysicalMemoryUsage)
+    public synchronized void setUsedPhysicalMemoryUsage(float usedPhysicalMemoryUsage)
     {
         this.usedPhysicalMemoryUsage = usedPhysicalMemoryUsage;
     }
 
-    public float getProcessCpuUsage()
+    public synchronized float getProcessCpuUsage()
     {
         return processCpuUsage;
     }
 
-    public void setProcessCpuUsage(float processCpuUsage)
+    public synchronized void setProcessCpuUsage(float processCpuUsage)
     {
         this.processCpuUsage = processCpuUsage;
     }
 
-    public float getSystemCpuUsage()
+    public synchronized float getSystemCpuUsage()
     {
         return systemCpuUsage;
     }
 
-    public void setSystemCpuUsage(float systemCpuUsage)
+    public synchronized void setSystemCpuUsage(float systemCpuUsage)
     {
         this.systemCpuUsage = systemCpuUsage;
     }
 
-    public float getUsedMaxMemoryUsage()
+    public synchronized float getUsedMaxMemoryUsage()
     {
         return usedMaxMemoryUsage;
     }
 
-    public void setUsedMaxMemoryUsage(float usedMaxMemoryUsage)
+    public synchronized void setUsedMaxMemoryUsage(float usedMaxMemoryUsage)
     {
         this.usedMaxMemoryUsage = usedMaxMemoryUsage;
     }
 
-    public float getUsedTotalMemoryUsage()
+    public synchronized float getUsedTotalMemoryUsage()
     {
         return usedTotalMemoryUsage;
     }
 
-    public void setUsedTotalMemoryUsage(float usedTotalMemoryUsage)
+    public synchronized void setUsedTotalMemoryUsage(float usedTotalMemoryUsage)
     {
         this.usedTotalMemoryUsage = usedTotalMemoryUsage;
     }
 
-    public int getHealthyScore()
+    public synchronized int getHealthyScore()
 	{
 		return healthyScore;
 	}
 
-	public void setHealthyScore(int healthyScore)
+	public synchronized void setHealthyScore(int healthyScore)
 	{
 		this.healthyScore = healthyScore;
 	}

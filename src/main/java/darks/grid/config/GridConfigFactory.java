@@ -106,6 +106,10 @@ public final class GridConfigFactory
                 {
                     parseAttrForObject(el, config.getStorageConfig());
                 }
+                else if ("master".equalsIgnoreCase(el.getNodeName()))
+                {
+                	parseMaster(config, el);
+                }
                 else if ("component".equalsIgnoreCase(el.getNodeName()))
                 {
                     parseComponent(config, el);
@@ -117,6 +121,37 @@ public final class GridConfigFactory
 		    }
 		}
 		return config;
+	}
+	
+	private static void parseMaster(GridConfiguration config, Element el)
+	{
+		parseAttrForObject(el, config.getMasterConfig());
+		NodeList nodesList = el.getChildNodes();
+		for (int i = 0; i < nodesList.getLength(); i++)
+		{
+		    Node node =  nodesList.item(i);
+		    if (node instanceof Element)
+		    {
+		    	System.out.println(node.getClass());
+		        Element elChild = (Element) node;
+		        if ("task".equalsIgnoreCase(elChild.getNodeName()))
+	            {
+		        	String taskName = null;
+		        	String taskClassName = null;
+		        	if (elChild.hasAttribute("name"))
+		        		taskName = elChild.getAttribute("name");
+		        	if (elChild.hasAttribute("class"))
+		        		taskClassName = elChild.getAttribute("class");
+		        	else
+		        		throw new GridException("Invalid master task config " + elChild);
+		        	if (taskClassName == null || "".equals(taskClassName.trim()))
+		        		throw new GridException("Invalid master task className:" + taskClassName);
+		        	if (taskName == null || "".equals(taskName.trim()))
+		        		taskName = taskClassName;
+		        	config.getMasterConfig().addTaskClass(taskName, taskClassName);
+	            }
+		    }
+		}
 	}
 	
 	private static void parseComponent(GridConfiguration config, Element el)

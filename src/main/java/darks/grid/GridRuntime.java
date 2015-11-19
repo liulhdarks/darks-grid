@@ -168,7 +168,7 @@ public final class GridRuntime
                     return true;
                 if (timeout > 0 && System.currentTimeMillis() - st > time)
                     break;
-                Thread.sleep(100);
+                Thread.sleep(10);
             }
         }
         catch (Exception e)

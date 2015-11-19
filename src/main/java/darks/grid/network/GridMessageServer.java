@@ -18,6 +18,7 @@ package darks.grid.network;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -32,7 +33,6 @@ import io.netty.handler.codec.serialization.ObjectEncoder;
 import io.netty.handler.timeout.IdleStateHandler;
 
 import java.net.BindException;
-import java.net.InetSocketAddress;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -42,7 +42,6 @@ import org.slf4j.LoggerFactory;
 import darks.grid.GridRuntime;
 import darks.grid.config.NetworkConfig;
 import darks.grid.network.handler.GridServerMessageHandler;
-import darks.grid.utils.NetworkUtils;
 
 public class GridMessageServer extends GridMessageDispatcher
 {
@@ -56,10 +55,6 @@ public class GridMessageServer extends GridMessageDispatcher
 	EventLoopGroup workerGroup = null;
 	
 	ServerBootstrap bootstrap = null;
-	
-	boolean binded = false;
-	
-	private InetSocketAddress bindAddress;
 	
 	public GridMessageServer()
 	{
@@ -99,7 +94,6 @@ public class GridMessageServer extends GridMessageDispatcher
 				.childOption(ChannelOption.SO_SNDBUF, config.getTcpSendBufferSize())
 				.childOption(ChannelOption.SO_RCVBUF, config.getTcpRecvBufferSize());
 			bootstrap.childHandler(newChannelHandler());
-			bindAddress = null;
 			return true;
 		}
 		catch (Exception e)
@@ -109,16 +103,15 @@ public class GridMessageServer extends GridMessageDispatcher
 		}
 	}
     
-    public boolean listen(int port) throws BindException
+    public GridSession listen(int port) throws BindException
     {
         return listen(null, port);
     }
 	
-	public boolean listen(String host, int port) throws BindException
+	public GridSession listen(String host, int port) throws BindException
 	{
-		bindAddress = null;
 		if (bootstrap == null)
-			return false;
+			return null;
 		try
 		{
 			ChannelFuture f = null;
@@ -126,10 +119,10 @@ public class GridMessageServer extends GridMessageDispatcher
 			    f = bootstrap.bind(port).sync();
 			else
 			    f = bootstrap.bind(host, port).sync();
-			channel = f.channel();
-			binded = true;
-			log.info("Grid message server binds address " + getAddress());
-			return true; 
+			Channel channel = f.channel();
+			GridSession session = GridSessionFactory.getLocalSession(channel);
+			log.info("Grid message server binds address " + session.remoteAddress());
+			return session; 
 		}
 		catch (Exception e)
 		{
@@ -137,7 +130,7 @@ public class GridMessageServer extends GridMessageDispatcher
 				throw (BindException)e;
 			else
 				log.error(e.getMessage(), e);
-			return false;
+			return null;
 		}
 	}
 	
@@ -149,24 +142,6 @@ public class GridMessageServer extends GridMessageDispatcher
 		workerGroup.shutdownGracefully();
 		threadExecutor.shutdown();
 		return super.destroy();
-	}
-
-	public boolean isBinded()
-	{
-		return binded;
-	}
-	
-	public synchronized InetSocketAddress getAddress()
-	{
-		if (channel == null)
-			return null;
-		if (bindAddress == null)
-		{
-			String ipHost = NetworkUtils.getIpAddress();
-			InetSocketAddress ipAddr = (InetSocketAddress) channel.localAddress();
-			bindAddress = new InetSocketAddress(ipHost, ipAddr.getPort());
-		}
-		return bindAddress;
 	}
 	
 	private ChannelInitializer<SocketChannel> newChannelHandler()

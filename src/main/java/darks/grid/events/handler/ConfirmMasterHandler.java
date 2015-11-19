@@ -56,6 +56,8 @@ public class ConfirmMasterHandler extends GridEventHandler
 				nd.setMaster(false);
 		}
 		node.setMaster(true);
+		if (node.isLocal())
+			GridRuntime.master().notifyTask();
 	}
 
 }

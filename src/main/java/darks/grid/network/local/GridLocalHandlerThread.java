@@ -16,8 +16,6 @@
  */
 package darks.grid.network.local;
 
-import io.netty.channel.Channel;
-
 import java.util.concurrent.BlockingQueue;
 
 import org.slf4j.Logger;
@@ -25,9 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import darks.grid.GridRuntime;
 import darks.grid.beans.GridMessage;
-import darks.grid.beans.GridNode;
 import darks.grid.network.GridSession;
-import darks.grid.network.GridSessionFactory;
 import darks.grid.network.handler.msg.GridMessageHandler;
 import darks.grid.network.handler.msg.MessageHandlerFactory;
 import darks.grid.utils.GridStatistic;
@@ -84,10 +80,11 @@ public class GridLocalHandlerThread extends Thread
 			GridMessageHandler handler = MessageHandlerFactory.getHandler(message);
 			if (handler != null)
 			{
-				GridNode localNode = GridRuntime.nodes().getLocalNode();
-				Channel channel = GridRuntime.network().getServerChannel();
-				GridSession session = localNode == null ? GridSessionFactory.getLocalSession(channel) : localNode.getSession();
-				handler.handler(session, message);
+				GridSession session = GridRuntime.network().getServerSession();
+				if (session == null)
+					log.error("Invalid server session.");
+				else
+					handler.handler(session, message);
 			}
 			GridStatistic.incrementLocalDelay(arriveTime - message.getTimestamp());
 		}

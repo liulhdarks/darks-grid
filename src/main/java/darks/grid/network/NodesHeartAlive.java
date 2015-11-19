@@ -56,6 +56,8 @@ public class NodesHeartAlive extends GridComponent
 			if (node.isLocal())
 			{
 			    node.context().getMachineInfo().update();
+			    if (!node.getSession().isActive())
+			    	GridRuntime.network().bindLocalNode();
                 continue;
 			}
 			if (!node.isAlive())

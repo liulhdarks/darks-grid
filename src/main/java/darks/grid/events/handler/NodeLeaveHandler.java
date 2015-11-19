@@ -42,11 +42,9 @@ public class NodeLeaveHandler extends GridEventHandler
 			node.setQuit(true);
 			GridRuntime.jobs().removeNodeAllJobs(node.getId());
 			if (retryConnect(node))
-			{
 				ThreadUtils.threadSleep(2000);
-				if (node.isMaster())
-					GridRuntime.master().checkMaster();
-			}
+			if (node.isMaster())
+				GridRuntime.master().checkMaster();
 		}
 		else
 		{

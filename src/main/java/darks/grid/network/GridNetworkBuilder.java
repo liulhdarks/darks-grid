@@ -21,8 +21,10 @@ import java.net.BindException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import darks.grid.GridRuntime;
 import darks.grid.config.GridConfiguration;
 import darks.grid.config.NetworkConfig;
+import darks.grid.utils.ThreadUtils;
 
 public final class GridNetworkBuilder
 {
@@ -34,20 +36,35 @@ public final class GridNetworkBuilder
 		
 	}
 	
+	public static GridMessageClient buildMessageClient(GridConfiguration config)
+	{
+		GridMessageClient client = new GridMessageClient(ThreadUtils.getThrealPool());
+		if (!client.initialize())
+			return null;
+		return client;
+	}
+	
 	public static GridMessageServer buildMessageServer(GridConfiguration config)
 	{
 		log.info("Startup grid message server.");
 		GridMessageServer server = new GridMessageServer();
 		if (!server.initialize())
 			return null;
-		NetworkConfig netConfig = config.getNetworkConfig();
+		return server;
+	}
+	
+	public static GridSession listenServer(GridMessageServer server)
+	{
+		GridSession session = null;
+		NetworkConfig netConfig = GridRuntime.config().getNetworkConfig();
 		String bindHost = netConfig.getBindHost();
 		int maxTryPort = netConfig.getBindPort() + netConfig.getBindPortRange();
 		for (int port = netConfig.getBindPort(); port <= maxTryPort; port++)
 		{
 			try
 			{
-				if (!server.listen(bindHost, port))
+				session = server.listen(bindHost, port);
+				if (session == null || !session.isActive())
 					log.error("Fail to bind host:" + bindHost + " port:" + port + ".Exception occured.");
 				break;
 			}
@@ -56,7 +73,7 @@ public final class GridNetworkBuilder
 				log.warn("Grid server try to listen host:" + bindHost + " port:" + port + "[max:" + maxTryPort + "] failed.");
 			}
 		}
-		return server.isBinded() ? server : null;
+		return session;
 	}
 	
 }

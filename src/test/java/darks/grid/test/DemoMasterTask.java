@@ -14,26 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package darks.grid.network;
 
-import java.net.InetSocketAddress;
+package darks.grid.test;
 
-public interface GridSession
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import darks.grid.master.MasterTask;
+
+public class DemoMasterTask extends MasterTask
 {
 	
-	public String getId();
+	private static final Logger log = LoggerFactory.getLogger(DemoMasterTask.class);
 
-	public boolean sendMessage(Object msg);
-	
-	public boolean sendSyncMessage(Object msg);
-	
-	public boolean sendSyncMessage(Object msg, boolean failRetry);
-	
-	public void close();
-	
-	public boolean isActive();
-	
-	public InetSocketAddress remoteAddress();
-	
-	public InetSocketAddress localAddress();
+	@Override
+	public boolean execute()
+	{
+		log.info("do master task.");
+		return true;
+	}
+
 }

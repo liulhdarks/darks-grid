@@ -213,6 +213,8 @@ public class GridNode implements Serializable
 
 	public String toSimpleString()
 	{
+		long heartDelay = System.currentTimeMillis() - heartAliveTime.get();
+		MachineInfo info = context.getMachineInfo();
 		String unit = "ms";
 		long delay = TimeUnit.NANOSECONDS.toMillis(pingDelay.get());
 		if (delay == 0)
@@ -225,9 +227,10 @@ public class GridNode implements Serializable
 				"  [", GridNodeType.valueOf(nodeType),']', flagMaster,
 				' ', String.format("%-21s", context.getServerAddress().toString()), 
 				' ', GridNodeStatus.valueOf(this),
-				' ', String.format("%-8d", System.currentTimeMillis() - heartAliveTime.get()),
-				'\t', StringUtils.percent(context.getMachineInfo().getSystemCpuUsage()), 
-				'\t', StringUtils.percent(context.getMachineInfo().getUsedTotalMemoryUsage()),
+				' ', String.format("%-8d", heartDelay),
+				'\t', StringUtils.percent(info.getSystemCpuUsage()), 
+				'\t', StringUtils.percent(info.getUsedTotalMemoryUsage()),
+				' ', String.format("%-3d", info.getHealthyScore()),
 				' ', delay, unit);
 	}
 

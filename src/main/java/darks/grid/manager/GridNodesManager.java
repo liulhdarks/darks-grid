@@ -72,10 +72,18 @@ public class GridNodesManager implements GridManager
 	
 	public synchronized void addLocalNode(GridSession session)
 	{
-		String localNodeId = NodeId.localId();
-		GridRuntime.context().setLocalNodeId(localNodeId);
-		GridNode node = new GridNode(localNodeId, session, GridRuntime.context(), GridNodeType.TYPE_LOCAL);
-        addNode(session, node);
+		GridNode localNode = getLocalNode();
+		if (localNode == null)
+		{
+			String localNodeId = NodeId.localId();
+			GridRuntime.context().setLocalNodeId(localNodeId);
+			localNode = new GridNode(localNodeId, session, GridRuntime.context(), GridNodeType.TYPE_LOCAL);
+	        addNode(session, localNode);
+		}
+		else
+		{
+			localNode.setSession(session);
+		}
 	}
 	
 	public synchronized GridNode addRemoteNode(String nodeId, GridSession session, GridContext context)

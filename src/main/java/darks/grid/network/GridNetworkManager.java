@@ -16,8 +16,6 @@
  */
 package darks.grid.network;
 
-import io.netty.channel.Channel;
-
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.List;
@@ -31,18 +29,19 @@ import darks.grid.beans.meta.JoinMeta;
 import darks.grid.config.GridConfiguration;
 import darks.grid.manager.GridManager;
 import darks.grid.utils.SyncPool;
-import darks.grid.utils.ThreadUtils;
 
 public class GridNetworkManager implements GridManager
 {
 	
 	private GridMessageServer messageServer;
 	
+	private GridMessageClient messageClient;
+	
 	private Map<String, Map<SocketAddress, JoinMeta>> waitJoin = new ConcurrentHashMap<String, Map<SocketAddress, JoinMeta>>();
 	
 	private Object mutex = new Object();
 	
-	private ThreadLocal<GridMessageClient> clientLocal = new ThreadLocal<>();
+	private GridSession serverSession;
 	
 	public GridNetworkManager()
 	{
@@ -50,19 +49,41 @@ public class GridNetworkManager implements GridManager
 	}
 	
 	@Override
-	public boolean initialize(GridConfiguration config)
+	public synchronized boolean initialize(GridConfiguration config)
 	{
 		messageServer = GridNetworkBuilder.buildMessageServer(config);
 		if (messageServer == null)
 			return false;
-		GridRuntime.context().setServerAddress(getBindAddress());
-		GridRuntime.nodes().addLocalNode(GridSessionFactory.getLocalSession(messageServer.getChannel()));
-		return true;
+		if (bindLocalNode())
+		{
+			messageClient = GridNetworkBuilder.buildMessageClient(config);
+			return messageClient != null;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	
+	public synchronized boolean bindLocalNode()
+	{
+		if (messageServer == null)
+			return false;
+		serverSession = GridNetworkBuilder.listenServer(messageServer);
+		if (serverSession != null)
+		{
+			GridRuntime.context().setServerAddress(getBindAddress());
+			GridRuntime.nodes().addLocalNode(serverSession);
+			return true;
+		}
+		else
+			return false;
 	}
 
 	@Override
 	public void destroy()
 	{
+		messageClient.destroy();
 		messageServer.destroy();
 	}
 	
@@ -97,14 +118,9 @@ public class GridNetworkManager implements GridManager
 		{
 			if (GridRuntime.nodes().contains(address))
 				return true;
-			GridMessageClient client = clientLocal.get();
-			if (client == null)
-			{
-				client = new GridMessageClient(ThreadUtils.getThrealPool());
-				client.initialize();
-				clientLocal.set(client);
-			}
-			return client.connect(address) != null;
+			if (messageClient == null)
+				return false;
+			return messageClient.connect(address) != null;
 		}
 		finally
 		{
@@ -143,18 +159,16 @@ public class GridNetworkManager implements GridManager
 		}
 	}
 	
-	public InetSocketAddress getBindAddress()
+	public synchronized InetSocketAddress getBindAddress()
 	{
-		if (messageServer == null)
+		if (messageServer == null || serverSession == null)
 			return null;
-		return messageServer.getAddress();
+		return serverSession.localAddress();
 	}
 	
 	
-	public Channel getServerChannel()
+	public GridSession getServerSession()
 	{
-		if (messageServer == null)
-			return null;
-		return messageServer.getChannel();
+		return serverSession;
 	}
 }

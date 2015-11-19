@@ -16,15 +16,16 @@
  */
 package darks.grid.network;
 
-import java.net.SocketAddress;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+
+import java.net.InetSocketAddress;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import darks.grid.GridRuntime;
 import darks.grid.utils.ChannelUtils;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 
 public class GridRemoteSession implements GridSession
 {
@@ -122,13 +123,20 @@ public class GridRemoteSession implements GridSession
 	}
 
 	@Override
-	public SocketAddress remoteAddress()
+	public InetSocketAddress remoteAddress()
 	{
 		if (channel == null)
 			return null;
-		return channel.remoteAddress();
+		return (InetSocketAddress)channel.remoteAddress();
 	}
 
+	@Override
+	public InetSocketAddress localAddress()
+	{
+		if (channel == null)
+			return null;
+		return (InetSocketAddress)channel.localAddress();
+	}
 
 	@Override
 	public int hashCode()

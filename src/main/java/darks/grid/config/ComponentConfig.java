@@ -63,7 +63,8 @@ public class ComponentConfig
     {
         try
         {
-            Class<? extends GridComponent> clazz = (Class<? extends GridComponent>) Class.forName(className);
+            @SuppressWarnings("unchecked")
+			Class<? extends GridComponent> clazz = (Class<? extends GridComponent>) Class.forName(className);
             componentsMap.put(labelName, clazz);
         }
         catch (Exception e)
