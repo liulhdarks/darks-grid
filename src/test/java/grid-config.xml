@@ -6,10 +6,10 @@
 	<component name="testcom" class="darks.grid.test.TestComponent"/> 
  	-->
 	<cluster cluster_name="KELUDEAPS"/>
-			<!-- 
-	<master auto_master="true" min_slave_num="1">
+	 
+	<master auto_master="true" min_slave_num="2">
 		<task name="demo" class="darks.grid.test.DemoMasterTask" interval="60000" />
-	</master> -->
+	</master>
 	
 	<task jobs_exec_count="30"/>
 

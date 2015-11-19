@@ -60,7 +60,6 @@ public final class NodeHealth
 				localNode = node;
 		}
 		long maxPingDelay = MAX_PING_DELAY * remoteNodeSize;
-		pingDelaySum = TimeUnit.NANOSECONDS.toMillis(pingDelaySum);
 		float pingScore = (maxPingDelay == 0 || maxPingDelay <= pingDelaySum) ? 0 :
 					(((float) (maxPingDelay - pingDelaySum) / (float) maxPingDelay) * 100);
 		long remoteDelay = GridStatistic.getAvgDelay();

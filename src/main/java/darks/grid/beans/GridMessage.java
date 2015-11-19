@@ -54,7 +54,7 @@ public class GridMessage implements Serializable, Cloneable, ReferenceCounted
 	
 	private int sourceType;
 	
-	private long timestamp = System.nanoTime();
+	private long timestamp = System.currentTimeMillis();
 	
 	AtomicInteger cnt = new AtomicInteger(0);
 

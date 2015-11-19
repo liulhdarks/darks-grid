@@ -122,6 +122,11 @@ public class GridNodesManager implements GridManager
         snapshotChange.set(true);
 	}
 	
+	public int getNodesCount()
+	{
+		return nodesMap.size();
+	}
+	
 	public GridNode getLocalNode()
 	{
 		String localNodeId = GridRuntime.context().getLocalNodeId();

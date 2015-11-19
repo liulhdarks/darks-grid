@@ -17,7 +17,6 @@
 package darks.grid.beans;
 
 import java.io.Serializable;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -83,9 +82,8 @@ public class GridNode implements Serializable
 	{
 		if (!session.isActive() || quit)
 			return false;
-		if (nodeType == GridNodeType.TYPE_REMOTE)
+		if (!isLocal())
 		{
-		    
 			if (System.currentTimeMillis() - heartAliveTime.get() > GridRuntime.config().getNetworkConfig().getNodesExpireTime())
 				return false;
 		}
@@ -213,20 +211,16 @@ public class GridNode implements Serializable
 
 	public String toSimpleString()
 	{
+		String nodeStatus = GridNodeStatus.valueOf(this);
 		long heartDelay = System.currentTimeMillis() - heartAliveTime.get();
 		MachineInfo info = context.getMachineInfo();
 		String unit = "ms";
-		long delay = TimeUnit.NANOSECONDS.toMillis(pingDelay.get());
-		if (delay == 0)
-		{
-			delay = pingDelay.get();
-			unit = "ns";
-		}
+		long delay = pingDelay.get();
 		String flagMaster = master ? "[M]" : "   ";
 		return StringUtils.stringBuffer(id, 
 				"  [", GridNodeType.valueOf(nodeType),']', flagMaster,
 				' ', String.format("%-21s", context.getServerAddress().toString()), 
-				' ', GridNodeStatus.valueOf(this),
+				' ', nodeStatus,
 				' ', String.format("%-8d", heartDelay),
 				'\t', StringUtils.percent(info.getSystemCpuUsage()), 
 				'\t', StringUtils.percent(info.getUsedTotalMemoryUsage()),

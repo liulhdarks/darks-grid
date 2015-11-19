@@ -29,7 +29,7 @@ public class MasterConfig
 
 	private boolean autoMaster = false;
 	
-	private Integer minSlaveNum = 0;
+	private int minSlaveNum = 0;
 	
 	private Map<String, Class<? extends MasterTask>> taskClasses = new HashMap<>();
 	
@@ -65,12 +65,12 @@ public class MasterConfig
 		return taskClasses;
 	}
 
-	public Integer getMinSlaveNum()
+	public int getMinSlaveNum()
 	{
 		return minSlaveNum;
 	}
 
-	public void setMinSlaveNum(Integer minSlaveNum)
+	public void setMinSlaveNum(int minSlaveNum)
 	{
 		this.minSlaveNum = minSlaveNum;
 	}

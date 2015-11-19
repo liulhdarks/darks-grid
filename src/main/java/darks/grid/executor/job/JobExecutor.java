@@ -37,7 +37,7 @@ public abstract class JobExecutor implements Runnable
 	
 	private JobStatusType statusType;
 	
-	private long timestamp = System.nanoTime();
+	private long timestamp = System.currentTimeMillis();
 	
 	public JobExecutor(GridSession session, GridMessage msg)
 	{
@@ -52,7 +52,7 @@ public abstract class JobExecutor implements Runnable
 	{
 		try
 		{
-			long delay = System.nanoTime() - timestamp;
+			long delay = System.currentTimeMillis() - timestamp;
 			GridStatistic.incrementJobDelay(delay);
 			GridStatistic.addWaitJobCount(-1);
 			statusType = JobStatusType.DOING;

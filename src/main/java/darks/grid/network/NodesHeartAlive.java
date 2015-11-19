@@ -55,6 +55,7 @@ public class NodesHeartAlive extends GridComponent
 			GridNode node = entry.getValue();
 			if (node.isLocal())
 			{
+				node.setHeartAliveTime(System.currentTimeMillis());
 			    node.context().getMachineInfo().update();
 			    if (!node.getSession().isActive())
 			    	GridRuntime.network().bindLocalNode();
@@ -78,7 +79,7 @@ public class NodesHeartAlive extends GridComponent
 		try
 		{
 			HeartAliveMeta meta = new HeartAliveMeta(GridRuntime.context().getLocalNodeId(), GridRuntime.context());
-			meta.setTimestamp(System.nanoTime());
+			meta.setTimestamp(System.currentTimeMillis());
 			GridMessage msg = new GridMessage(meta, GridMessage.MSG_HEART_ALIVE);
 			valid = node.sendSyncMessage(msg);
 		}

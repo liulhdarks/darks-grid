@@ -99,7 +99,15 @@ public class GridMasterManager implements GridManager
 			return false;
 		try
 		{
-			return strategy.checkElect() != null;
+			int minSlaveNum = masterConfig.getMinSlaveNum();
+			int slaveCount = GridRuntime.nodes().getNodesCount() - 1;
+			if (slaveCount >= minSlaveNum)
+				return strategy.checkElect() != null;
+			else
+			{
+				log.warn("Cancel to check master, because slaveCount:" + slaveCount + " < minSlaveNum:" + minSlaveNum);
+				return false;
+			}
 		}
 		catch (Exception e)
 		{

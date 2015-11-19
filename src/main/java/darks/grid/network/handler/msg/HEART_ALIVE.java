@@ -36,7 +36,7 @@ public class HEART_ALIVE implements GridMessageHandler
 	@Override
 	public void handler(GridSession session, GridMessage msg) throws Exception
 	{
-		long arriveTime = System.nanoTime();
+		long arriveTime = System.currentTimeMillis();
 		HeartAliveMeta meta = msg.getData();
 		String nodeId = meta.getNodeId();
 		GridNode node = GridRuntime.nodes().getNode(nodeId);
@@ -59,7 +59,7 @@ public class HEART_ALIVE implements GridMessageHandler
 			{
 			    GridRuntime.context().getMachineInfo().update();
 				HeartAliveMeta replyMeta = new HeartAliveMeta(GridRuntime.context().getLocalNodeId(), GridRuntime.context());
-				replyMeta.setTimestamp(System.nanoTime());
+				replyMeta.setTimestamp(System.currentTimeMillis());
 				GridMessage replyMsg = new GridMessage(replyMeta, GridMessage.MSG_HEART_ALIVE_REPLY, msg);
 				valid = session.sendSyncMessage(replyMsg);
 			}

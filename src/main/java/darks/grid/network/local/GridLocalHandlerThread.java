@@ -73,7 +73,7 @@ public class GridLocalHandlerThread extends Thread
 	{
 		try
 		{
-			long arriveTime = System.nanoTime();
+			long arriveTime = System.currentTimeMillis();
 			GridMessage message = (GridMessage) obj;
 			if (log.isDebugEnabled())
 				log.debug("Local read:" + message);

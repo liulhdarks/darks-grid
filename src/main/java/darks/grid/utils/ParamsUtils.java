@@ -64,32 +64,52 @@ public final class ParamsUtils
 
 	private static void buildIpList(List<String> ipList, String[] ipArg, int index, String prefix)
 	{
+		List<Integer> scanList = new ArrayList<>();
 		String ipVal = ipArg[index++];
-		int startVal = 1;
-		int endVal = 1;
+		int startVal = -1;
+		int endVal = -1;
 		if ("*".equals(ipVal))
 		{
 			startVal = 1;
 			endVal = 254;
+			scopeIntList(scanList, startVal, endVal);
 		}
 		else if (ipVal.indexOf("-") > 0)
 		{
 			String[] arg = ipVal.split("-");
 			startVal = Integer.parseInt(arg[0]);
 			endVal = Integer.parseInt(arg[1]);
+			scopeIntList(scanList, startVal, endVal);
+		}
+		else if (ipVal.indexOf("/") > 0)
+		{
+			String[] args = ipVal.split("/");
+			for (String val : args)
+			{
+				scanList.add(Integer.parseInt(val));
+			}
 		}
 		else
 		{
 			startVal = Integer.parseInt(ipVal);
 			endVal = startVal;
+			scopeIntList(scanList, startVal, endVal);
 		}
-		for (int i = startVal; i <= endVal; i++)
+		for (Integer v : scanList)
 		{
-			String newPreffix = (prefix == null || "".equals(prefix)) ? String.valueOf(i) : prefix + "." + i;
+			String newPreffix = (prefix == null || "".equals(prefix)) ? String.valueOf(v) : prefix + "." + v;
 			if (index < ipArg.length)
 				buildIpList(ipList, ipArg, index, newPreffix);
 			else
 				ipList.add(newPreffix);
+		}
+	}
+	
+	private static void scopeIntList(List<Integer> list, int start, int end)
+	{
+		for (int i = start; i <= end; i++)
+		{
+			list.add(i);
 		}
 	}
 	
@@ -118,7 +138,7 @@ public final class ParamsUtils
 	
 	public static void main(String[] args)
 	{
-		String hosts = "10.176.102.92-93:[12120-12122],10.176.122.115-116:[12120-12122]";
+		String hosts = "10.179.102/102.115/116:[12120-12121],10.176.122.92/93:[12120-12121]";
 		Collection<InetSocketAddress> list = parseAddress(hosts);
 		System.out.println(list.size());
 		for (InetSocketAddress addr : list)
