@@ -104,14 +104,28 @@ public class GridMessageClient extends GridMessageDispatcher
 
 	public Channel connect(SocketAddress address)
 	{
+		return connect(address, true);
+	}
+
+	public Channel connect(SocketAddress address, boolean sync)
+	{
 		if (bootstrap == null)
 			return null;
 		try
 		{
-			ChannelFuture f = bootstrap.connect(address).sync();
-			Channel channel = f.channel();
-			log.info("Succeed to connect " + address);
-			return channel;
+			ChannelFuture f = bootstrap.connect(address);
+			if (sync)
+			{
+				f.sync();
+				Channel channel = f.channel();
+				if (channel != null)
+					log.info("Succeed to connect " + address);
+				else
+					log.error("Fail to connect " + address);
+				return channel;
+			}
+			else
+				return f.channel();
 		}
 		catch (Exception e)
 		{

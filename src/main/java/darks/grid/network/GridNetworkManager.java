@@ -23,6 +23,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import darks.grid.GridRuntime;
 import darks.grid.beans.GridNode;
 import darks.grid.beans.meta.JoinMeta;
@@ -32,6 +35,10 @@ import darks.grid.utils.SyncPool;
 
 public class GridNetworkManager implements GridManager
 {
+	
+	private static final Logger log = LoggerFactory.getLogger(GridNetworkManager.class);
+	
+	private static final long LOCK_EXPIRE_TIME = 60000;
 	
 	private GridMessageServer messageServer;
 	
@@ -109,18 +116,35 @@ public class GridNetworkManager implements GridManager
 	
 	public boolean tryJoinAddress(InetSocketAddress address)
 	{
+		return tryJoinAddress(address, true);
+	}
+	
+	public boolean tryJoinAddress(InetSocketAddress address, boolean sync)
+	{
 		if (address == null)
+		{
+			log.error("Address is null when trying to join.");
 			return false;
-		Lock lock = SyncPool.lock(address);
+		}
+		Lock lock = SyncPool.lock(address, LOCK_EXPIRE_TIME);
 		if (!lock.tryLock())
+		{
+			log.error("Address " + address + " locked when trying to join.");
 			return false;
+		}
 		try
 		{
 			if (GridRuntime.nodes().contains(address))
+			{
+				log.warn("Address " + address + " has joined when trying to join.");
 				return true;
+			}
 			if (messageClient == null)
+			{
+				log.error("Message client is null when trying to join.");
 				return false;
-			return messageClient.connect(address) != null;
+			}
+			return messageClient.connect(address, sync) != null;
 		}
 		finally
 		{
