@@ -26,11 +26,13 @@ import org.slf4j.LoggerFactory;
 
 import darks.grid.GridRuntime;
 import darks.grid.beans.GridEvent;
+import darks.grid.beans.GridMessage;
 import darks.grid.beans.GridNode;
 import darks.grid.config.EventsConfig;
 import darks.grid.config.EventsConfig.EventsChannelConfig;
 import darks.grid.config.GridConfiguration;
 import darks.grid.manager.GridManager;
+import darks.grid.network.GridSession;
 
 public class GridEventsManager implements GridManager
 {
@@ -108,6 +110,15 @@ public class GridEventsManager implements GridManager
 		return false;
 	}
 	
+	public boolean publish(GridSession session, GridEvent event, boolean sync)
+	{
+		GridMessage message = new GridMessage(event, GridMessage.MSG_EVENT);
+		if (sync)
+			return session.sendSyncMessage(message);
+		else
+			return session.sendMessage(message);
+	}
+	
 	public boolean publishAll(String type, Object obj)
 	{
 		return publishAll(new GridEvent(obj, type));
@@ -120,9 +131,15 @@ public class GridEventsManager implements GridManager
 	
 	public boolean publishAll(GridEvent event)
 	{
+		List<GridNode> nodes = GridRuntime.nodes().getNodesList();
+		for (GridNode node : nodes)
+		{
+			if (!node.isLocal() && node.isAlive())
+				publish(node, event, true);
+		}
 		EventsChannel channel = channels.get(event.getChannel());
 		if (channel != null)
-			return channel.publishAll(event);
+			return channel.publish(event);
 		return false;
 	}
 	

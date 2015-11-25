@@ -27,7 +27,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import darks.grid.GridRuntime;
 import darks.grid.beans.GridEvent;
 import darks.grid.beans.GridMessage;
 import darks.grid.beans.GridNode;
@@ -106,17 +105,6 @@ public class EventsChannel
 			else
 				return node.sendMessage(message);
 		}
-	}
-	
-	public boolean publishAll(GridEvent event)
-	{
-		List<GridNode> nodes = GridRuntime.nodes().getNodesList();
-		for (GridNode node : nodes)
-		{
-			if (!node.isLocal() && node.isAlive())
-				publish(node, event, true);
-		}
-		return eventQueue.offer(event);
 	}
 	
 	public boolean publish(GridEvent event)

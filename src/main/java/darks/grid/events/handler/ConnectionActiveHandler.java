@@ -23,8 +23,8 @@ import org.slf4j.LoggerFactory;
 
 import darks.grid.GridRuntime;
 import darks.grid.beans.GridEvent;
-import darks.grid.beans.GridMessage;
 import darks.grid.beans.meta.JoinMeta;
+import darks.grid.events.EventsChannel;
 import darks.grid.events.GridEventHandler;
 import darks.grid.network.GridSession;
 
@@ -43,7 +43,8 @@ public class ConnectionActiveHandler extends GridEventHandler
         if (GridRuntime.awaitReady(AWAIT_READY_TIMEOUT, TimeUnit.SECONDS))
         {
             JoinMeta meta = new JoinMeta(GridRuntime.getLocalId(), GridRuntime.context());
-            session.sendSyncMessage(new GridMessage(meta, GridMessage.MSG_JOIN));
+            GridEvent joinEvent = new GridEvent(meta, GridEvent.JOIN_REQUEST, EventsChannel.SYSTEM_CHANNEL);
+            GridRuntime.events().publish(session, joinEvent, true);
         }
         else
         {

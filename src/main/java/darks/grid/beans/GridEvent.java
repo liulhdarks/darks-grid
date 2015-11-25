@@ -31,6 +31,8 @@ public class GridEvent implements Serializable, Cloneable
 	public static final String MERGE_NODES = "merge_nodes";
 	public static final String CONFIRM_MASTER = "confirm_master";
 	public static final String HEART_ALIVE_REPLY = "heart_alive_reply";
+	public static final String JOIN_REQUEST = "join_request";
+	public static final String JOIN_REQUEST_REPLY = "join_request_reply";
 	
 	/**
 	 * 

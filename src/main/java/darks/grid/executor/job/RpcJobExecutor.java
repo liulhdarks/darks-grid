@@ -34,7 +34,7 @@ public class RpcJobExecutor extends JobExecutor
 	{
 		GridRpcJob jobBean = (GridRpcJob) job;
 		GridJobReply resp = (GridJobReply) jobBean.execute();
-		if (jobBean.isCallback())
+		if (jobBean.isCallback() && session.isActive())
 		{
 	        GridMessage replyMsg = new GridMessage(resp, GridMessage.MSG_MR_RESPONSE, msg);
 	        session.sendSyncMessage(replyMsg);

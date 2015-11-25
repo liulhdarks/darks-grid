@@ -32,6 +32,8 @@ import darks.grid.beans.GridEvent;
 import darks.grid.events.handler.ConfirmMasterHandler;
 import darks.grid.events.handler.ConnectionActiveHandler;
 import darks.grid.events.handler.HeartAliveReplyHandler;
+import darks.grid.events.handler.JoinReplyHandler;
+import darks.grid.events.handler.JoinRequestHandler;
 import darks.grid.events.handler.MergeNodesHandler;
 import darks.grid.events.handler.NodeJoinHandler;
 import darks.grid.events.handler.NodeLeaveHandler;
@@ -55,6 +57,8 @@ public final class EventsHandlerFactory
 		addHandler(GridEvent.MERGE_NODES, new MergeNodesHandler());
 		addHandler(GridEvent.CONFIRM_MASTER, new ConfirmMasterHandler());
 		addHandler(GridEvent.HEART_ALIVE_REPLY, new HeartAliveReplyHandler());
+		addHandler(GridEvent.JOIN_REQUEST, new JoinRequestHandler());
+		addHandler(GridEvent.JOIN_REQUEST_REPLY, new JoinReplyHandler());
 	}
 	
 	private EventsHandlerFactory()

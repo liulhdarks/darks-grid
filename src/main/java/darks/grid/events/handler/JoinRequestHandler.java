@@ -25,10 +25,10 @@ import org.slf4j.LoggerFactory;
 
 import darks.grid.GridRuntime;
 import darks.grid.beans.GridEvent;
-import darks.grid.beans.GridMessage;
 import darks.grid.beans.GridNode;
 import darks.grid.beans.meta.JoinMeta;
 import darks.grid.beans.meta.JoinNodeMeta;
+import darks.grid.events.EventsChannel;
 import darks.grid.events.GridEventHandler;
 import darks.grid.network.GridSession;
 
@@ -63,7 +63,7 @@ public class JoinRequestHandler extends GridEventHandler
 	            if (node.getSession().getId().equals(session.getId()))
 	            {
 	                log.warn("Ignore repeat join request from " + node.getId());
-	                handleNewChannel(meta, msg, false);
+	                handleNewChannel(session, meta, false);
 	                return;
 	            }
 				if (node.getSession().isActive())
@@ -82,7 +82,7 @@ public class JoinRequestHandler extends GridEventHandler
 				if (localTime < remoteTime)
 				{
 					log.warn("Channel from " + nodeId + " has repeat " + count + " connections.Deal by local.");
-					handleRepeatChannel(meta, msg);
+					handleRepeatChannel(session, meta);
 				}
 				else
 				{
@@ -91,13 +91,13 @@ public class JoinRequestHandler extends GridEventHandler
 			}
 			else if (count == 1)
 			{
-				handleNewChannel(meta, msg, false);
+				handleNewChannel(session, meta, false);
 			}
 		}
 	}
 	
 
-	private void handleRepeatChannel(JoinMeta meta, GridMessage msg)
+	private void handleRepeatChannel(GridSession session, JoinMeta meta)
 	{
 		String nodeId = meta.getNodeId();
 		Map<SocketAddress, JoinMeta> nodesMap = GridRuntime.network().getWaitJoin(nodeId);
@@ -118,23 +118,23 @@ public class JoinRequestHandler extends GridEventHandler
 		}
 		if (keepJoinMeta != null)
 		{
-			handleNewChannel(keepJoinMeta, msg, true);
+			handleNewChannel(session, keepJoinMeta, true);
 		}
 		nodesMap.clear();
 	}
 	
-	private void handleNewChannel(JoinMeta meta, GridMessage msg, boolean autoJoin)
+	private void handleNewChannel(GridSession session, JoinMeta meta, boolean autoJoin)
 	{
 		String nodeId = meta.getNodeId();
 		JoinNodeMeta data = new JoinNodeMeta(GridRuntime.getLocalId(), GridRuntime.context());
-		GridMessage replyMsg = new GridMessage(data, GridMessage.MSG_JOIN_REPLY, msg);
 		try
 		{
-			boolean success = meta.getSession().sendSyncMessage(replyMsg);
+            GridEvent joinEvent = new GridEvent(data, GridEvent.JOIN_REQUEST_REPLY, EventsChannel.SYSTEM_CHANNEL);
+            boolean success = GridRuntime.events().publish(session, joinEvent, true);
 			if (autoJoin)
 			{
 				if (success)
-					GridRuntime.nodes().addRemoteNode(nodeId, meta.getSession(), meta.context());
+					GridRuntime.nodes().addRemoteNode(nodeId, session, meta.context());
 				Map<SocketAddress, JoinMeta> nodesMap = GridRuntime.network().getWaitJoin(nodeId);
 				nodesMap.clear();
 			}

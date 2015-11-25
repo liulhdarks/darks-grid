@@ -8,7 +8,7 @@
 	<cluster cluster_name="KELUDEAPS"/>
 	 
 	<master auto_master="true" min_slave_num="2">
-		<task name="demo" class="darks.grid.test.DemoMasterTask" interval="60000" />
+		<task name="demo" class="darks.grid.test.DemoMasterTask" interval="300000" />
 	</master>
 	
 	<task jobs_exec_count="30"/>
