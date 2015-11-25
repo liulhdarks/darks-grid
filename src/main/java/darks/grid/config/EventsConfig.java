@@ -16,55 +16,142 @@
  */
 package darks.grid.config;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class EventsConfig
 {
 
-	private boolean useBlockQueue = true;
+	private int defaultBlockQueueMaxNumber = Integer.MAX_VALUE;
 	
-	private int blockQueueMaxNumber = Integer.MAX_VALUE;
+	private int defaultEventConsumerNumber = Runtime.getRuntime().availableProcessors();
+
+	private int systemBlockQueueMaxNumber = Integer.MAX_VALUE;
 	
-	private int eventConsumerNumber = Runtime.getRuntime().availableProcessors();
+	private int systemEventConsumerNumber = Runtime.getRuntime().availableProcessors();
+	
+	private Map<String, EventsChannelConfig> channelsConfig = new HashMap<>();
 	
 	public EventsConfig()
 	{
 		
 	}
 
-	public boolean isUseBlockQueue()
+	public int getDefaultBlockQueueMaxNumber()
 	{
-		return useBlockQueue;
+		return defaultBlockQueueMaxNumber;
 	}
 
-	public void setUseBlockQueue(boolean useBlockQueue)
+	public void setDefaultBlockQueueMaxNumber(int defaultBlockQueueMaxNumber)
 	{
-		this.useBlockQueue = useBlockQueue;
+		this.defaultBlockQueueMaxNumber = defaultBlockQueueMaxNumber;
 	}
 
-	public int getBlockQueueMaxNumber()
+	public int getDefaultEventConsumerNumber()
 	{
-		return blockQueueMaxNumber;
+		return defaultEventConsumerNumber;
 	}
 
-	public void setBlockQueueMaxNumber(int blockQueueMaxNumber)
+	public void setDefaultEventConsumerNumber(int defaultEventConsumerNumber)
 	{
-		this.blockQueueMaxNumber = blockQueueMaxNumber;
+		this.defaultEventConsumerNumber = defaultEventConsumerNumber;
 	}
 
-	public int getEventConsumerNumber()
+	public int getSystemBlockQueueMaxNumber()
 	{
-		return eventConsumerNumber;
+		return systemBlockQueueMaxNumber;
 	}
 
-	public void setEventConsumerNumber(int eventConsumerNumber)
+	public void setSystemBlockQueueMaxNumber(int systemBlockQueueMaxNumber)
 	{
-		this.eventConsumerNumber = eventConsumerNumber;
+		this.systemBlockQueueMaxNumber = systemBlockQueueMaxNumber;
 	}
+
+	public int getSystemEventConsumerNumber()
+	{
+		return systemEventConsumerNumber;
+	}
+
+	public void setSystemEventConsumerNumber(int systemEventConsumerNumber)
+	{
+		this.systemEventConsumerNumber = systemEventConsumerNumber;
+	}
+	
+	
+
+	public Map<String, EventsChannelConfig> getChannelsConfig()
+	{
+		return channelsConfig;
+	}
+
 
 	@Override
 	public String toString()
 	{
-		return "EventsConfig [useBlockQueue=" + useBlockQueue + ", blockQueueMaxNumber="
-				+ blockQueueMaxNumber + ", eventConsumerNumber=" + eventConsumerNumber + "]";
+		return "EventsConfig [defaultBlockQueueMaxNumber=" + defaultBlockQueueMaxNumber
+				+ ", defaultEventConsumerNumber=" + defaultEventConsumerNumber
+				+ ", systemBlockQueueMaxNumber=" + systemBlockQueueMaxNumber
+				+ ", systemEventConsumerNumber=" + systemEventConsumerNumber + ", channelsConfig="
+				+ channelsConfig + "]";
+	}
+
+
+	public static class EventsChannelConfig
+	{
+		String name;
+
+		int blockQueueMaxNumber = Integer.MAX_VALUE;
+		
+		int eventConsumerNumber = Runtime.getRuntime().availableProcessors();
+
+		public EventsChannelConfig()
+		{
+		}
+
+		public EventsChannelConfig(String name, int blockQueueMaxNumber, int eventConsumerNumber)
+		{
+			this.name = name;
+			this.blockQueueMaxNumber = blockQueueMaxNumber;
+			this.eventConsumerNumber = eventConsumerNumber;
+		}
+
+		public String getName()
+		{
+			return name;
+		}
+
+		public void setName(String name)
+		{
+			this.name = name;
+		}
+
+		public int getBlockQueueMaxNumber()
+		{
+			return blockQueueMaxNumber;
+		}
+
+		public void setBlockQueueMaxNumber(int blockQueueMaxNumber)
+		{
+			this.blockQueueMaxNumber = blockQueueMaxNumber;
+		}
+
+		public int getEventConsumerNumber()
+		{
+			return eventConsumerNumber;
+		}
+
+		public void setEventConsumerNumber(int eventConsumerNumber)
+		{
+			this.eventConsumerNumber = eventConsumerNumber;
+		}
+
+		@Override
+		public String toString()
+		{
+			return "EventsChannelConfig [name=" + name + ", blockQueueMaxNumber="
+					+ blockQueueMaxNumber + ", eventConsumerNumber=" + eventConsumerNumber + "]";
+		}
+		
 	}
 	
 }

@@ -19,6 +19,9 @@ package darks.grid.beans;
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicLong;
 
+import darks.grid.events.EventsChannel;
+import darks.grid.network.GridSession;
+
 public class GridEvent implements Serializable, Cloneable
 {
 
@@ -27,6 +30,7 @@ public class GridEvent implements Serializable, Cloneable
 	public static final String NODE_LEAVE = "node_leave";
 	public static final String MERGE_NODES = "merge_nodes";
 	public static final String CONFIRM_MASTER = "confirm_master";
+	public static final String HEART_ALIVE_REPLY = "heart_alive_reply";
 	
 	/**
 	 * 
@@ -41,6 +45,10 @@ public class GridEvent implements Serializable, Cloneable
 	
 	private String type;
 	
+	private String channel = EventsChannel.DEFAULT_CHANNEL;
+	
+	private transient GridSession session;
+	
 	public GridEvent()
 	{
 		this.id = eventIdSeed.incrementAndGet();
@@ -51,6 +59,14 @@ public class GridEvent implements Serializable, Cloneable
 		this.id = eventIdSeed.incrementAndGet();
 		this.data = data;
 		this.type = type;
+	}
+
+	public GridEvent(Object data, String type, String channel)
+	{
+		this.id = eventIdSeed.incrementAndGet();
+		this.data = data;
+		this.type = type;
+		this.channel = channel;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -84,11 +100,33 @@ public class GridEvent implements Serializable, Cloneable
 		this.type = type;
 	}
 
-	@Override
-	public String toString()
+	
+	public String getChannel()
 	{
-		return "GridEvent [id=" + id + ", data=" + data + ", type=" + type + "]";
+		return channel;
+	}
+
+	public void setChannel(String channel)
+	{
+		this.channel = channel;
 	}
 
 	
+	public GridSession getSession()
+	{
+		return session;
+	}
+
+	public void setSession(GridSession session)
+	{
+		this.session = session;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "GridEvent [id=" + id + ", data=" + data + ", type=" + type + ", channel=" + channel
+				+ "]";
+	}
+
 }

@@ -13,7 +13,7 @@
 	
 	<task jobs_exec_count="30"/>
 
-	<events event_consumer_number="8"/>
+	<events default_event_consumer_number="8" system_event_consumer_number="3"/>
 	
 	<log interval="60000" 
 		nodes_info="true" 

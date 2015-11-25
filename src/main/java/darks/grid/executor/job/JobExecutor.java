@@ -16,6 +16,8 @@
  */
 package darks.grid.executor.job;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +26,7 @@ import darks.grid.beans.GridMessage;
 import darks.grid.network.GridSession;
 import darks.grid.utils.GridStatistic;
 
-public abstract class JobExecutor implements Runnable
+public abstract class JobExecutor extends Thread
 {
 	
 	private static final Logger log = LoggerFactory.getLogger(JobExecutor.class);
@@ -37,14 +39,20 @@ public abstract class JobExecutor implements Runnable
 	
 	private JobStatusType statusType;
 	
-	private long timestamp = System.currentTimeMillis();
+	private long timestamp;
+	
+	private long delay;
+	
+	private AtomicBoolean canceled = new AtomicBoolean(false);
 	
 	public JobExecutor(GridSession session, GridMessage msg)
 	{
+		GridStatistic.addWaitJobCount(1);
 		this.session = session;
 		this.msg = msg;
 		this.job = msg.getData();
-		GridStatistic.addWaitJobCount(1);
+		this.statusType = JobStatusType.WAITING;
+		this.timestamp = System.currentTimeMillis();
 	}
 
 	@Override
@@ -52,22 +60,39 @@ public abstract class JobExecutor implements Runnable
 	{
 		try
 		{
-			long delay = System.currentTimeMillis() - timestamp;
+			delay = System.currentTimeMillis() - timestamp;
 			GridStatistic.incrementJobDelay(delay);
 			GridStatistic.addWaitJobCount(-1);
-			statusType = JobStatusType.DOING;
-			execute(session, msg, job);
-			statusType = JobStatusType.SUCCESS;
+			if (!isCanncel())
+			{
+				setStatusType(JobStatusType.DOING);
+				execute(session, msg, job);
+				setStatusType(JobStatusType.SUCCESS);
+			}
+			else
+				setStatusType(JobStatusType.CANCEL);
 		}
 		catch (Exception e)
 		{
-			statusType = JobStatusType.FAIL;
+			setStatusType(JobStatusType.FAIL);
 			log.error(e.getMessage(), e);
 		}
 		GridRuntime.jobs().completeExecuteJob(this);
 	}
 
 	public abstract void execute(GridSession session, GridMessage msg, GridJob job) throws Exception;
+	
+	public boolean isCanncel()
+	{
+		return canceled.get() || isInterrupted() || !session.isActive();
+	}
+	
+	public void cancel()
+	{
+		canceled.getAndSet(true);
+		setStatusType(JobStatusType.CANCEL);
+		interrupt();
+	}
 	
 	public String getTaskId()
 	{
@@ -79,14 +104,61 @@ public abstract class JobExecutor implements Runnable
 		return job.getJobId();
 	}
 
-	public JobStatusType getStatusType()
+	public synchronized JobStatusType getStatusType()
 	{
 		return statusType;
 	}
 
-	public void setStatusType(JobStatusType statusType)
+	public synchronized void setStatusType(JobStatusType statusType)
 	{
 		this.statusType = statusType;
 	}
+
+	public long getTimestamp()
+	{
+		return timestamp;
+	}
+
+	public void setTimestamp(long timestamp)
+	{
+		this.timestamp = timestamp;
+	}
+
+	public long getDelay()
+	{
+		return delay;
+	}
+
+	public void setDelay(long delay)
+	{
+		this.delay = delay;
+	}
+	
+
+	public GridSession getSession()
+	{
+		return session;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "JobExecutor [session=" + session + ", msg=" + msg + ", job=" + job
+				+ ", statusType=" + statusType + ", timestamp=" + timestamp + ", delay=" + delay
+				+ ", canceled=" + canceled + "]";
+	}
+
+	public String toSimpleString()
+	{
+		StringBuilder buf = new StringBuilder();
+		buf.append(getJobId()).append(' ')
+			.append(getStatusType()).append('\t')
+			.append(getTimestamp()).append(' ')
+			.append(getDelay());
+		if (isCanncel())
+			buf.append(' ').append("CANCELED");
+		return buf.toString();
+	}
+	
 	
 }

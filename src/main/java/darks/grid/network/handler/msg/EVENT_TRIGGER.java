@@ -34,7 +34,10 @@ public class EVENT_TRIGGER implements GridMessageHandler
 	{
 	    GridEvent event = msg.getData();
 	    if (event != null)
+	    {
+	    	event.setSession(session);
 	    	GridRuntime.events().publish(event);
+	    }
 	    else
 	    	log.error("Invalid event message " + msg);
 	}

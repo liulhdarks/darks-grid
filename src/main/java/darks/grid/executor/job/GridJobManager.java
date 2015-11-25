@@ -18,13 +18,16 @@ package darks.grid.executor.job;
 
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import darks.grid.GridRuntime;
 import darks.grid.beans.GridNode;
@@ -35,6 +38,8 @@ import darks.grid.utils.GridStatistic;
 
 public class GridJobManager implements GridManager
 {
+	
+	private static final Logger log = LoggerFactory.getLogger(GridJobManager.class);
 
 	private Map<String, Map<String, GridJob>> nodesJobsMap = new ConcurrentHashMap<>();
 
@@ -102,6 +107,7 @@ public class GridJobManager implements GridManager
 				GridJob job = entry.getValue();
 				uniqueTask.add(job.getTaskId());
 			}
+			log.info("Remove node " + nodeId + " jobs:" + jobsMap.size() + " tasks:" + uniqueTask.size());
 			jobsMap.clear();
 			for (String taskId : uniqueTask)
 			{
@@ -169,7 +175,7 @@ public class GridJobManager implements GridManager
 				buf.append(entry.getKey()).append('\n');
 				for (JobExecutor job : entry.getValue().values())
 				{
-					buf.append("     ").append(job.getJobId()).append(' ').append(job.getStatusType()).append('\n');
+					buf.append("     ").append(job.toSimpleString()).append('\n');
 				}
 			}
 			return buf.toString().trim();

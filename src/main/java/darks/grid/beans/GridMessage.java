@@ -21,6 +21,7 @@ import io.netty.util.ReferenceCounted;
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import darks.grid.network.GridSession;
 import darks.grid.utils.UUIDUtils;
 
 public class GridMessage implements Serializable, Cloneable, ReferenceCounted
@@ -55,6 +56,8 @@ public class GridMessage implements Serializable, Cloneable, ReferenceCounted
 	private int sourceType;
 	
 	private long timestamp = System.currentTimeMillis();
+	
+	private transient GridSession session;
 	
 	AtomicInteger cnt = new AtomicInteger(0);
 
@@ -170,6 +173,18 @@ public class GridMessage implements Serializable, Cloneable, ReferenceCounted
 	public void setTimestamp(long timestamp)
 	{
 		this.timestamp = timestamp;
+	}
+	
+
+	public GridSession getSession()
+	{
+		return session;
+	}
+
+
+	public void setSession(GridSession session)
+	{
+		this.session = session;
 	}
 
 

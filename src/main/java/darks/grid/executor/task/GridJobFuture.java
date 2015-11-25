@@ -202,6 +202,30 @@ public class GridJobFuture extends GridFuture<JobResult>
 		return result;
 	}
 	
+	public boolean checkDeadJob()
+	{
+		lock.lock();
+		try
+		{
+			boolean alive = true;
+			for (Entry<String, GridJobStatus> entry : statusMap.entrySet())
+			{
+				GridJobStatus status = entry.getValue();
+				alive = alive && status.getNode().isAlive();
+			}
+			if (!alive)
+			{
+				waitCheck = false;
+	    		statusCheck.signalAll();
+			}
+			return alive;
+		}
+		finally
+		{
+			lock.unlock();
+		}
+	}
+	
 	public String toSimpleString(String linePrefix)
 	{
 		StringBuilder buf = new StringBuilder();

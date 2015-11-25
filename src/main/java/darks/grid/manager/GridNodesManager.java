@@ -38,6 +38,7 @@ import darks.grid.beans.GridNode;
 import darks.grid.beans.GridNode.GridNodeType;
 import darks.grid.beans.NodeId;
 import darks.grid.config.GridConfiguration;
+import darks.grid.events.EventsChannel;
 import darks.grid.network.GridSession;
 
 public class GridNodesManager implements GridManager
@@ -118,7 +119,7 @@ public class GridNodesManager implements GridManager
         nodesSet.add(node);
         addressMap.put(node.context().getServerAddress(), nodeId);
         sessionIdMap.put(session.getId(), nodeId);
-        GridRuntime.events().publish(GridEvent.NODE_JOIN, node);
+        GridRuntime.events().publish(EventsChannel.SYSTEM_CHANNEL, GridEvent.NODE_JOIN, node);
         snapshotChange.set(true);
 	}
 	
@@ -188,7 +189,7 @@ public class GridNodesManager implements GridManager
 		if (rNode != null)
 		{
 			rNode.getSession().close();
-			GridRuntime.events().publish(GridEvent.NODE_LEAVE, rNode);
+			GridRuntime.events().publish(EventsChannel.SYSTEM_CHANNEL, GridEvent.NODE_LEAVE, rNode);
 		}
         snapshotChange.set(true);
 		return rNode;
@@ -204,7 +205,7 @@ public class GridNodesManager implements GridManager
 			if (node != null)
 			{
 				node.getSession().close();
-				GridRuntime.events().publish(GridEvent.NODE_LEAVE, node);
+				GridRuntime.events().publish(EventsChannel.SYSTEM_CHANNEL, GridEvent.NODE_LEAVE, node);
 			}
 		}
         snapshotChange.set(true);

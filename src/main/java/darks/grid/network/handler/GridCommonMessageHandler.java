@@ -30,6 +30,8 @@ import org.slf4j.LoggerFactory;
 import darks.grid.GridRuntime;
 import darks.grid.beans.GridEvent;
 import darks.grid.beans.GridMessage;
+import darks.grid.events.EventsChannel;
+import darks.grid.network.GridSession;
 import darks.grid.network.GridSessionFactory;
 import darks.grid.network.handler.msg.GridMessageHandler;
 import darks.grid.network.handler.msg.MessageHandlerFactory;
@@ -64,7 +66,7 @@ public class GridCommonMessageHandler extends SimpleChannelInboundHandler<GridMe
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception
 	{
-        GridRuntime.events().publish(GridEvent.CONNECT_ACTIVE, GridSessionFactory.getSession(ctx.channel()));
+        GridRuntime.events().publish(EventsChannel.SYSTEM_CHANNEL, GridEvent.CONNECT_ACTIVE, GridSessionFactory.getSession(ctx.channel()));
 		super.channelActive(ctx);
 	}
 
@@ -84,7 +86,9 @@ public class GridCommonMessageHandler extends SimpleChannelInboundHandler<GridMe
 		GridMessageHandler handler = MessageHandlerFactory.getHandler(msg);
 		if (handler != null)
 		{
-			handler.handler(GridSessionFactory.getSession(ctx.channel()), msg);
+			GridSession session = GridSessionFactory.getSession(ctx.channel());
+			msg.setSession(session);
+			handler.handler(session, msg);
 		}
 		GridStatistic.incrementDelay(arriveTime - msg.getTimestamp());
 	}

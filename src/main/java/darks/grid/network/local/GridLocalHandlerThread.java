@@ -81,6 +81,7 @@ public class GridLocalHandlerThread extends Thread
 			if (handler != null)
 			{
 				GridSession session = GridRuntime.network().getServerSession();
+				message.setSession(session);
 				if (session == null)
 					log.error("Invalid server session.");
 				else

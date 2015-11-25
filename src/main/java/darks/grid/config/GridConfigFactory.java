@@ -32,6 +32,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import darks.grid.GridException;
+import darks.grid.config.EventsConfig.EventsChannelConfig;
 import darks.grid.utils.ReflectUtils;
 
 public final class GridConfigFactory
@@ -100,7 +101,7 @@ public final class GridConfigFactory
                 }
                 else if ("events".equalsIgnoreCase(el.getNodeName()))
                 {
-                    parseAttrForObject(el, config.getEventsConfig());
+                	parseEvents(config, el);
                 }
                 else if ("storage".equalsIgnoreCase(el.getNodeName()))
                 {
@@ -123,6 +124,26 @@ public final class GridConfigFactory
 		return config;
 	}
 	
+	private static void parseEvents(GridConfiguration config, Element el)
+	{
+        parseAttrForObject(el, config.getEventsConfig());
+        NodeList nodesList = el.getChildNodes();
+		for (int i = 0; i < nodesList.getLength(); i++)
+		{
+		    Node node =  nodesList.item(i);
+		    if (node instanceof Element)
+		    {
+		        Element elChild = (Element) node;
+		        if ("channel".equalsIgnoreCase(elChild.getNodeName()))
+	            {
+		        	EventsChannelConfig cfg = new EventsChannelConfig();
+		            parseAttrForObject(elChild, cfg);
+		            config.getEventsConfig().getChannelsConfig().put(cfg.getName(), cfg);
+	            }
+		    }
+		}
+	}
+	
 	private static void parseMaster(GridConfiguration config, Element el)
 	{
 		parseAttrForObject(el, config.getMasterConfig());
@@ -132,7 +153,6 @@ public final class GridConfigFactory
 		    Node node =  nodesList.item(i);
 		    if (node instanceof Element)
 		    {
-		    	System.out.println(node.getClass());
 		        Element elChild = (Element) node;
 		        if ("task".equalsIgnoreCase(elChild.getNodeName()))
 	            {

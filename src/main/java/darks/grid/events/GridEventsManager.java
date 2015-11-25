@@ -16,20 +16,19 @@
  */
 package darks.grid.events;
 
-import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import darks.grid.GridRuntime;
 import darks.grid.beans.GridEvent;
-import darks.grid.beans.GridMessage;
 import darks.grid.beans.GridNode;
+import darks.grid.config.EventsConfig;
+import darks.grid.config.EventsConfig.EventsChannelConfig;
 import darks.grid.config.GridConfiguration;
 import darks.grid.manager.GridManager;
 
@@ -37,12 +36,12 @@ public class GridEventsManager implements GridManager
 {
 	
 	private static final Logger log = LoggerFactory.getLogger(GridEventsManager.class);
-
-	BlockingQueue<GridEvent> eventQueue = null;
 	
-	ExecutorService threadPool = null;
+	private Map<String, EventsChannel> channels = new ConcurrentHashMap<>();
 	
-	List<EventsConsumer> concumers = new LinkedList<>();
+	EventsChannel systemChannel = null;
+	
+	EventsChannel defaultChannel = null;
 	
 	public GridEventsManager()
 	{
@@ -53,26 +52,34 @@ public class GridEventsManager implements GridManager
 	public boolean initialize(GridConfiguration config)
 	{
 		log.info("Start to initialize events manager.");
-		eventQueue = new LinkedBlockingQueue<>(config.getEventsConfig().getBlockQueueMaxNumber());
-		int threadSize = config.getEventsConfig().getEventConsumerNumber();
-		threadPool = Executors.newFixedThreadPool(threadSize);
-		for (int i = 0; i < threadSize; i++)
+		EventsConfig eventsConfig = config.getEventsConfig();
+		Map<String, EventsChannelConfig> map = eventsConfig.getChannelsConfig();
+		EventsChannelConfig defaultConfig = new EventsChannelConfig(EventsChannel.DEFAULT_CHANNEL, 
+				eventsConfig.getDefaultBlockQueueMaxNumber(), eventsConfig.getDefaultEventConsumerNumber());
+		EventsChannelConfig systemConfig = new EventsChannelConfig(EventsChannel.SYSTEM_CHANNEL, 
+				eventsConfig.getSystemBlockQueueMaxNumber(), eventsConfig.getSystemEventConsumerNumber());
+		map.put(EventsChannel.DEFAULT_CHANNEL, defaultConfig);
+		map.put(EventsChannel.SYSTEM_CHANNEL, systemConfig);
+		for (Entry<String, EventsChannelConfig> entry : map.entrySet())
 		{
-			EventsConsumer consumer = new EventsConsumer(eventQueue);
-			threadPool.execute(consumer);
-			concumers.add(consumer);
+			EventsChannel channel = new EventsChannel();
+			channel.initialize(entry.getValue());
+			channels.put(entry.getKey(), channel);
+			if (EventsChannel.DEFAULT_CHANNEL.equals(entry.getKey()))
+				defaultChannel = channel;
+			if (EventsChannel.SYSTEM_CHANNEL.equals(entry.getKey()))
+				systemChannel = channel;
 		}
-		return true;
+		return defaultChannel != null && systemChannel != null;
 	}
 
 	@Override
 	public void destroy()
 	{
-		for (EventsConsumer consumer : concumers)
+		for (Entry<String, EventsChannel> entry : channels.entrySet())
 		{
-			consumer.destroy();
+			entry.getValue().destroy();
 		}
-		threadPool.shutdownNow();
 	}
 	
 	public boolean publish(String type, Object obj)
@@ -80,39 +87,25 @@ public class GridEventsManager implements GridManager
 		return publish(new GridEvent(obj, type));
 	}
 	
+	public boolean publish(String channel, String type, Object obj)
+	{
+		return publish(new GridEvent(obj, type, channel));
+	}
+	
 	public boolean publish(GridEvent event)
 	{
-		return eventQueue.offer(event);
+		EventsChannel channel = channels.get(event.getChannel());
+		if (channel != null)
+			return channel.publish(event);
+		return false;
 	}
 	
 	public boolean publish(GridNode node, GridEvent event, boolean sync)
 	{
-		if (node.isLocal())
-		{
-			if (sync)
-			{
-				try
-				{
-					eventQueue.put(event);
-					return true;
-				}
-				catch (Exception e)
-				{
-					log.error(e.getMessage(), e);
-					return false;
-				}
-			}
-			else
-				return eventQueue.offer(event);
-		}
-		else
-		{
-			GridMessage message = new GridMessage(event, GridMessage.MSG_EVENT);
-			if (sync)
-				return node.sendSyncMessage(message);
-			else
-				return node.sendMessage(message);
-		}
+		EventsChannel channel = channels.get(event.getChannel());
+		if (channel != null)
+			return channel.publish(node, event, sync);
+		return false;
 	}
 	
 	public boolean publishAll(String type, Object obj)
@@ -120,20 +113,27 @@ public class GridEventsManager implements GridManager
 		return publishAll(new GridEvent(obj, type));
 	}
 	
+	public boolean publishAll(String channel, String type, Object obj)
+	{
+		return publishAll(new GridEvent(obj, type, channel));
+	}
+	
 	public boolean publishAll(GridEvent event)
 	{
-		List<GridNode> nodes = GridRuntime.nodes().getNodesList();
-		for (GridNode node : nodes)
-		{
-			if (!node.isLocal() && node.isAlive())
-				publish(node, event, true);
-		}
-		return eventQueue.offer(event);
+		EventsChannel channel = channels.get(event.getChannel());
+		if (channel != null)
+			return channel.publishAll(event);
+		return false;
 	}
 	
 	public boolean publishOthers(String type, Object obj)
 	{
 		return publishOthers(new GridEvent(obj, type));
+	}
+	
+	public boolean publishOthers(String channel, String type, Object obj)
+	{
+		return publishOthers(new GridEvent(obj, type, channel));
 	}
 	
 	public boolean publishOthers(GridEvent event)
