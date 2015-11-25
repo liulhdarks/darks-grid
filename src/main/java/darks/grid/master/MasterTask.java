@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import darks.grid.GridRuntime;
 import darks.grid.beans.GridNode;
+import darks.grid.config.MasterConfig.MasterTaskConfig;
 
 public abstract class MasterTask extends Thread
 {
@@ -39,6 +40,11 @@ public abstract class MasterTask extends Thread
 	public MasterTask(int interval)
 	{
 		this.interval = interval;
+	}
+	
+	public void initialize(MasterTaskConfig taskConfig)
+	{
+		this.interval = taskConfig.getInterval();
 	}
 
 	@Override

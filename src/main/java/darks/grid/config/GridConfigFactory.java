@@ -33,6 +33,7 @@ import org.w3c.dom.NodeList;
 
 import darks.grid.GridException;
 import darks.grid.config.EventsConfig.EventsChannelConfig;
+import darks.grid.config.MasterConfig.MasterTaskConfig;
 import darks.grid.utils.ReflectUtils;
 
 public final class GridConfigFactory
@@ -156,19 +157,9 @@ public final class GridConfigFactory
 		        Element elChild = (Element) node;
 		        if ("task".equalsIgnoreCase(elChild.getNodeName()))
 	            {
-		        	String taskName = null;
-		        	String taskClassName = null;
-		        	if (elChild.hasAttribute("name"))
-		        		taskName = elChild.getAttribute("name");
-		        	if (elChild.hasAttribute("class"))
-		        		taskClassName = elChild.getAttribute("class");
-		        	else
-		        		throw new GridException("Invalid master task config " + elChild);
-		        	if (taskClassName == null || "".equals(taskClassName.trim()))
-		        		throw new GridException("Invalid master task className:" + taskClassName);
-		        	if (taskName == null || "".equals(taskName.trim()))
-		        		taskName = taskClassName;
-		        	config.getMasterConfig().addTaskClass(taskName, taskClassName);
+		        	MasterTaskConfig taskConfig = new MasterTaskConfig();
+		        	taskConfig.parse(elChild);
+		        	config.getMasterConfig().addTaskConfig(taskConfig);
 	            }
 		    }
 		}

@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import darks.grid.GridRuntime;
 import darks.grid.beans.GridEvent;
 import darks.grid.beans.GridNode;
+import darks.grid.events.EventsChannel;
 import darks.grid.manager.GridNodesManager;
 
 public class MERGE_NODES extends GridDiscovery
@@ -54,7 +55,7 @@ public class MERGE_NODES extends GridDiscovery
 			nodeAddrMap.put(node.getId(), node.context().getServerAddress());
 		}
 		log.info("Publish merge nodes event with " + nodeAddrMap.size() + " nodes.");
-		GridRuntime.events().publishOthers(GridEvent.MERGE_NODES, nodeAddrMap);
+		GridRuntime.events().publishOthers(EventsChannel.SYSTEM_CHANNEL, GridEvent.MERGE_NODES, nodeAddrMap);
 	}
 
 	

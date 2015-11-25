@@ -20,6 +20,8 @@ package darks.grid.config;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.w3c.dom.Element;
+
 import darks.grid.GridException;
 import darks.grid.master.MasterTask;
 
@@ -31,23 +33,11 @@ public class MasterConfig
 	
 	private int minSlaveNum = 0;
 	
-	private Map<String, Class<? extends MasterTask>> taskClasses = new HashMap<>();
+	private Map<String, MasterTaskConfig> taskMaps = new HashMap<>();
 	
-	public void addTaskClass(String name, String className)
+	public void addTaskConfig(MasterTaskConfig taskConfig)
 	{
-		try
-		{
-			@SuppressWarnings("unchecked")
-			Class<? extends MasterTask> taskClass = (Class<? extends MasterTask>) Class.forName(className);
-			if (taskClass != null)
-			{
-				taskClasses.put(name, taskClass);
-			}
-		}
-		catch (Exception e)
-		{
-			throw new GridException("Fail to add master task " + className + ". Cause " + e.getMessage(), e);
-		}
+		taskMaps.put(taskConfig.getTaskName(), taskConfig);
 	}
 	
 	public boolean isAutoMaster()
@@ -59,10 +49,11 @@ public class MasterConfig
 	{
 		this.autoMaster = autoMaster;
 	}
+	
 
-	public Map<String, Class<? extends MasterTask>> getTaskClasses()
+	public Map<String, MasterTaskConfig> getTaskMaps()
 	{
-		return taskClasses;
+		return taskMaps;
 	}
 
 	public int getMinSlaveNum()
@@ -75,12 +66,100 @@ public class MasterConfig
 		this.minSlaveNum = minSlaveNum;
 	}
 
+
 	@Override
 	public String toString()
 	{
-		return "MasterConfig [autoMaster=" + autoMaster + ", minSlaveNum=" + minSlaveNum
-				+ ", taskClasses=" + taskClasses + "]";
+		return "MasterConfig [autoMaster=" + autoMaster + ", minSlaveNum="
+				+ minSlaveNum + ", taskMaps=" + taskMaps + "]";
 	}
 
 
+
+	public static class MasterTaskConfig
+	{
+		Class<? extends MasterTask> taskClass;
+		
+		String taskName = null;
+		
+    	String taskClassName = null;
+		
+		int interval = 1000;
+		
+		@SuppressWarnings("unchecked")
+		public void setTaskClass(String className)
+		{
+			try
+			{
+				taskClass = (Class<? extends MasterTask>) Class.forName(className);
+			}
+			catch (Exception e)
+			{
+				throw new GridException("Fail to add master task " + className + ". Cause " + e.getMessage(), e);
+			}
+		}
+		
+		public void parse(Element el)
+		{
+        	if (el.hasAttribute("name"))
+        		taskName = el.getAttribute("name");
+        	if (el.hasAttribute("class"))
+        		taskClassName = el.getAttribute("class");
+        	else
+        		throw new GridException("Invalid master task config " + el);
+        	if (taskClassName == null || "".equals(taskClassName.trim()))
+        		throw new GridException("Invalid master task className:" + taskClassName);
+        	if (taskName == null || "".equals(taskName.trim()))
+        		taskName = taskClassName;
+			if (el.hasAttribute("interval"))
+			{
+        		String strInterval = el.getAttribute("interval");
+        		interval = Integer.parseInt(strInterval);
+        		if (interval < 0)
+            		throw new GridException("Invalid master task interval:" + interval);
+			}
+			setTaskClass(taskClassName);
+		}
+
+		public Class<? extends MasterTask> getTaskClass()
+		{
+			return taskClass;
+		}
+
+		public void setTaskClass(Class<? extends MasterTask> taskClass)
+		{
+			this.taskClass = taskClass;
+		}
+
+		public String getTaskName()
+		{
+			return taskName;
+		}
+
+		public void setTaskName(String taskName)
+		{
+			this.taskName = taskName;
+		}
+
+		public String getTaskClassName()
+		{
+			return taskClassName;
+		}
+
+		public void setTaskClassName(String taskClassName)
+		{
+			this.taskClassName = taskClassName;
+		}
+
+		public int getInterval()
+		{
+			return interval;
+		}
+
+		public void setInterval(int interval)
+		{
+			this.interval = interval;
+		}
+		
+	}
 }

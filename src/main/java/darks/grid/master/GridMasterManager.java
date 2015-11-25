@@ -32,6 +32,7 @@ import darks.grid.beans.GridEvent;
 import darks.grid.beans.meta.MasterMeta;
 import darks.grid.config.GridConfiguration;
 import darks.grid.config.MasterConfig;
+import darks.grid.config.MasterConfig.MasterTaskConfig;
 import darks.grid.manager.GridManager;
 import darks.grid.utils.ReflectUtils;
 import darks.grid.utils.ThreadUtils;
@@ -60,17 +61,18 @@ public class GridMasterManager implements GridManager
 		{
 			GridRuntime.components().setupComponent(new MasterChecker());
 		}
-		Map<String, Class<? extends MasterTask>> map = masterConfig.getTaskClasses();
+		Map<String, MasterTaskConfig> map = masterConfig.getTaskMaps();
 		if (!map.isEmpty())
 		{
-			for (Entry<String, Class<? extends MasterTask>> entry : map.entrySet())
+			for (Entry<String, MasterTaskConfig> entry : map.entrySet())
 			{
 				String name = entry.getKey();
-				Class<? extends MasterTask> clazz = entry.getValue();
-				MasterTask task = ReflectUtils.newInstance(clazz);
+				MasterTaskConfig taskConfig = entry.getValue();
+				MasterTask task = ReflectUtils.newInstance(taskConfig.getTaskClass());
 				if (task != null)
 				{
 					log.info("Instance master task " + name);
+					task.initialize(taskConfig);
 					ThreadUtils.executeThread(task);
 					tasks.put(name, task);
 				}

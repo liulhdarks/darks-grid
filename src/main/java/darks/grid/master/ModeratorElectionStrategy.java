@@ -28,6 +28,7 @@ import darks.grid.GridRuntime;
 import darks.grid.beans.GridEvent;
 import darks.grid.beans.GridNode;
 import darks.grid.beans.meta.MasterMeta;
+import darks.grid.events.EventsChannel;
 import darks.grid.executor.ExecuteConfig;
 import darks.grid.executor.RpcExecutor;
 import darks.grid.executor.task.rpc.RpcResult;
@@ -83,7 +84,7 @@ public class ModeratorElectionStrategy implements ElectionStrategy
 		if (node == null || !node.isAlive())
 			return null;
 		MasterMeta meta = new MasterMeta(nodeId, node.context().getServerAddress());
-		if (GridRuntime.events().publishAll(GridEvent.CONFIRM_MASTER, meta))
+		if (GridRuntime.events().publishAll(EventsChannel.SYSTEM_CHANNEL, GridEvent.CONFIRM_MASTER, meta))
 			return nodeId;
 		else
 			return null;
