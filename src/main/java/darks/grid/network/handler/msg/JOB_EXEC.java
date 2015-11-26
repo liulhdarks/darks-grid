@@ -40,12 +40,12 @@ public class JOB_EXEC implements GridMessageHandler
 		if (job.getTaskType() == TaskType.RPC)
 		{
 		    executor = new RpcJobExecutor(session, msg);
+			GridRuntime.jobs().addExecuteJob(executor);
 		}
 		else
 		{
 		    log.error("Invalid task type " + job.getTaskType());
 		}
-		GridRuntime.jobs().addExecuteJob(executor);
 	}
 
 }

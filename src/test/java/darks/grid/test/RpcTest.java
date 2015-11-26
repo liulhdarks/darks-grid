@@ -48,11 +48,13 @@ public class RpcTest
 		Scanner scan = new Scanner(System.in);
 		while (scan.hasNext())
 		{
+			ExecuteConfig cfg = new ExecuteConfig();
+			cfg.setTimeout(5000);
 			String cmd = scan.next();
 			RpcResult result = null;
 			if ("print".equals(cmd))
 			{
-				result = RpcExecutor.callMethod("print", null, new ExecuteConfig());
+				result = RpcExecutor.callMethod("print", null, cfg);
 				System.out.println(result);
 			}
 			else if (cmd.startsWith("add"))
@@ -115,10 +117,10 @@ public class RpcTest
 			
 		}
 		
-		public String print()
+		public String print() throws InterruptedException
 		{
 			System.out.println("wait print ");
-			ThreadUtils.threadSleep(10000);
+			Thread.sleep(60000);
 			System.out.println("Execute print " + MachineUtils.getProcessId());
 			return MachineUtils.getProcessId();
 		}

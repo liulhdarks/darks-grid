@@ -33,6 +33,8 @@ import darks.grid.config.EventsConfig.EventsChannelConfig;
 import darks.grid.config.GridConfiguration;
 import darks.grid.manager.GridManager;
 import darks.grid.network.GridSession;
+import darks.grid.utils.GridStatistic;
+import darks.grid.utils.GridStatistic.EventStatistic;
 
 public class GridEventsManager implements GridManager
 {
@@ -72,6 +74,7 @@ public class GridEventsManager implements GridManager
 			if (EventsChannel.SYSTEM_CHANNEL.equals(entry.getKey()))
 				systemChannel = channel;
 		}
+		GridStatistic.initEventStat(eventsConfig);
 		return defaultChannel != null && systemChannel != null;
 	}
 
@@ -174,4 +177,19 @@ public class GridEventsManager implements GridManager
 		EventsHandlerFactory.addHandler(eventType, clazz);
 	}
 		
+	public String getEventsInfo()
+	{
+		EventStatistic stat = GridStatistic.getEventStat(null);
+		StringBuilder buf = new StringBuilder();
+		buf.append("Event(")
+			.append("count:").append(stat.getEventCount())
+			.append(" avg-delay:").append(stat.getAvgEventDelay())
+			.append(" max-delay:").append(stat.getMaxEventDelay()).append("):\n");
+		for (Entry<String, EventsChannel> entry : channels.entrySet())
+		{
+			EventsChannel channel = entry.getValue();
+			buf.append(channel.getChannelInfo()).append('\n');
+		}
+		return buf.toString().trim();
+	}
 }

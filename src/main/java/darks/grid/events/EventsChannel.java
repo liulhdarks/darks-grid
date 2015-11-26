@@ -31,6 +31,8 @@ import darks.grid.beans.GridEvent;
 import darks.grid.beans.GridMessage;
 import darks.grid.beans.GridNode;
 import darks.grid.config.EventsConfig.EventsChannelConfig;
+import darks.grid.utils.GridStatistic;
+import darks.grid.utils.GridStatistic.EventStatistic;
 
 public class EventsChannel
 {
@@ -55,13 +57,14 @@ public class EventsChannel
 	
 	public boolean initialize(EventsChannelConfig config)
 	{
+		this.name = config.getName();
 		eventQueue = new LinkedBlockingQueue<>(config.getBlockQueueMaxNumber());
 		int threadSize = config.getEventConsumerNumber();
 		threadPool = Executors.newFixedThreadPool(threadSize);
 		log.info("Initialize events channel " + config.getName() + " with " + config);
 		for (int i = 0; i < threadSize; i++)
 		{
-			EventsConsumer consumer = new EventsConsumer(eventQueue);
+			EventsConsumer consumer = new EventsConsumer(name, eventQueue);
 			threadPool.execute(consumer);
 			concumers.add(consumer);
 		}
@@ -81,21 +84,7 @@ public class EventsChannel
 	{
 		if (node.isLocal())
 		{
-			if (sync)
-			{
-				try
-				{
-					eventQueue.put(event);
-					return true;
-				}
-				catch (Exception e)
-				{
-					log.error(e.getMessage(), e);
-					return false;
-				}
-			}
-			else
-				return eventQueue.offer(event);
+			return enqueueEvent(event, sync);
 		}
 		else
 		{
@@ -109,6 +98,39 @@ public class EventsChannel
 	
 	public boolean publish(GridEvent event)
 	{
-		return eventQueue.offer(event);
+		return enqueueEvent(event, false);
+	}
+	
+	private boolean enqueueEvent(GridEvent event, boolean sync)
+	{
+		GridStatistic.incrementEventCount(name);
+		event.setEnqueueTimestamp(System.currentTimeMillis());
+		if (sync)
+		{
+			try
+			{
+				eventQueue.put(event);
+				return true;
+			}
+			catch (Exception e)
+			{
+				log.error(e.getMessage(), e);
+				return false;
+			}
+		}
+		else
+			return eventQueue.offer(event);
+	}
+	
+	public String getChannelInfo()
+	{
+		EventStatistic stat = GridStatistic.getEventStat(name);
+		StringBuilder buf = new StringBuilder();
+		buf.append(name)
+	    	.append("\tcount:").append(stat.getEventCount())
+		    .append(" remain:").append(eventQueue.size())
+			.append(" avg-delay:").append(stat.getAvgEventDelay())
+			.append(" max-delay:").append(stat.getMaxEventDelay());
+		return buf.toString();
 	}
 }

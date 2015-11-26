@@ -63,7 +63,7 @@ public abstract class JobExecutor extends Thread
 			delay = System.currentTimeMillis() - timestamp;
 			GridStatistic.incrementJobDelay(delay);
 			GridStatistic.addWaitJobCount(-1);
-			if (!isCanncel())
+			if (!isInvalid())
 			{
 				setStatusType(JobStatusType.DOING);
 				execute(session, msg, job);
@@ -82,9 +82,22 @@ public abstract class JobExecutor extends Thread
 
 	public abstract void execute(GridSession session, GridMessage msg, GridJob job) throws Exception;
 	
+	public boolean isTimeout()
+	{
+		if (job.getTimeout() > 0 
+				&& System.currentTimeMillis() - timestamp > job.getTimeout())
+			return true;
+		return false;
+	}
+	
+	public boolean isInvalid()
+	{
+		return canceled.get() || isInterrupted() || !session.isActive() || isTimeout();
+	}
+	
 	public boolean isCanncel()
 	{
-		return canceled.get() || isInterrupted() || !session.isActive();
+		return canceled.get() || isInterrupted();
 	}
 	
 	public void cancel()
@@ -153,7 +166,9 @@ public abstract class JobExecutor extends Thread
 		StringBuilder buf = new StringBuilder();
 		buf.append(getJobId()).append(' ')
 			.append(getStatusType()).append('\t')
-			.append(getTimestamp()).append(' ')
+			.append(System.currentTimeMillis() - getTimestamp()).append('/')
+			.append(job.getTimeout()).append(' ')
+			.append(System.currentTimeMillis() - getTimestamp()).append(' ')
 			.append(getDelay());
 		if (isCanncel())
 			buf.append(' ').append("CANCELED");

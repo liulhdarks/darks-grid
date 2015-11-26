@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import darks.grid.beans.GridEvent;
+import darks.grid.utils.GridStatistic;
 
 public class EventsConsumer extends Thread
 {
@@ -33,8 +34,12 @@ public class EventsConsumer extends Thread
 	
 	private boolean destroyed = false;
 	
-	public EventsConsumer(BlockingQueue<GridEvent> queue)
+	private String channel;
+	
+	public EventsConsumer(String channel, BlockingQueue<GridEvent> queue)
 	{
+		super(channel + "-event-consumer-thread");
+		this.channel = channel;
 		this.queue = queue;
 	}
 	
@@ -63,6 +68,8 @@ public class EventsConsumer extends Thread
 	
 	private void consumer(GridEvent event)
 	{
+		long delay = System.currentTimeMillis() - event.getEnqueueTimestamp();
+		GridStatistic.incrementEventDelay(channel, delay);
 		List<GridEventHandler> handlers = EventsHandlerFactory.getHandler(event.getType());
 		if (handlers == null)
 		{

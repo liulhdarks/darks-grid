@@ -78,6 +78,8 @@ public class TCPPING extends GridDiscovery
 				GridRuntime.network().tryJoinAddress(address);
 			}
 		}
+		else
+			log.info("TCPPING's ping address is empty.");
 	}
 
     public String getHosts()

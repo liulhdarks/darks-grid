@@ -190,4 +190,10 @@ public class GridJobManager implements GridManager
 	{
 		return execJobsMap.size();
 	}
+
+	public Map<String, Map<String, JobExecutor>> getExecJobsMap()
+	{
+		return execJobsMap;
+	}
+	
 }

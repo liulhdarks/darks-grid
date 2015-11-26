@@ -101,7 +101,7 @@ public class GridCommonMessageHandler extends SimpleChannelInboundHandler<GridMe
 			IdleStateEvent event = (IdleStateEvent) evt;
 			if (event.state() == IdleState.ALL_IDLE)
 			{
-				
+				log.warn("Grid network write and read is idle status.");
 			}
         }
 		else

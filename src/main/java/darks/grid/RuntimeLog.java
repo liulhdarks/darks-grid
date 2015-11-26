@@ -31,6 +31,12 @@ public class RuntimeLog extends GridComponent
 	
 	private static final Logger log = LoggerFactory.getLogger(RuntimeLog.class);
 	
+	private static final String HEAD_SEP = "\n==========================Darks Grid V1.0.0====================================\n";
+	
+	private static final String INFO_SEP = "-------------------------------------------------------------------------------\n";
+	
+	private static final String END_SEP = "===============================================================================\n";
+	
 	private boolean nodesInfo = true;
 	
 	private boolean taskInfo = true;
@@ -40,16 +46,18 @@ public class RuntimeLog extends GridComponent
 	private boolean jvmInfo = true;
 	
 	private boolean statInfo = true;
+	
+	private boolean eventInfo = true;
 
 	@Override
 	protected void execute() throws Exception
 	{
 		StringBuilder buf = new StringBuilder();
-		buf.append("\n=============================================================\n");
+		buf.append(HEAD_SEP);
 		if (nodesInfo)
 		{
 			buf.append(GridRuntime.nodes().getNodesInfo());
-			buf.append("-------------------------------------------------------------\n");
+			buf.append(INFO_SEP);
 		}
 		if (jvmInfo)
 		{
@@ -61,7 +69,7 @@ public class RuntimeLog extends GridComponent
 			if (jvmRuntime.totalMemory() != jvmRuntime.maxMemory())
 				buf.append('/').append(StringUtils.memorySize(jvmRuntime.maxMemory()));
 			buf.append('\n');
-			buf.append("-------------------------------------------------------------\n");
+			buf.append(INFO_SEP);
 		}
 		if (statInfo)
 		{
@@ -75,7 +83,12 @@ public class RuntimeLog extends GridComponent
 				.append(' ').append("Cur-JobW-Count:").append(GridStatistic.getCurJobWaitCount())
 				.append(' ').append("Run-Job-Count:").append(GridRuntime.jobs().getRunningJobsCount());
 			buf.append('\n');
-			buf.append("-------------------------------------------------------------\n");
+			buf.append(INFO_SEP);
+		}
+		if (eventInfo)
+		{
+			buf.append(GridRuntime.events().getEventsInfo()).append('\n');
+			buf.append(INFO_SEP);
 		}
 		if (taskInfo)
 		{
@@ -84,7 +97,7 @@ public class RuntimeLog extends GridComponent
 			buf.append("Tasks(").append(taskCount).append("):\n");
 			if (!"".equals(info))
 				buf.append(info).append('\n');
-			buf.append("-------------------------------------------------------------\n");
+			buf.append(INFO_SEP);
 		}
 		if (execJobInfo)
 		{
@@ -94,7 +107,7 @@ public class RuntimeLog extends GridComponent
 			if (!"".equals(info))
 				buf.append(info).append('\n');
 		}
-		buf.append("=============================================================\n");
+		buf.append(END_SEP);
 		log.info(buf.toString());
 	}
 
@@ -146,6 +159,16 @@ public class RuntimeLog extends GridComponent
 	public void setStatInfo(boolean statInfo)
 	{
 		this.statInfo = statInfo;
+	}
+
+	public boolean isEventInfo()
+	{
+		return eventInfo;
+	}
+
+	public void setEventInfo(boolean eventInfo)
+	{
+		this.eventInfo = eventInfo;
 	}
 
 }

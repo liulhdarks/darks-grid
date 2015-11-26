@@ -33,6 +33,7 @@ import darks.grid.RuntimeLog;
 import darks.grid.beans.GridComponent;
 import darks.grid.config.ComponentConfig;
 import darks.grid.config.GridConfiguration;
+import darks.grid.executor.job.JobExecuteGuard;
 import darks.grid.network.NodesHeartAlive;
 import darks.grid.network.discovery.MERGE_NODES;
 import darks.grid.network.discovery.TCPPING;
@@ -57,11 +58,17 @@ public class GridComponentManager implements GridManager
         systemCompConfig.put("alive", NodesHeartAlive.class);
         systemCompConfig.put("log", RuntimeLog.class);
         systemCompConfig.put("merge", MERGE_NODES.class);
+        
     }
     
     public GridComponentManager()
     {
         
+    }
+    
+    private void registerSystemComponents()
+    {
+        registerComponent("$GRID_JOB_EXEC_GUARD", new JobExecuteGuard());
     }
     
     @Override
@@ -102,6 +109,7 @@ public class GridComponentManager implements GridManager
                     registerComponent(labelName, comp);
                 }
             }
+            registerSystemComponents();
             return true;
         }
         catch (Exception e)

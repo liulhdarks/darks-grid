@@ -43,6 +43,8 @@ public abstract class GridJob implements Serializable
 	
 	private boolean callback = true;
 	
+	private int timeout = 0; 
+	
 	public GridJob()
 	{
 		
@@ -53,6 +55,7 @@ public abstract class GridJob implements Serializable
         this.taskId = task.getId();
         this.taskType = task.getTaskType();
         this.callback = config.getResponseType() != ResponseType.NONE;
+        this.timeout = config.getTimeout();
     }
     
     public abstract Object execute();
@@ -110,11 +113,22 @@ public abstract class GridJob implements Serializable
         this.callback = callback;
     }
 
-    @Override
-    public String toString()
-    {
-        return "GridJob [jobId=" + jobId + ", taskId=" + taskId + ", taskType=" + taskType + ", failRedo=" + failRedo
-            + ", callback=" + callback + "]";
-    }
+    public int getTimeout()
+	{
+		return timeout;
+	}
+
+	public void setTimeout(int timeout)
+	{
+		this.timeout = timeout;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "GridJob [jobId=" + jobId + ", taskId=" + taskId + ", taskType=" + taskType
+				+ ", failRedo=" + failRedo + ", callback=" + callback + ", timeout=" + timeout
+				+ "]";
+	}
 
 }

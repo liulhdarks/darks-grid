@@ -51,6 +51,8 @@ public class GridEvent implements Serializable, Cloneable
 	
 	private transient GridSession session;
 	
+	private transient long enqueueTimestamp;
+	
 	public GridEvent()
 	{
 		this.id = eventIdSeed.incrementAndGet();
@@ -122,6 +124,17 @@ public class GridEvent implements Serializable, Cloneable
 	public void setSession(GridSession session)
 	{
 		this.session = session;
+	}
+
+	
+	public long getEnqueueTimestamp()
+	{
+		return enqueueTimestamp;
+	}
+
+	public void setEnqueueTimestamp(long enqueueTimestamp)
+	{
+		this.enqueueTimestamp = enqueueTimestamp;
 	}
 
 	@Override
