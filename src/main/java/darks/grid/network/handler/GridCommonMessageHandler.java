@@ -66,13 +66,15 @@ public class GridCommonMessageHandler extends SimpleChannelInboundHandler<GridMe
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception
 	{
-        GridRuntime.events().publish(EventsChannel.SYSTEM_CHANNEL, GridEvent.CONNECT_ACTIVE, GridSessionFactory.getSession(ctx.channel()));
+		GridSession session = GridSessionFactory.getSession(ctx.channel());
+        GridRuntime.events().publish(EventsChannel.SYSTEM_CHANNEL, GridEvent.CONNECT_ACTIVE, session);
 		super.channelActive(ctx);
 	}
 
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception
 	{
+	    log.warn("Inactive connection " + ctx.channel().remoteAddress());
 		GridRuntime.nodes().removeNode(GridSessionFactory.getSession(ctx.channel()));
 		super.channelInactive(ctx);
 	}
@@ -101,7 +103,17 @@ public class GridCommonMessageHandler extends SimpleChannelInboundHandler<GridMe
 			IdleStateEvent event = (IdleStateEvent) evt;
 			if (event.state() == IdleState.ALL_IDLE)
 			{
-				log.warn("Grid network write and read is idle status.");
+				GridSession session = GridSessionFactory.getSession(ctx.channel());
+				String nodeId = GridRuntime.nodes().getNodeId(session.getId());
+				log.warn("Grid session " + session.remoteAddress() + " write and read is idle status.nodeId:" + nodeId);
+				if (nodeId == null || !GridRuntime.nodes().contains(nodeId) || !session.isActive())
+				{
+					log.warn("Grid session " + session.remoteAddress() + " isn't the node session.");
+					GridRuntime.network().removeWaitActive(session);
+					session.close();
+					if (nodeId != null)
+						GridRuntime.nodes().removeNode(session);
+				}
 			}
         }
 		else

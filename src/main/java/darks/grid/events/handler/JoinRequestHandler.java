@@ -41,6 +41,7 @@ public class JoinRequestHandler extends GridEventHandler
 	public void handle(GridEvent event) throws Exception
 	{
 		GridSession session = event.getSession();
+		GridRuntime.network().removeWaitActive(session);
 		JoinMeta meta = event.getData();
 		meta.setSession(session);
         String nodeId = meta.getNodeId();

@@ -40,6 +40,7 @@ public class ConnectionActiveHandler extends GridEventHandler
         throws Exception
     {
         GridSession session = event.getData();
+		GridRuntime.network().addWaitActive(session);
         if (GridRuntime.awaitReady(AWAIT_READY_TIMEOUT, TimeUnit.SECONDS))
         {
             JoinMeta meta = new JoinMeta(GridRuntime.getLocalId(), GridRuntime.context());

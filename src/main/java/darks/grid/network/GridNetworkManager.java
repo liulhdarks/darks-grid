@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import darks.grid.GridRuntime;
 import darks.grid.beans.GridNode;
+import darks.grid.beans.TimerObject;
 import darks.grid.beans.meta.JoinMeta;
 import darks.grid.config.GridConfiguration;
 import darks.grid.manager.GridManager;
@@ -40,9 +41,13 @@ public class GridNetworkManager implements GridManager
 	
 	private static final long LOCK_EXPIRE_TIME = 60000;
 	
+	private static final long ACTIVE_EXPIRE_TIME = 120000;
+	
 	private GridMessageServer messageServer;
 	
 	private GridMessageClient messageClient;
+	
+	private Map<SocketAddress, TimerObject<GridSession>> waitActive = new ConcurrentHashMap<>();
 	
 	private Map<String, Map<SocketAddress, JoinMeta>> waitJoin = new ConcurrentHashMap<String, Map<SocketAddress, JoinMeta>>();
 	
@@ -167,6 +172,16 @@ public class GridNetworkManager implements GridManager
 			channelMap.put(meta.getSession().remoteAddress(), meta);
 			return channelMap.size();
 		}
+	}
+	
+	public void addWaitActive(GridSession session)
+	{
+		waitActive.put(session.remoteAddress(), new TimerObject<GridSession>(session, ACTIVE_EXPIRE_TIME));
+	}
+	
+	public void removeWaitActive(GridSession session)
+	{
+		waitActive.remove(session.remoteAddress());
 	}
 	
 	public synchronized Map<SocketAddress, JoinMeta> getWaitJoin(String nodeId)

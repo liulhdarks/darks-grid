@@ -17,8 +17,6 @@
 
 package darks.grid.beans;
 
-import java.util.concurrent.TimeUnit;
-
 import darks.grid.GridRuntime;
 import darks.grid.utils.GridStatistic;
 
@@ -29,7 +27,7 @@ public final class NodeHealth
 	
 	private static final long MAX_NETWORK_DELAY = 3000; 
 	
-	private static final float PROP_CPU = 0.4f;
+	private static final float PROP_CPU = 0.3f;
 	
 	private static final float PROP_MEN = 0.2f;
 	
@@ -37,7 +35,7 @@ public final class NodeHealth
 	
 	private static final float PROP_LOCAL = 0.05f;
 	
-	private static final float PROP_PING = 0.2f;
+	private static final float PROP_PING = 0.3f;
 
 	private NodeHealth()
 	{
@@ -46,7 +44,6 @@ public final class NodeHealth
 	
 	public static int evaluateLocal(MachineInfo info)
 	{
-		GridNode localNode = null;
 		long pingDelaySum = 0;
 		int remoteNodeSize = 0;
 		for (GridNode node : GridRuntime.nodes().getNodesList())
@@ -56,8 +53,6 @@ public final class NodeHealth
 				remoteNodeSize++;
 				pingDelaySum += node.getPingDelay();
 			}
-			else
-				localNode = node;
 		}
 		long maxPingDelay = MAX_PING_DELAY * remoteNodeSize;
 		float pingScore = (maxPingDelay == 0 || maxPingDelay <= pingDelaySum) ? 0 :
@@ -69,8 +64,10 @@ public final class NodeHealth
 		float localScore = MAX_NETWORK_DELAY <= localDelay ? 0 :
 				(((float) (MAX_NETWORK_DELAY - localDelay) / (float) MAX_NETWORK_DELAY) * 100);
 		float cpuUsage = info.getSystemCpuUsage();
+		if (cpuUsage < 0) cpuUsage = 0.f;
 		float cpuScore = 100.f - cpuUsage * 100.f;
 		float memUsage = info.getUsedTotalMemoryUsage();
+		if (memUsage < 0) memUsage = 0.f;
 		float menScore = 100.f - memUsage * 100.f;
 		int score = (int) (cpuScore * PROP_CPU + menScore * PROP_MEN + pingScore * PROP_PING +
 				remoteScore * PROP_REMOTE + localScore * PROP_LOCAL);

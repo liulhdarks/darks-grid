@@ -109,7 +109,10 @@ public class GridRemoteSession implements GridSession
 	public synchronized void close()
 	{
 		if (channel != null && channel.isActive() && channel.isOpen())
+		{
+		    log.warn("Close session channel " + channel.remoteAddress());
 			channel.close();
+		}
 		GridSessionFactory.removeSessionCache(channel);
 	}
 

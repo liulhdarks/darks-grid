@@ -1,10 +1,10 @@
 package darks.grid.test;
 
-import java.util.Random;
-import java.util.Scanner;
-
 import io.netty.util.ResourceLeakDetector;
 import io.netty.util.ResourceLeakDetector.Level;
+
+import java.util.Random;
+import java.util.Scanner;
 
 import org.junit.Test;
 
