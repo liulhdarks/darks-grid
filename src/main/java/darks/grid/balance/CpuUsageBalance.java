@@ -80,4 +80,10 @@ public class CpuUsageBalance extends GridBalance
 			});
 		}
 	}
+
+	@Override
+	public List<GridNode> getTargetNodes()
+	{
+		return nodesList;
+	}
 }
