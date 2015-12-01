@@ -168,7 +168,6 @@ public abstract class JobExecutor extends Thread
 			.append(getStatusType()).append('\t')
 			.append(System.currentTimeMillis() - getTimestamp()).append('/')
 			.append(job.getTimeout()).append(' ')
-			.append(System.currentTimeMillis() - getTimestamp()).append(' ')
 			.append(getDelay());
 		if (isCanncel())
 			buf.append(' ').append("CANCELED");

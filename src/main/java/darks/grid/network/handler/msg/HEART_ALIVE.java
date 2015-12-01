@@ -46,7 +46,7 @@ public class HEART_ALIVE implements GridMessageHandler
 			node.setHeartAliveTime(System.currentTimeMillis());
 			node.context().setMachineInfo(meta.context().getMachineInfo());
 		}
-		node.setPingDelay(arriveTime - meta.getTimestamp());
+		node.setPingDelay(Math.abs(arriveTime - meta.getTimestamp()));
 		//HEART ALIVE REPLY
 		if (msg.getType() == GridMessage.MSG_HEART_ALIVE)
 			GridRuntime.events().publish(EventsChannel.SYSTEM_CHANNEL, GridEvent.HEART_ALIVE_REPLY, msg);

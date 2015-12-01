@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import darks.grid.GridRuntime;
+import darks.grid.balance.GridBalance;
 import darks.grid.beans.GridMessage;
 import darks.grid.beans.GridNode;
 import darks.grid.executor.ExecuteConfig;
@@ -55,8 +56,10 @@ public class MapReduceExecutor<T, R> extends TaskExecutor<T, R>
     protected R execute()
     {
         ExecuteConfig config = getConfig();
-        List<GridNode> nodesList = GridRuntime.nodes().getSnapshotNodes();
-        task.initialize(nodesList, config.getBalance());
+        GridBalance balance = config.getBalance();
+        List<GridNode> nodesList = balance.getTargetNodes() != null ? 
+        		balance.getTargetNodes() : GridRuntime.nodes().getSnapshotNodes();
+        task.initialize(nodesList, balance);
         int jobCount = nodesList.size();
         if (config.getCallType() == CallType.SINGLE)
             jobCount = 1;

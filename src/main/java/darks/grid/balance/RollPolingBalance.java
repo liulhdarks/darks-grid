@@ -66,4 +66,11 @@ public class RollPolingBalance extends GridBalance
 		}
 		return nodesList != null;
 	}
+
+	@Override
+	public synchronized List<GridNode> getTargetNodes()
+	{
+		return nodesList;
+	}
+	
 }
