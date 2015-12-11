@@ -215,7 +215,7 @@ public class GridNode implements Serializable
 		long heartDelay = System.currentTimeMillis() - heartAliveTime.get();
 		MachineInfo info = context.getMachineInfo();
 		String unit = "ms";
-		long delay = pingDelay.get();
+		long delay = Math.abs(pingDelay.get());
 		String flagMaster = master ? "[M]" : "   ";
 		return StringUtils.stringBuffer(id, 
 				"  [", GridNodeType.valueOf(nodeType),']', flagMaster,
