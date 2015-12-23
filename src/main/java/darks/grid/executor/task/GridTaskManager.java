@@ -114,7 +114,15 @@ public class GridTaskManager implements GridManager
 
 	public void completeTask(String taskId)
 	{
-		doingTasksMap.remove(taskId);
+		TaskExecutor<?, ?> task = doingTasksMap.remove(taskId);
+		if (task != null)
+		{
+			GridJobFuture future = task.getFuture();
+			if (future != null)
+			{
+				future.removeAllJobStatus();
+			}
+		}
 	}
 	
 	public TaskExecutor<?, ?> getTaskExecutor(String taskId)

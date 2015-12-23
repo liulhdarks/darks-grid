@@ -29,6 +29,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import darks.grid.GridRuntime;
 import darks.grid.beans.GridFuture;
 import darks.grid.executor.job.GridJobStatus;
 import darks.grid.executor.job.JobResult;
@@ -64,7 +65,21 @@ public class GridJobFuture extends GridFuture<JobResult>
     
     public void removeJobStatus(String jobId)
     {
-    	statusMap.remove(jobId);
+    	GridJobStatus status = statusMap.remove(jobId);
+    	if (status != null)
+    	{
+            GridRuntime.jobs().removeNodeJob(status.getNode().getId(), jobId);
+    	}
+    }
+    
+    public void removeAllJobStatus()
+    {
+    	for (Entry<String, GridJobStatus> entry : statusMap.entrySet())
+    	{
+    		String jobId = entry.getKey();
+    		GridJobStatus status = entry.getValue();
+            GridRuntime.jobs().removeNodeJob(status.getNode().getId(), jobId);
+    	}
     }
     
     public void replyStatus(GridJobReply reply)
@@ -157,7 +172,7 @@ public class GridJobFuture extends GridFuture<JobResult>
 					if (!status.getNode().isAlive())
 					{
 						log.info("Remove job " + status.getJob().getJobId() + ". failed in node " + status.getNode().getId());
-						statusMap.remove(status.getJob().getJobId());
+						removeJobStatus(status.getJob().getJobId());
 						if (status.getJob().isFailRedo())
 						{
 						    executor.failRedo(status.getJob());

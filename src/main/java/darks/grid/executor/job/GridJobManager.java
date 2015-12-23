@@ -170,6 +170,7 @@ public class GridJobManager implements GridManager
 		try
 		{
 			StringBuilder buf = new StringBuilder();
+			buf.append("Await Node Jobs:").append(nodesJobsMap.size()).append('\n');
 			for (Entry<String, Map<String, JobExecutor>> entry : execJobsMap.entrySet())
 			{
 				buf.append(entry.getKey()).append('\n');

@@ -117,18 +117,27 @@ public class MapReduceExecutor<T, R> extends TaskExecutor<T, R>
 
     private boolean executeJobOnNode(GridNode node, GridJob job)
     {
-        GridJobStatus status = new GridJobStatus(job, node);
-        status.setStatusType(JobStatusType.DOING);
-        future.addJobStatus(status);
-        GridRuntime.jobs().addNodeJob(node, job);
-        GridMessage message = new GridMessage(job, GridMessage.MSG_MR_REQUEST);
-        boolean ret = node.sendSyncMessage(message);
-        if (!ret)
+        ExecuteConfig config = getConfig();
+        if (config.getResponseType() == ResponseType.NONE)
         {
-            future.removeJobStatus(job.getJobId());
-            GridRuntime.jobs().removeNodeJob(node.getId(), job.getJobId());
+        	GridMessage message = new GridMessage(job, GridMessage.MSG_MR_REQUEST);
+            return node.sendSyncMessage(message);
         }
-        return ret;
+        else
+        {
+            GridJobStatus status = new GridJobStatus(job, node);
+            status.setStatusType(JobStatusType.DOING);
+            future.addJobStatus(status);
+            GridRuntime.jobs().addNodeJob(node, job);
+            GridMessage message = new GridMessage(job, GridMessage.MSG_MR_REQUEST);
+            boolean ret = node.sendSyncMessage(message);
+            if (!ret)
+            {
+                future.removeJobStatus(job.getJobId());
+                GridRuntime.jobs().removeNodeJob(node.getId(), job.getJobId());
+            }
+            return ret;
+        }
     }
 
 }
