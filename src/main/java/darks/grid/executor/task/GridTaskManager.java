@@ -139,4 +139,16 @@ public class GridTaskManager implements GridManager
 		}
 		return buf.toString();
 	}
+
+	public Map<String, TaskExecutor<?, ?>> getDoingTasksMap()
+	{
+		return doingTasksMap;
+	}
+
+	public Map<String, Set<String>> getRemoteTaskMap()
+	{
+		return remoteTaskMap;
+	}
+	
+	
 }

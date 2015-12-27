@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -51,6 +52,8 @@ public class GridJobFuture extends GridFuture<JobResult>
     private volatile boolean waitCheck = true;
     
     private TaskExecutor<?, ?> executor;
+    
+    private AtomicInteger finishedCountAtomic = new AtomicInteger(0);
 
     public GridJobFuture(TaskExecutor<?, ?> executor)
     {
@@ -185,6 +188,7 @@ public class GridJobFuture extends GridFuture<JobResult>
 						finishedCount++;
 					}
 				}
+				finishedCountAtomic.getAndSet(finishedCount);
 				if (finishedCount == statusMap.size())
 					return true;
 				waitCheck = true;
@@ -252,4 +256,13 @@ public class GridJobFuture extends GridFuture<JobResult>
 		return buf.toString();
 	}
 
+	public int getTotalJobCount()
+	{
+		return statusMap.size();
+	}
+	
+	public int getFinishedCount()
+	{
+		return finishedCountAtomic.get();
+	}
 }
