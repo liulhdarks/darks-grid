@@ -126,6 +126,11 @@ public abstract class JobExecutor extends Thread
 	{
 		this.statusType = statusType;
 	}
+	
+	public GridJob getJob()
+	{
+		return job;
+	}
 
 	public long getTimestamp()
 	{

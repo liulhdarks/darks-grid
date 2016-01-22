@@ -88,11 +88,13 @@ public class GridJobManager implements GridManager
 	{
 		Map<String, GridJob> jobsMap = getNodeJobs(node.getId());
 		jobsMap.put(job.getJobId(), job);
+		GridStatistic.addWaitJobResultCount(1);
 	}
 	
 	public GridJob removeNodeJob(String nodeId, String jobId)
 	{
 		Map<String, GridJob> jobsMap = getNodeJobs(nodeId);
+        GridStatistic.addWaitJobResultCount(-1);
 		return jobsMap.remove(jobId);
 	}
 	
@@ -108,6 +110,7 @@ public class GridJobManager implements GridManager
 				uniqueTask.add(job.getTaskId());
 			}
 			log.info("Remove node " + nodeId + " jobs:" + jobsMap.size() + " tasks:" + uniqueTask.size());
+			GridStatistic.addWaitJobResultCount(jobsMap.size());
 			jobsMap.clear();
 			for (String taskId : uniqueTask)
 			{
@@ -170,7 +173,7 @@ public class GridJobManager implements GridManager
 		try
 		{
 			StringBuilder buf = new StringBuilder();
-			buf.append("Await Node Jobs:").append(nodesJobsMap.size()).append('\n');
+			buf.append("Await Node Jobs:").append(GridStatistic.getCurJobResultWaitCount()).append('\n');
 			for (Entry<String, Map<String, JobExecutor>> entry : execJobsMap.entrySet())
 			{
 				buf.append(entry.getKey()).append('\n');
@@ -196,5 +199,4 @@ public class GridJobManager implements GridManager
 	{
 		return execJobsMap;
 	}
-	
 }

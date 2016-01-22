@@ -27,6 +27,7 @@ public final class GridStatistic
 	static Map<String, EventStatistic> channelEventStat = new ConcurrentHashMap<String, GridStatistic.EventStatistic>();
 	
 	static AtomicLong jobWaitCount = new AtomicLong(0);
+    static AtomicLong jobResultWaitCount = new AtomicLong(0);
 	
 	static AtomicLong taskCount = new AtomicLong(0);
 	static AtomicLong jobCount = new AtomicLong(0);
@@ -49,6 +50,13 @@ public final class GridStatistic
 	{
 		jobWaitCount.getAndAdd(delta);
 	}
+    
+    public static void addWaitJobResultCount(long delta)
+    {
+        long count = jobResultWaitCount.addAndGet(delta);
+        if (count < 0)
+            jobResultWaitCount.getAndSet(0);
+    }
 	
 	public static void incrementJobDelay(long delay)
 	{
@@ -152,6 +160,11 @@ public final class GridStatistic
 	{
 		return jobWaitCount.get();
 	}
+    
+    public static long getCurJobResultWaitCount()
+    {
+        return jobResultWaitCount.get();
+    }
 	
 
 	public static void incrementEventDelay(String channel, long delay)
