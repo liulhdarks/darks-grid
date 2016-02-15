@@ -39,10 +39,12 @@ public class SpringTest extends AbstractJUnit4SpringContextTests
         GridConfiguration config = GridConfigFactory.configure(this.getClass().getResourceAsStream("/grid-config.xml"));
 		GridRuntime.initialize(config);
 		ThreadUtils.threadSleep(3000);
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 5; i++)
         {
-            int ret = rpcComputer.rand(100);
-            System.out.println(ret);
+//            int ret = rpcComputer.rand(100);
+//            Integer ret = rpcComputer.add(5, 2);
+            rpcComputer.print(5);
+//            System.out.println("result:" + ret);
         }
 		while(true)
 		{

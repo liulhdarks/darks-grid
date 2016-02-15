@@ -63,6 +63,13 @@ public class MapReduceExecutor<T, R> extends TaskExecutor<T, R>
         int jobCount = nodesList.size();
         if (config.getCallType() == CallType.SINGLE)
             jobCount = 1;
+        else if (getConfig().getCallType() == CallType.OTHERS)
+            jobCount--;
+        if (jobCount <= 0)
+        {
+            log.warn("Cancel task " + getTaskId() + " cause none target job count.");
+            return null;
+        }
         Collection<? extends GridJob> jobs = task.split(jobCount, paramters);
         for (GridJob job : jobs)
         {
@@ -70,14 +77,20 @@ public class MapReduceExecutor<T, R> extends TaskExecutor<T, R>
             executeJob(job);
         }
         if (config.getResponseType() == ResponseType.NONE)
-        	return null;
-        future.await(config.getTimeout(), TimeUnit.MILLISECONDS);
-        GridRuntime.tasks().completeTask(getTaskId());
-        List<JobResult> jobResults = future.getList();
-        R ret = task.reduce(jobResults);
-        if (listener != null)
-            listener.handle(ret);
-        return ret;
+        {
+            GridRuntime.tasks().completeTask(getTaskId());
+            return null;
+        }
+        else
+        {
+            future.await(config.getTimeout(), TimeUnit.MILLISECONDS);
+            GridRuntime.tasks().completeTask(getTaskId());
+            List<JobResult> jobResults = future.getList();
+            R ret = task.reduce(jobResults);
+            if (listener != null)
+                listener.handle(ret);
+            return ret;
+        }
     }
 
     @Override

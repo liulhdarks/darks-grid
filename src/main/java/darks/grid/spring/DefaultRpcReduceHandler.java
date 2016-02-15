@@ -14,15 +14,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package darks.grid;
+
+package darks.grid.spring;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
+import darks.grid.RpcReduceHandler;
 import darks.grid.executor.task.rpc.RpcResult;
 
-public interface RpcReduceHandler
-{
+public class DefaultRpcReduceHandler implements RpcReduceHandler {
 
-	public Object reduce(Object target, Method method, Object[] args, RpcResult result);
-	
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Object reduce(Object target, Method method, Object[] args, RpcResult result) {
+        Object finalResult = null;
+        if (method.getReturnType().equals(Object.class))
+        {
+            finalResult = result.getResult();
+        }
+        else
+        {
+            List<Object> list = result.getResult();
+            finalResult = (list == null || list.isEmpty()) ? null : list.get(0);
+        }
+        return finalResult;
+    }
+
 }

@@ -47,7 +47,7 @@ public class GridNetworkManager implements GridManager
 	
 	private GridMessageClient messageClient;
 	
-	private Map<SocketAddress, TimerObject<GridSession>> waitActive = new ConcurrentHashMap<>();
+	private Map<SocketAddress, TimerObject<GridSession>> waitActive = new ConcurrentHashMap<SocketAddress, TimerObject<GridSession>>();
 	
 	private Map<String, Map<SocketAddress, JoinMeta>> waitJoin = new ConcurrentHashMap<String, Map<SocketAddress, JoinMeta>>();
 	
@@ -165,7 +165,7 @@ public class GridNetworkManager implements GridManager
 			Map<SocketAddress, JoinMeta> channelMap = waitJoin.get(nodeId);
 			if (channelMap == null)
 			{
-				channelMap = new ConcurrentHashMap<>();
+				channelMap = new ConcurrentHashMap<SocketAddress, JoinMeta>();
 				waitJoin.put(nodeId, channelMap);
 			}
 			meta.setJoinTime(System.currentTimeMillis());
@@ -191,7 +191,7 @@ public class GridNetworkManager implements GridManager
 			Map<SocketAddress, JoinMeta> channelMap = waitJoin.get(nodeId);
 			if (channelMap == null)
 			{
-				channelMap = new ConcurrentHashMap<>();
+				channelMap = new ConcurrentHashMap<SocketAddress, JoinMeta>();
 				waitJoin.put(nodeId, channelMap);
 			}
 			return channelMap;

@@ -19,4 +19,10 @@ public class RpcComputerImpl implements RpcComputer
         return rand.nextInt(base);
     }
 
+    @Override
+    public void print(int v) {
+        System.out.println("RpcComputerImpl print " + v);
+    }
+    
+
 }

@@ -99,7 +99,7 @@ public final class EventsHandlerFactory
 			List<Constructor<? extends GridEventHandler>> classList = getInternHandlerClass(String);
 			if (classList != null && !classList.isEmpty())
 			{
-				handlers = new ArrayList<>(classList.size());
+				handlers = new ArrayList<GridEventHandler>(classList.size());
 				for (Constructor<? extends GridEventHandler> cst : classList)
 				{
 					if (cst != null)
@@ -130,7 +130,7 @@ public final class EventsHandlerFactory
 				handlers = handlersMap.get(String);
 				if (handlers == null)
 				{
-					handlers = new CopyOnWriteArrayList<>();
+					handlers = new CopyOnWriteArrayList<GridEventHandler>();
 					handlersMap.put(String, handlers);
 				}
 			}
@@ -153,7 +153,7 @@ public final class EventsHandlerFactory
 				handlers = handlersClassMap.get(String);
 				if (handlers == null)
 				{
-					handlers = new CopyOnWriteArrayList<>();
+					handlers = new CopyOnWriteArrayList<Constructor<? extends GridEventHandler>>();
 					handlersClassMap.put(String, handlers);
 				}
 			}

@@ -30,7 +30,7 @@ public class EventsConfig
 	
 	private int systemEventConsumerNumber = Runtime.getRuntime().availableProcessors();
 	
-	private Map<String, EventsChannelConfig> channelsConfig = new HashMap<>();
+	private Map<String, EventsChannelConfig> channelsConfig = new HashMap<String, EventsChannelConfig>();
 	
 	public EventsConfig()
 	{

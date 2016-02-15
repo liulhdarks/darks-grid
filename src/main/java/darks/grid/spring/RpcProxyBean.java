@@ -26,7 +26,7 @@ public class RpcProxyBean
 {
 	ExecuteConfig config = new ExecuteConfig();
 	
-	Set<String> targetMethods = new HashSet<>();
+	Set<String> targetMethods = new HashSet<String>();
 	
 	TaskResultListener taskResultListener;
 	

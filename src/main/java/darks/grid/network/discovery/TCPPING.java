@@ -47,7 +47,7 @@ public class TCPPING extends GridDiscovery
 	@Override
 	public void findNodes()
 	{
-		Set<InetSocketAddress> tryAddrs = new LinkedHashSet<>();
+		Set<InetSocketAddress> tryAddrs = new LinkedHashSet<InetSocketAddress>();
 		GridNodesManager nodesManager = GridRuntime.nodes();
 		if (tryAddressList != null)
 		{

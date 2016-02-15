@@ -50,7 +50,7 @@ public class GridNodesManager implements GridManager
 	
 	private Map<String, GridNode> nodesMap = new ConcurrentHashMap<String, GridNode>();
 	
-	private ConcurrentSkipListSet<GridNode> nodesSet = new ConcurrentSkipListSet<>(new NodeComparator());
+	private ConcurrentSkipListSet<GridNode> nodesSet = new ConcurrentSkipListSet<GridNode>(new NodeComparator());
 	
 	private Map<SocketAddress, String> addressMap = new ConcurrentHashMap<SocketAddress, String>();
 	

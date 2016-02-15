@@ -49,14 +49,14 @@ public class GridRpcTask extends MapReduceTaskAdapter<RpcRequest, RpcResult>
     {
         StringBuilder errorBuf = new StringBuilder();
         RpcResult result = new RpcResult();
-        List<Object> objs = new ArrayList<>(results.size());
-        List<String> nodeIds = new ArrayList<>(results.size());
+        List<Object> objs = new ArrayList<Object>(results.size());
+        List<String> nodeIds = new ArrayList<String>(results.size());
         for (JobResult jobRet : results)
         {
             if (!jobRet.isSuccess())
             {
-                errorBuf.append("Error ").append(jobRet.getErrorCode())
-                    .append(" on ").append(jobRet.getNode().getId()).append(" ")
+                errorBuf.append("ErrorCode ").append(jobRet.getErrorCode())
+                    .append(" on ").append(jobRet.getNode().getId()).append(" msg:")
                     .append(jobRet.getErrorMessage()).append('\n');
             }
             else

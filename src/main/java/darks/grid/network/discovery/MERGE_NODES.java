@@ -48,7 +48,7 @@ public class MERGE_NODES extends GridDiscovery
 	public void findNodes()
 	{
 		GridNodesManager nodesManager = GridRuntime.nodes();
-		Map<String, InetSocketAddress> nodeAddrMap = new HashMap<>();
+		Map<String, InetSocketAddress> nodeAddrMap = new HashMap<String, InetSocketAddress>();
 		for (Entry<String, GridNode> entry : nodesManager.getNodesMap().entrySet())
 		{
 			GridNode node = entry.getValue();

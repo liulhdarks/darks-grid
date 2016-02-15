@@ -87,7 +87,7 @@ public class GridJobStatus implements Serializable
     @Override
     public String toString()
     {
-        return "MRJobStatus [job=" + job + ", node=" + node + ", statusType=" + statusType + ", result=" + result + "]";
+        return "GridJobStatus [job=" + job + ", node=" + node + ", statusType=" + statusType + ", result=" + result + "]";
     }
 	
 	

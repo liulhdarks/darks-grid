@@ -33,7 +33,7 @@ public class MasterConfig
 	
 	private int minSlaveNum = 0;
 	
-	private Map<String, MasterTaskConfig> taskMaps = new HashMap<>();
+	private Map<String, MasterTaskConfig> taskMaps = new HashMap<String, MasterTaskConfig>();
 	
 	public void addTaskConfig(MasterTaskConfig taskConfig)
 	{

@@ -41,7 +41,7 @@ public class GridEventsManager implements GridManager
 	
 	private static final Logger log = LoggerFactory.getLogger(GridEventsManager.class);
 	
-	private Map<String, EventsChannel> channels = new ConcurrentHashMap<>();
+	private Map<String, EventsChannel> channels = new ConcurrentHashMap<String, EventsChannel>();
 	
 	EventsChannel systemChannel = null;
 	

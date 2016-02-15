@@ -39,9 +39,9 @@ import darks.grid.utils.ThreadUtils;
 public class GridTaskManager implements GridManager
 {
 
-	Map<String, TaskExecutor<?, ?>> doingTasksMap = new ConcurrentHashMap<>();
+	Map<String, TaskExecutor<?, ?>> doingTasksMap = new ConcurrentHashMap<String, TaskExecutor<?, ?>>();
 	
-	Map<String, Set<String>> remoteTaskMap = new ConcurrentHashMap<>();
+	Map<String, Set<String>> remoteTaskMap = new ConcurrentHashMap<String, Set<String>>();
 
 	private Lock mutex = new ReentrantLock();
 	
@@ -91,7 +91,7 @@ public class GridTaskManager implements GridManager
 				taskIds = remoteTaskMap.get(nodeId);
 				if (taskIds == null)
 				{
-					taskIds = new ConcurrentSkipListSet<>();
+					taskIds = new ConcurrentSkipListSet<String>();
 					remoteTaskMap.put(nodeId, taskIds);
 				}
 			}

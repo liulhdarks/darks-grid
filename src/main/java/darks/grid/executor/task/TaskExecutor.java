@@ -44,8 +44,8 @@ public abstract class TaskExecutor<T, R>  implements Callable<R>
         this.task = task;
         this.paramters = paramters;
         this.taskId = task.getId();
-        this.future = new GridJobFuture(this);
         this.config = config;
+        this.future = new GridJobFuture(this);
     }
     
     @Override

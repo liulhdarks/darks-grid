@@ -33,9 +33,9 @@ public class GridLocalMessageManager implements GridManager
 	
 	private static final Logger log = LoggerFactory.getLogger(GridLocalMessageManager.class);
 
-	private BlockingQueue<Object> messageQueue = new LinkedBlockingQueue<>();
+	private BlockingQueue<Object> messageQueue = new LinkedBlockingQueue<Object>();
 	
-	private List<GridLocalHandlerThread> handlers = new ArrayList<>();
+	private List<GridLocalHandlerThread> handlers = new ArrayList<GridLocalHandlerThread>();
 	
 	public GridLocalMessageManager()
 	{

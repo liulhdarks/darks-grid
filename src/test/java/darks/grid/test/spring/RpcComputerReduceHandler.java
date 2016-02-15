@@ -3,6 +3,7 @@ package darks.grid.test.spring;
 import darks.grid.RpcReduceHandler;
 import darks.grid.executor.task.rpc.RpcResult;
 
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -14,8 +15,8 @@ public class RpcComputerReduceHandler implements RpcReduceHandler
 {
 
     @Override
-    public Object reduce(RpcResult result) {
-        System.out.println(result.getResult());
+    public Object reduce(Object target, Method method, Object[] args, RpcResult result) {
+        System.out.println("Reducer:" + result.getResult());
         List<Object> list = result.getResult();
         if (list != null && list.size() > 1)
         {

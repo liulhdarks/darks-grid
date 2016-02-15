@@ -48,7 +48,7 @@ public class GridNode implements Serializable
 	
 	private AtomicLong pingDelay = new AtomicLong(0);
 	
-	private AtomicReference<MachineInfo> machineInfo = new AtomicReference<>();
+	private AtomicReference<MachineInfo> machineInfo = new AtomicReference<MachineInfo>();
 	
 	private volatile boolean quit = false;
 	

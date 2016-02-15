@@ -64,7 +64,7 @@ public final class ParamsUtils
 
 	private static void buildIpList(List<String> ipList, String[] ipArg, int index, String prefix)
 	{
-		List<Integer> scanList = new ArrayList<>();
+		List<Integer> scanList = new ArrayList<Integer>();
 		String ipVal = ipArg[index++];
 		int startVal = -1;
 		int endVal = -1;

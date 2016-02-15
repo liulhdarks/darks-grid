@@ -14,36 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package darks.grid.spring;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package darks.grid.annotations;
 
+import java.lang.reflect.Method;
 
-public class JavassistProxyBuilder implements ProxyBuilder
-{
+import darks.grid.RpcReduceHandler;
+import darks.grid.executor.task.rpc.RpcResult;
 
-	private static final Logger log = LoggerFactory.getLogger(JavassistProxyBuilder.class);
-	
-	private RpcProxyBean proxyBean;
-	
-	public JavassistProxyBuilder(RpcProxyBean proxyBean)
-	{
-		this.proxyBean = proxyBean;
-	}
-    
+public class BlankRpcReduceHandler implements RpcReduceHandler {
+
     @Override
-    public Object build(Class<?> interfaceClass)
-    {
-        try
-		{
-			return JavassistProxy.make(interfaceClass, new ProxyRpcInvocationHandler(interfaceClass, proxyBean));
-		}
-		catch (Exception e)
-		{
-			log.error(e.getMessage(), e);
-			return null;
-		}
+    public Object reduce(Object target, Method method, Object[] args, RpcResult result) {
+        return null;
     }
-    
+
 }

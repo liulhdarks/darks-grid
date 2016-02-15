@@ -44,7 +44,7 @@ public class RpcExecutor extends GridExecutor
     
     private static final Logger log = LoggerFactory.getLogger(RpcExecutor.class);
 	
-	static Map<String, GridRpcMethod> rpcMap = new ConcurrentHashMap<>();
+	static Map<String, GridRpcMethod> rpcMap = new ConcurrentHashMap<String, GridRpcMethod>();
 	
 	public static void registerSystemMethod()
 	{
@@ -121,10 +121,14 @@ public class RpcExecutor extends GridExecutor
 	        return new RpcResult();
 	    try
         {
+	        RpcResult result = null;
 	        if (config.getTimeout() <= 0)
-	            return future.get();
+	            result = future.get();
 	        else
-	            return future.get(config.getTimeout(), TimeUnit.MILLISECONDS);
+	            result = future.get(config.getTimeout(), TimeUnit.MILLISECONDS);
+	        if (result == null)
+	            result = RpcResult.fail("Fail to call method " + uniqueName + ". Cause null result.");
+	        return result;
         }
         catch (TimeoutException e)
         {

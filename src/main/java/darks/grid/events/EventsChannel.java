@@ -46,7 +46,7 @@ public class EventsChannel
 
 	BlockingQueue<GridEvent> eventQueue = null;
 	
-	List<EventsConsumer> concumers = new LinkedList<>();
+	List<EventsConsumer> concumers = new LinkedList<EventsConsumer>();
 	
 	ExecutorService threadPool = null;
 	
@@ -58,7 +58,7 @@ public class EventsChannel
 	public boolean initialize(EventsChannelConfig config)
 	{
 		this.name = config.getName();
-		eventQueue = new LinkedBlockingQueue<>(config.getBlockQueueMaxNumber());
+		eventQueue = new LinkedBlockingQueue<GridEvent>(config.getBlockQueueMaxNumber());
 		int threadSize = config.getEventConsumerNumber();
 		threadPool = Executors.newFixedThreadPool(threadSize);
 		log.info("Initialize events channel " + config.getName() + " with " + config);

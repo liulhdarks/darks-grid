@@ -24,7 +24,7 @@ public final class ReflectUtils
         {
             return clazz.newInstance();
         }
-        catch (InstantiationException | IllegalAccessException e)
+        catch (Exception e)
         {
             log.error(e.getMessage(), e);
         }

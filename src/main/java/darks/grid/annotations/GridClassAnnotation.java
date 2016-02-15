@@ -14,36 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package darks.grid.spring;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package darks.grid.annotations;
 
+import java.util.HashMap;
+import java.util.Map;
 
-public class JavassistProxyBuilder implements ProxyBuilder
-{
+public class GridClassAnnotation {
 
-	private static final Logger log = LoggerFactory.getLogger(JavassistProxyBuilder.class);
-	
-	private RpcProxyBean proxyBean;
-	
-	public JavassistProxyBuilder(RpcProxyBean proxyBean)
-	{
-		this.proxyBean = proxyBean;
-	}
+    Map<String, GridMethodAnnotation> methodsAnnotations = new HashMap<String, GridMethodAnnotation>();
     
-    @Override
-    public Object build(Class<?> interfaceClass)
-    {
-        try
-		{
-			return JavassistProxy.make(interfaceClass, new ProxyRpcInvocationHandler(interfaceClass, proxyBean));
-		}
-		catch (Exception e)
-		{
-			log.error(e.getMessage(), e);
-			return null;
-		}
+    public GridMethodAnnotation getMethodAnnotation(String methodUniqueName) {
+        return methodsAnnotations.get(methodUniqueName);
     }
     
+    public void addMethodAnnotation(String methodUniqueName, GridMethodAnnotation value) {
+        methodsAnnotations.put(methodUniqueName, value);
+    }
 }

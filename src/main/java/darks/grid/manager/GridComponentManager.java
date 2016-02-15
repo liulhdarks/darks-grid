@@ -50,7 +50,7 @@ public class GridComponentManager implements GridManager
     
     private ExecutorService threadPool = Executors.newCachedThreadPool();
     
-    private List<GridComponent> runningComponents = new LinkedList<>();
+    private List<GridComponent> runningComponents = new LinkedList<GridComponent>();
     
     static
     {

@@ -32,7 +32,7 @@ public class JdkProxyBuilder implements ProxyBuilder
     public Object build(Class<?> interfaceClass)
     {
         return Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),   
-            new Class<?>[]{interfaceClass}, new ProxyRpcInvocationHandler(proxyBean)); 
+            new Class<?>[]{interfaceClass}, new ProxyRpcInvocationHandler(interfaceClass, proxyBean)); 
     }
     
 }

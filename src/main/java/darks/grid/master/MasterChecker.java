@@ -46,7 +46,7 @@ public class MasterChecker extends GridComponent
 	@Override
 	protected void execute() throws Exception
 	{
-		List<String> nodeIds = new ArrayList<>();
+		List<String> nodeIds = new ArrayList<String>();
 		List<GridNode> nodes = GridRuntime.nodes().getNodesList();
 		for (GridNode node : nodes)
 		{

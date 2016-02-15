@@ -32,6 +32,8 @@ import org.slf4j.LoggerFactory;
 
 import darks.grid.GridRuntime;
 import darks.grid.beans.GridFuture;
+import darks.grid.executor.ExecuteConfig;
+import darks.grid.executor.ExecuteConfig.ResponseType;
 import darks.grid.executor.job.GridJobStatus;
 import darks.grid.executor.job.JobResult;
 import darks.grid.executor.job.JobStatusType;
@@ -41,7 +43,7 @@ public class GridJobFuture extends GridFuture<JobResult>
     
 	private static final Logger log = LoggerFactory.getLogger(GridJobFuture.class);
 	
-    protected Map<String, GridJobStatus> statusMap = new ConcurrentHashMap<>();
+    protected Map<String, GridJobStatus> statusMap = new ConcurrentHashMap<String, GridJobStatus>();
     
     private static final long DEFAULT_AWAIT_TIME = 100;
     
@@ -53,11 +55,14 @@ public class GridJobFuture extends GridFuture<JobResult>
     
     private TaskExecutor<?, ?> executor;
     
+    private ExecuteConfig config;
+    
     private AtomicInteger finishedCountAtomic = new AtomicInteger(0);
 
     public GridJobFuture(TaskExecutor<?, ?> executor)
     {
     	this.executor = executor;
+    	this.config = executor.getConfig();
     }
     
     public void addJobStatus(GridJobStatus status)
@@ -98,6 +103,7 @@ public class GridJobFuture extends GridFuture<JobResult>
         		return;
         	}
         	status.getResult().setObject(reply.getResult());
+        	status.getResult().setSuccess(reply.isSuccess());
         	if (reply.isSuccess())
         		status.setStatusType(JobStatusType.SUCCESS);
         	else
@@ -107,7 +113,7 @@ public class GridJobFuture extends GridFuture<JobResult>
         		status.getResult().setErrorMessage(reply.getErrorMessage());
         	}
         	waitCheck = false;
-//			System.out.println("signal...");
+//			log.info("signal..." + reply);
         	statusCheck.signal();
 		}
 		finally
@@ -153,7 +159,7 @@ public class GridJobFuture extends GridFuture<JobResult>
 	{
 		long maxTime = timeout > 0 ? unit.toMillis(timeout) : 0;
 		long st = System.currentTimeMillis();
-		List<GridJobStatus> statuses = new ArrayList<>(statusMap.size());
+		List<GridJobStatus> statuses = new ArrayList<GridJobStatus>(statusMap.size());
 		for (;;)
 		{
 			lock.lock();
@@ -189,7 +195,8 @@ public class GridJobFuture extends GridFuture<JobResult>
 					}
 				}
 				finishedCountAtomic.getAndSet(finishedCount);
-				if (finishedCount == statusMap.size())
+				if (finishedCount == statusMap.size()
+				        || (config.getResponseType() == ResponseType.SINGLE && finishedCount > 0))
 					return true;
 				waitCheck = true;
 				if (maxTime > 0 && System.currentTimeMillis() - st > maxTime)
@@ -197,7 +204,7 @@ public class GridJobFuture extends GridFuture<JobResult>
 			}
 			catch (InterruptedException e)
 			{
-				e.printStackTrace();
+			    log.error("Interrupt job future. Cause " + e.getMessage(), e);
 				return false;
 			}
 			finally
@@ -210,13 +217,25 @@ public class GridJobFuture extends GridFuture<JobResult>
 	@Override
 	public List<JobResult> getList()
 	{
-		List<JobResult> result = new ArrayList<>(statusMap.size());
+		List<JobResult> result = new ArrayList<JobResult>(statusMap.size());
 		for (Entry<String, GridJobStatus> entry : statusMap.entrySet())
 		{
 		    GridJobStatus status = entry.getValue();
 		    JobResult ret = status.getResult();
-		    ret.setSuccess(status.getStatusType() == JobStatusType.SUCCESS);
-			result.add(ret);
+            ret.setSuccess(status.getStatusType() == JobStatusType.SUCCESS);
+            if (config.getResponseType() == ResponseType.SINGLE)
+            {
+                if (status.getStatusType() == JobStatusType.SUCCESS 
+                        || status.getStatusType() == JobStatusType.FAIL)
+                {
+                    result.add(ret);
+                    break;
+                }
+            }
+            else
+            {
+                result.add(ret);
+            }
 		}
 		return result;
 	}

@@ -27,7 +27,7 @@ import io.netty.channel.Channel;
 public class GridSessionFactory
 {
 	
-	private static Map<Channel, SoftReference<GridSession>> sessionCache = new ConcurrentHashMap<>();
+	private static Map<Channel, SoftReference<GridSession>> sessionCache = new ConcurrentHashMap<Channel, SoftReference<GridSession>>();
 	
 	private static Lock lock = new ReentrantLock();
 

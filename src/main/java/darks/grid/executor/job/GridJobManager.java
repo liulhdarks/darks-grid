@@ -41,9 +41,9 @@ public class GridJobManager implements GridManager
 	
 	private static final Logger log = LoggerFactory.getLogger(GridJobManager.class);
 
-	private Map<String, Map<String, GridJob>> nodesJobsMap = new ConcurrentHashMap<>();
+	private Map<String, Map<String, GridJob>> nodesJobsMap = new ConcurrentHashMap<String, Map<String, GridJob>>();
 
-	private Map<String, Map<String, JobExecutor>> execJobsMap = new ConcurrentHashMap<>();
+	private Map<String, Map<String, JobExecutor>> execJobsMap = new ConcurrentHashMap<String, Map<String, JobExecutor>>();
 	
 	private Lock lock = new ReentrantLock();
 	
@@ -103,7 +103,7 @@ public class GridJobManager implements GridManager
 		Map<String, GridJob> jobsMap = getNodeJobs(nodeId);
 		if (jobsMap != null && !jobsMap.isEmpty())
 		{
-			Set<String> uniqueTask = new HashSet<>();
+			Set<String> uniqueTask = new HashSet<String>();
 			for (Entry<String, GridJob> entry : jobsMap.entrySet())
 			{
 				GridJob job = entry.getValue();
@@ -132,7 +132,7 @@ public class GridJobManager implements GridManager
 				jobsMap = nodesJobsMap.get(nodeId);
 				if (jobsMap == null)
 				{
-					jobsMap = new ConcurrentHashMap<>();
+					jobsMap = new ConcurrentHashMap<String, GridJob>();
 					nodesJobsMap.put(nodeId, jobsMap);
 				}
 			}
@@ -155,7 +155,7 @@ public class GridJobManager implements GridManager
 				jobsMap = execJobsMap.get(taskId);
 				if (jobsMap == null)
 				{
-					jobsMap = new ConcurrentHashMap<>();
+					jobsMap = new ConcurrentHashMap<String, JobExecutor>();
 					execJobsMap.put(taskId, jobsMap);
 				}
 			}

@@ -71,7 +71,7 @@ public class GridStorageManager implements GridManager
 		if (historyNodesFile.exists())
 		{
 			List<String> addresses = FileUtils.readLineToList(historyNodesFile);
-			Set<InetSocketAddress> result = new HashSet<>(addresses.size());
+			Set<InetSocketAddress> result = new HashSet<InetSocketAddress>(addresses.size());
 			for (String addr : addresses)
 			{
 				String[] datas = addr.split(":");
@@ -80,7 +80,7 @@ public class GridStorageManager implements GridManager
 			return result;
 		}
 		else
-			return new ArrayList<>(0);
+			return new ArrayList<InetSocketAddress>(0);
 	}
 
 }
