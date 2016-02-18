@@ -24,6 +24,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import darks.grid.GridException;
 import darks.grid.GridRuntime;
 import darks.grid.manager.GridNodesManager;
 import darks.grid.utils.ParamsUtils;
@@ -92,7 +93,14 @@ public class TCPPING extends GridDiscovery
         this.hosts = hosts;
         if (hosts != null)
         {
-            tryAddressList = ParamsUtils.parseAddress(hosts);
+            try 
+            {
+                tryAddressList = ParamsUtils.parseAddress(hosts);
+            } 
+            catch (Exception e) 
+            {
+                throw new GridException("Invalid TCPPING hosts:" + hosts, e);
+            }
         }
     }
 	
