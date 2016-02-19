@@ -36,4 +36,6 @@ public interface GridSession
 	public InetSocketAddress remoteAddress();
 	
 	public InetSocketAddress localAddress();
+	
+	public boolean isLocal();
 }

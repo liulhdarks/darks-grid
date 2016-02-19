@@ -72,8 +72,14 @@ public class GridLocalSession implements GridSession
 		while (count < failRetryCount && failRetry);
 		return ret;
 	}
+	
 
 	@Override
+    public boolean isLocal() {
+        return true;
+    }
+
+    @Override
 	public void close()
 	{
 //		channel.close();

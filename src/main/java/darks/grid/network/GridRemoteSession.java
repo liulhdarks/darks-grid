@@ -104,8 +104,14 @@ public class GridRemoteSession implements GridSession
 			return false;
 		}
 	}
+	
 
 	@Override
+    public boolean isLocal() {
+        return false;
+    }
+
+    @Override
 	public synchronized void close()
 	{
 		if (channel != null && channel.isActive() && channel.isOpen())

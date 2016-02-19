@@ -27,6 +27,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import darks.grid.GridRuntime;
 import darks.grid.beans.GridEvent;
 import darks.grid.beans.GridMessage;
 import darks.grid.beans.GridNode;
@@ -103,6 +104,9 @@ public class EventsChannel
 	
 	private boolean enqueueEvent(GridEvent event, boolean sync)
 	{
+	    if (event.getSession() == null) {
+	        event.setSession(GridRuntime.network().getServerSession());
+	    }
 		GridStatistic.incrementEventCount(name);
 		event.setEnqueueTimestamp(System.currentTimeMillis());
 		if (sync)
