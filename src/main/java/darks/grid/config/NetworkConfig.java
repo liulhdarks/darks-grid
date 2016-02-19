@@ -16,6 +16,8 @@
  */
 package darks.grid.config;
 
+import darks.grid.annotations.TimeField;
+
 public class NetworkConfig
 {
     
@@ -27,8 +29,10 @@ public class NetworkConfig
     
     private boolean tcpNodelay = true;
     
+    @TimeField
     private int tcpKeepIdle = 60000;
-    
+
+    @TimeField
     private int tcpKeepInterval = 5000;
     
     private int tcpKeepCount = 3;
@@ -42,9 +46,11 @@ public class NetworkConfig
     private int tcpSendBufferSize = 8 * 1024;
     
     private int tcpRecvBufferSize = 8 * 1024;
-    
+
+    @TimeField
     private int recvTimeout = 10000;
-    
+
+    @TimeField
     private int connectTimeout = 3000;
     
     private int serverWorkerThreadNumber = 6;
@@ -52,7 +58,8 @@ public class NetworkConfig
     private int serverBossThreadDelta = 2;
     
     private int clientWorkerThreadNumber = Runtime.getRuntime().availableProcessors() * 2;
-    
+
+    @TimeField
     private int nodesExpireTime = 600000;
     
     private int localMsgHandlerNumber = Runtime.getRuntime().availableProcessors() * 2;

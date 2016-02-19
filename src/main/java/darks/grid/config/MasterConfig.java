@@ -24,6 +24,7 @@ import org.w3c.dom.Element;
 
 import darks.grid.GridException;
 import darks.grid.master.MasterTask;
+import darks.grid.utils.ParamsUtils;
 
 
 public class MasterConfig
@@ -84,7 +85,9 @@ public class MasterConfig
 		
     	String taskClassName = null;
 		
-		int interval = 1000;
+		long interval = 1000;
+		
+		boolean singleUse = false;
 		
 		@SuppressWarnings("unchecked")
 		public void setTaskClass(String className)
@@ -114,10 +117,15 @@ public class MasterConfig
 			if (el.hasAttribute("interval"))
 			{
         		String strInterval = el.getAttribute("interval");
-        		interval = Integer.parseInt(strInterval);
+        		interval = ParamsUtils.parseTime(strInterval);
         		if (interval < 0)
             		throw new GridException("Invalid master task interval:" + interval);
 			}
+            if (el.hasAttribute("single_use"))
+            {
+                String strSingleUse = el.getAttribute("single_use");
+                singleUse = Boolean.parseBoolean(strSingleUse);
+            }
 			setTaskClass(taskClassName);
 		}
 
@@ -151,15 +159,24 @@ public class MasterConfig
 			this.taskClassName = taskClassName;
 		}
 
-		public int getInterval()
+		public long getInterval()
 		{
 			return interval;
 		}
 
-		public void setInterval(int interval)
+		public void setInterval(long interval)
 		{
 			this.interval = interval;
 		}
+
+        public boolean isSingleUse() {
+            return singleUse;
+        }
+
+        public void setSingleUse(boolean singleUse) {
+            this.singleUse = singleUse;
+        }
+		
 		
 	}
 }

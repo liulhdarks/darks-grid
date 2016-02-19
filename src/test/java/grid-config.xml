@@ -6,16 +6,16 @@
 	<component name="testcom" class="darks.grid.test.TestComponent"/> 
  	-->
 	<cluster cluster_name="KELUDEAPS_TEST"/>
-	 <!-- 
-	<master auto_master="true" min_slave_num="2">
-		<task name="demo" class="darks.grid.test.DemoMasterTask" interval="300000" />
+	 
+	<master auto_master="true" min_slave_num="0">
+		<task name="demo" class="darks.grid.test.DemoMasterTask" interval="5s" single_use="true"/>
 	</master>
-	-->
+	
 	<task jobs_exec_count="30"/>
 
 	<events default_event_consumer_number="8" system_event_consumer_number="3"/>
 	
-	<log interval="60000" 
+	<log interval="1min" 
 		nodes_info="true" 
 	    task_info="true" 
 	    exec_job_info="true" 
@@ -29,20 +29,20 @@
 		tcp_nodelay="true"
 		tcp_keep_alive="true"
 		tcp_reuse_addr="false"
-		recv_timeout="50000"
-		connect_timeout="2000"
+		recv_timeout="50s"
+		connect_timeout="2s"
 		server_worker_thread_number="4"
 		server_boss_thread_delta="2"
 		client_worker_thread_number="4"
-		nodes_expire_time="600000"
+		nodes_expire_time="10min"
 		cache_history_nodes="false"
 		/>
 
-	<alive interval="60000"/>
+	<alive interval="1min"/>
 
-	<MERGE interval="300000"/>
+	<MERGE interval="5min"/>
 	
-	<TCPPING hosts="localhost:[7800-7803]" interval="300000"/>
+	<TCPPING hosts="localhost:[7800-7803]" interval="5min"/>
 	
 	<!-- <testcom interval="60000"/> -->
 </grid>

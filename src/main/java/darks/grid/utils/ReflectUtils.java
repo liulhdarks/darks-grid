@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import darks.grid.GridException;
+import darks.grid.annotations.TimeField;
 
 public final class ReflectUtils
 {
@@ -189,6 +190,14 @@ public final class ReflectUtils
         Field field = ReflectUtils.getDeepField(clazz, fieldName);
         if (field == null)
             throw new GridException("Cannot find field " + fieldName + " for attribute " + attrName);
+        TimeField timeField = (TimeField)field.getAnnotation(TimeField.class);
+        if (timeField != null)
+        {
+            long time = ParamsUtils.parseTime(attrValue, timeField.unit());
+            if (time <= 0)
+                throw new GridException("Time attribute " + attrName + "'s value can't less than 1ms.");
+            attrValue = String.valueOf(time);
+        }
         Method method = ReflectUtils.getSetMethod(clazz, attrName, field.getType());
         if (method == null)
             throw new GridException("Cannot find set method for attribute " + attrName);

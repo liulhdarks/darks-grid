@@ -21,6 +21,8 @@ import java.io.Serializable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import darks.grid.annotations.TimeField;
+
 public abstract class GridComponent extends Thread implements Serializable, Cloneable
 {
     
@@ -30,9 +32,12 @@ public abstract class GridComponent extends Thread implements Serializable, Clon
 
     private volatile boolean destroyed = false;
     
+    @TimeField
     private int interval = 1000;
     
     private int delay = 0;
+    
+    private boolean singleUse = false;
     
     public GridComponent()
     {
@@ -47,16 +52,22 @@ public abstract class GridComponent extends Thread implements Serializable, Clon
             log.info("Grid component " + getClass() + " startup.");
             if (delay > 0)
                 Thread.sleep(delay);
-            while (isRunning())
-            {
+            if (singleUse)
                 execute();
-                if (interval > 0)
-                    Thread.sleep(interval);
+            else
+            {
+                while (isRunning())
+                {
+                    execute();
+                    if (interval > 0)
+                        Thread.sleep(interval);
+                }
             }
+            log.info("Grid component " + getClass() + " normal shutdown.");
         }
         catch (Exception e)
         {
-            log.error(e.getMessage(), e);
+            log.error("Grid component " + getClass() + " abnormal shutdown. Cause " + e.getMessage(), e);
         }
     }
     
@@ -102,5 +113,13 @@ public abstract class GridComponent extends Thread implements Serializable, Clon
 	{
 		this.delay = delay;
 	}
+
+    public boolean isSingleUse() {
+        return singleUse;
+    }
+
+    public void setSingleUse(boolean singleUse) {
+        this.singleUse = singleUse;
+    }
     
 }

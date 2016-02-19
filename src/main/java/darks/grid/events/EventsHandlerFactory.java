@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import darks.grid.beans.GridEvent;
+import darks.grid.events.handler.ChangeOwnMasterHandler;
 import darks.grid.events.handler.ConfirmMasterHandler;
 import darks.grid.events.handler.ConnectionActiveHandler;
 import darks.grid.events.handler.HeartAliveReplyHandler;
@@ -59,6 +60,7 @@ public final class EventsHandlerFactory
 		addHandler(GridEvent.HEART_ALIVE_REPLY, new HeartAliveReplyHandler());
 		addHandler(GridEvent.JOIN_REQUEST, new JoinRequestHandler());
 		addHandler(GridEvent.JOIN_REQUEST_REPLY, new JoinReplyHandler());
+        addHandler(GridEvent.CHANGE_OWN_MASTER, new ChangeOwnMasterHandler());
 	}
 	
 	private EventsHandlerFactory()

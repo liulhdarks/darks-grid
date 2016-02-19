@@ -3,18 +3,39 @@ package darks.grid.utils;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import darks.grid.GridException;
+
 public final class ParamsUtils
 {
+    
+    private static final Logger log = LoggerFactory.getLogger(ParamsUtils.class);
+    
+    private static Map<String, TimeUnit> timeEscape = new HashMap<>();
 	
-	private static final Logger log = LoggerFactory.getLogger(ParamsUtils.class);
+	static 
+	{
+        timeEscape.put("day", TimeUnit.DAYS);
+        timeEscape.put("hour", TimeUnit.HOURS);
+	    timeEscape.put("d", TimeUnit.DAYS);
+        timeEscape.put("h", TimeUnit.HOURS);
+        timeEscape.put("ms", TimeUnit.MILLISECONDS);
+        timeEscape.put("min", TimeUnit.MINUTES);
+        timeEscape.put("ns", TimeUnit.NANOSECONDS);
+        timeEscape.put("s", TimeUnit.SECONDS);
+	}
 	
 	private ParamsUtils()
 	{
@@ -135,15 +156,45 @@ public final class ParamsUtils
 		}
 		return result;
 	}
+
+    public static long parseTime(String strTime) 
+    {
+        return parseTime(strTime, TimeUnit.MILLISECONDS);
+    }
+    
+	public static long parseTime(String strTime, TimeUnit unit) 
+	{
+	    try 
+	    {
+            long time = Long.parseLong(strTime);
+            return time;
+        } 
+	    catch (NumberFormatException e) {}
+	    Pattern pattern = Pattern.compile("(\\d+)(\\w+)");
+	    Matcher matcher = pattern.matcher(strTime);
+	    if (matcher.find() && matcher.groupCount() >= 2)
+        {
+            String num = matcher.group(1);
+            String numUnit = matcher.group(2);
+            long srcNum = Long.parseLong(num);
+            TimeUnit srcUnit = timeEscape.get(numUnit);
+            if (srcUnit == null)
+                throw new GridException("Invalid time pattern unit " + numUnit + " from " + strTime);
+            return unit.convert(srcNum, srcUnit);
+        } 
+	    else
+	        throw new GridException("Invalid time pattern " + strTime);
+	}
 	
 	public static void main(String[] args)
 	{
-		String hosts = "10.179.102/102.115/116:[12120-12121],10.176.122.92/93:[12120-12121]";
-		Collection<InetSocketAddress> list = parseAddress(hosts);
-		System.out.println(list.size());
-		for (InetSocketAddress addr : list)
-		{
-			System.out.println(addr);
-		}
+	    System.out.println(parseTime("1min", TimeUnit.MILLISECONDS));
+//		String hosts = "10.179.102/102.115/116:[12120-12121],10.176.122.92/93:[12120-12121]";
+//		Collection<InetSocketAddress> list = parseAddress(hosts);
+//		System.out.println(list.size());
+//		for (InetSocketAddress addr : list)
+//		{
+//			System.out.println(addr);
+//		}
 	}
 }

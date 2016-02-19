@@ -27,7 +27,7 @@ import darks.grid.beans.meta.HeartAliveMeta;
 import darks.grid.events.EventsChannel;
 import darks.grid.events.GridEventHandler;
 
-public class HeartAliveReplyHandler extends GridEventHandler
+public class HeartAliveReplyHandler implements GridEventHandler
 {
 
 	private static final Logger log = LoggerFactory.getLogger(HeartAliveReplyHandler.class);

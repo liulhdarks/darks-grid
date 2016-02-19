@@ -27,7 +27,7 @@ import darks.grid.beans.GridNode;
 import darks.grid.events.GridEventHandler;
 import darks.grid.utils.ThreadUtils;
 
-public class NodeLeaveHandler extends GridEventHandler
+public class NodeLeaveHandler implements GridEventHandler
 {
 	
 	private static final Logger log = LoggerFactory.getLogger(NodeLeaveHandler.class);

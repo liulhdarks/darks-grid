@@ -30,7 +30,7 @@ import darks.grid.beans.meta.JoinNodeMeta;
 import darks.grid.events.GridEventHandler;
 import darks.grid.network.GridSession;
 
-public class JoinReplyHandler extends GridEventHandler
+public class JoinReplyHandler implements GridEventHandler
 {
 
 	private static final Logger log = LoggerFactory.getLogger(JoinReplyHandler.class);

@@ -30,14 +30,16 @@ public abstract class MasterTask extends Thread
 	
 	private volatile boolean destroyed = false;
 	
-	private int interval = 1000;
+	private long interval = 1000;
+	
+	private boolean singleUse = false;
 	
 	public MasterTask()
 	{
 		
 	}
 	
-	public MasterTask(int interval)
+	public MasterTask(long interval)
 	{
 		this.interval = interval;
 	}
@@ -45,6 +47,7 @@ public abstract class MasterTask extends Thread
 	public void initialize(MasterTaskConfig taskConfig)
 	{
 		this.interval = taskConfig.getInterval();
+		this.singleUse = taskConfig.isSingleUse();
 	}
 
 	@Override
@@ -58,7 +61,7 @@ public abstract class MasterTask extends Thread
 			{
 				if (!localNode.isMaster())
 					GridRuntime.master().awaitMaster();
-				if (!execute())
+				if (!execute() || singleUse)
 					break;
 				if (interval > 0)
 					Thread.sleep(interval);

@@ -23,10 +23,11 @@ import darks.grid.GridRuntime;
 import darks.grid.beans.GridEvent;
 import darks.grid.beans.GridNode;
 import darks.grid.beans.meta.MasterMeta;
+import darks.grid.events.EventsChannel;
 import darks.grid.events.GridEventHandler;
 import darks.grid.utils.ThreadUtils;
 
-public class ConfirmMasterHandler extends GridEventHandler
+public class ConfirmMasterHandler implements GridEventHandler
 {
 
 	private static final Logger log = LoggerFactory.getLogger(ConfirmMasterHandler.class);
@@ -56,8 +57,9 @@ public class ConfirmMasterHandler extends GridEventHandler
 				nd.setMaster(false);
 		}
 		node.setMaster(true);
-		if (node.isLocal())
-			GridRuntime.master().notifyTask();
+		if (node.isLocal()) {
+	        GridRuntime.events().publish(EventsChannel.SYSTEM_CHANNEL, GridEvent.CHANGE_OWN_MASTER, null);
+		}
 	}
 
 }

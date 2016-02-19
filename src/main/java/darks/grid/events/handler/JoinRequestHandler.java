@@ -32,7 +32,7 @@ import darks.grid.events.EventsChannel;
 import darks.grid.events.GridEventHandler;
 import darks.grid.network.GridSession;
 
-public class JoinRequestHandler extends GridEventHandler
+public class JoinRequestHandler implements GridEventHandler
 {
 
 	private static final Logger log = LoggerFactory.getLogger(JoinRequestHandler.class);

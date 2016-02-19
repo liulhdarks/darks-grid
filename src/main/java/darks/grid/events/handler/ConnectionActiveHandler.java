@@ -28,7 +28,7 @@ import darks.grid.events.EventsChannel;
 import darks.grid.events.GridEventHandler;
 import darks.grid.network.GridSession;
 
-public class ConnectionActiveHandler extends GridEventHandler
+public class ConnectionActiveHandler implements GridEventHandler
 {
     
     private static final Logger log = LoggerFactory.getLogger(ConnectionActiveHandler.class);

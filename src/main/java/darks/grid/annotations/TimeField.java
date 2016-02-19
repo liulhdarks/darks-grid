@@ -14,13 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package darks.grid.events;
 
-import darks.grid.beans.GridEvent;
+package darks.grid.annotations;
 
-public interface GridEventHandler
-{
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.util.concurrent.TimeUnit;
 
-	public void handle(GridEvent event) throws Exception;
-	
+@Documented
+@Inherited
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
+public @interface TimeField {
+
+    TimeUnit unit() default TimeUnit.MILLISECONDS;
 }

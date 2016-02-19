@@ -29,7 +29,7 @@ import darks.grid.beans.GridNode;
 import darks.grid.events.GridEventHandler;
 import darks.grid.manager.GridNodesManager;
 
-public class MergeNodesHandler extends GridEventHandler
+public class MergeNodesHandler implements GridEventHandler
 {
 
 	private static final Logger log = LoggerFactory.getLogger(MergeNodesHandler.class);
