@@ -23,7 +23,7 @@ public final class ParamsUtils
     
     private static final Logger log = LoggerFactory.getLogger(ParamsUtils.class);
     
-    private static Map<String, TimeUnit> timeEscape = new HashMap<>();
+    private static Map<String, TimeUnit> timeEscape = new HashMap<String, TimeUnit>();
 	
 	static 
 	{

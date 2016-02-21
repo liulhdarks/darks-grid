@@ -34,6 +34,7 @@ import org.w3c.dom.NodeList;
 import darks.grid.GridException;
 import darks.grid.config.EventsConfig.EventsChannelConfig;
 import darks.grid.config.MasterConfig.MasterTaskConfig;
+import darks.grid.utils.IOUtils;
 import darks.grid.utils.ReflectUtils;
 
 public final class GridConfigFactory
@@ -49,13 +50,19 @@ public final class GridConfigFactory
 	
 	public static GridConfiguration configure(File file)
 	{
-		try (InputStream ins = new FileInputStream(file))
+		InputStream ins = null;
+		try 
 		{
+			ins = new FileInputStream(file);
 			return configure(ins);
 		}
 		catch (Exception e)
 		{
             log.error(e.getMessage(), e);
+		}
+		finally
+		{
+			IOUtils.closeStream(ins);
 		}
 		return null;
 	}

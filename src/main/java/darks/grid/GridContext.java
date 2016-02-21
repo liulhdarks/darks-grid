@@ -20,6 +20,8 @@ import java.io.Serializable;
 import java.net.InetSocketAddress;
 
 import darks.grid.beans.MachineInfo;
+import darks.grid.commons.GenericMachineInfoFactory;
+import darks.grid.commons.MachineInfoFactory;
 import darks.grid.config.GridConfiguration;
 import darks.grid.manager.GridManager;
 
@@ -38,11 +40,14 @@ public class GridContext implements Serializable, GridManager
 	
 	private InetSocketAddress serverAddress;
 	
-	private MachineInfo machineInfo = new MachineInfo();
+	private MachineInfoFactory machineInfoFactory;
+	
+	private MachineInfo machineInfo = null;;
 	
 	public GridContext()
 	{
-		
+		machineInfoFactory = new GenericMachineInfoFactory();
+		machineInfo = machineInfoFactory.createMachineInfo();
 	}
 	
 	@Override
@@ -127,8 +132,18 @@ public class GridContext implements Serializable, GridManager
     {
         this.machineInfo = machineInfo;
     }
+    
+    public MachineInfoFactory getMachineInfoFactory()
+	{
+		return machineInfoFactory;
+	}
 
-    @Override
+	public void setMachineInfoFactory(MachineInfoFactory machineInfoFactory)
+	{
+		this.machineInfoFactory = machineInfoFactory;
+	}
+
+	@Override
 	public String toString()
 	{
 		return "GridContext [startupTime=" + startupTime + ", startupNanoTime=" + startupNanoTime

@@ -40,8 +40,10 @@ public final class FileUtils
 	
 	public static boolean appendLine(File file, String content)
 	{
-		try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));)
+		BufferedWriter writer = null;
+		try
 		{
+			writer = new BufferedWriter(new FileWriter(file, true));
 			writer.write(content + "\n");
 			writer.flush();
 			return true;
@@ -51,13 +53,19 @@ public final class FileUtils
 			log.error(e.getMessage(), e);
 			return false;
 		}
+		finally
+		{
+			IOUtils.closeStream(writer);
+		}
 	}
 	
 	public static List<String> readLineToList(File file)
 	{
-		List<String> result = new LinkedList<>();
-		try (BufferedReader reader = new BufferedReader(new FileReader(file)))
+		List<String> result = new LinkedList<String>();
+		BufferedReader reader = null;
+		try
 		{
+			reader = new BufferedReader(new FileReader(file));
 			String line = null;
 			while ((line = reader.readLine()) != null)
 			{
@@ -70,6 +78,10 @@ public final class FileUtils
 		catch (Exception e)
 		{
 			log.error(e.getMessage(), e);
+		} 
+		finally
+		{
+			IOUtils.closeStream(reader);
 		}
 		return result;
 	}

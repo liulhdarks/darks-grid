@@ -21,6 +21,7 @@ import java.lang.management.ManagementFactory;
 
 import com.sun.management.OperatingSystemMXBean;
 
+import darks.grid.GridRuntime;
 import darks.grid.utils.MachineUtils;
 
 @SuppressWarnings("restriction")
@@ -43,21 +44,11 @@ public class MachineInfo implements Serializable
 
     public MachineInfo()
     {
-        update();
     }
     
     public synchronized void update()
     {
-        usedPhysicalMemoryUsage = MachineUtils.getPhysicalMemoryUsage();
-        OperatingSystemMXBean osmxb = (OperatingSystemMXBean)ManagementFactory.getOperatingSystemMXBean();  
-        long maxMemory = Runtime.getRuntime().maxMemory();
-        long totalMemory = Runtime.getRuntime().totalMemory();   
-        long freeMemory = Runtime.getRuntime().freeMemory(); 
-        usedMaxMemoryUsage = (float)((double) (maxMemory - freeMemory) / (double) maxMemory);
-        usedTotalMemoryUsage = (float)((double) (totalMemory - freeMemory) / (double) totalMemory);
-        processCpuUsage = (float) osmxb.getProcessCpuLoad();
-        systemCpuUsage = (float) osmxb.getSystemCpuLoad();
-        healthyScore = NodeHealth.evaluateLocal(this);
+        GridRuntime.context().getMachineInfoFactory().updateMachineInfo(this);
     }
 
     public synchronized float getUsedPhysicalMemoryUsage()
