@@ -31,6 +31,8 @@ import darks.grid.beans.GridNode;
 import darks.grid.config.EventsConfig;
 import darks.grid.config.EventsConfig.EventsChannelConfig;
 import darks.grid.config.GridConfiguration;
+import darks.grid.events.disruptor.DisruptorEventsChannel;
+import darks.grid.events.generic.GenericEventsChannel;
 import darks.grid.manager.GridManager;
 import darks.grid.network.GridSession;
 import darks.grid.utils.GridStatistic;
@@ -66,7 +68,7 @@ public class GridEventsManager implements GridManager
 		map.put(EventsChannel.SYSTEM_CHANNEL, systemConfig);
 		for (Entry<String, EventsChannelConfig> entry : map.entrySet())
 		{
-			EventsChannel channel = new EventsChannel();
+			EventsChannel channel = new DisruptorEventsChannel();
 			channel.initialize(entry.getValue());
 			channels.put(entry.getKey(), channel);
 			if (EventsChannel.DEFAULT_CHANNEL.equals(entry.getKey()))

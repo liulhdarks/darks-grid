@@ -95,6 +95,12 @@
 			<version>1.6.5.132</version>
 			<optional>true</optional>
 		</dependency>
+		<dependency>
+			<groupId>com.lmax</groupId>
+			<artifactId>disruptor</artifactId>
+			<version>3.3.4</version>
+			<optional>true</optional>
+		</dependency>
 	</dependencies>
 
 	<build>

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package darks.grid.events;
+package darks.grid.events.generic;
 
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -23,6 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import darks.grid.beans.GridEvent;
+import darks.grid.events.EventsHandlerFactory;
+import darks.grid.events.GridEventHandler;
 import darks.grid.utils.GridStatistic;
 
 public class EventsConsumer extends Thread

@@ -39,7 +39,7 @@ public class GridContext implements Serializable, GridManager
 	
 	private InetSocketAddress serverAddress;
 	
-	private MachineInfoFactory machineInfoFactory;
+	private transient MachineInfoFactory machineInfoFactory;
 	
 	private MachineInfo machineInfo = null;;
 	

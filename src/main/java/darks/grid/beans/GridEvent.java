@@ -73,8 +73,17 @@ public class GridEvent implements Serializable, Cloneable
 		this.type = type;
 		this.channel = channel;
 	}
+	
+	public void copy(GridEvent evt) {
+        this.id = evt.id;
+        this.data = evt.data;
+        this.type = evt.type;
+        this.channel = evt.channel;
+        this.session = evt.session;
+        this.enqueueTimestamp = evt.enqueueTimestamp;
+    }
 
-	@SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked")
 	public <T> T getData()
 	{
 		return (T) data;
