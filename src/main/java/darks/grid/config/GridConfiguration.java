@@ -36,6 +36,8 @@ public class GridConfiguration implements Serializable
 	private StorageConfig storageConfig = new StorageConfig();
 	
 	private MasterConfig masterConfig = new MasterConfig();
+	
+	private ConstantConfig constantConfig = new ConstantConfig();
     
 	public GridConfiguration()
 	{
@@ -85,7 +87,18 @@ public class GridConfiguration implements Serializable
 		return masterConfig;
 	}
 
-	@Override
+	
+	public ConstantConfig getConstantConfig() 
+	{
+        return constantConfig;
+    }
+
+    public void setConstantConfig(ConstantConfig constantConfig) 
+    {
+        this.constantConfig = constantConfig;
+    }
+
+    @Override
 	public String toString()
 	{
 		return "GridConfiguration [clusterName=" + clusterName + ", networkConfig=" + networkConfig

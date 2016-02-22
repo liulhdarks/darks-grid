@@ -20,7 +20,6 @@ import java.io.Serializable;
 import java.net.InetSocketAddress;
 
 import darks.grid.beans.MachineInfo;
-import darks.grid.commons.GenericMachineInfoFactory;
 import darks.grid.commons.MachineInfoFactory;
 import darks.grid.config.GridConfiguration;
 import darks.grid.manager.GridManager;
@@ -46,13 +45,13 @@ public class GridContext implements Serializable, GridManager
 	
 	public GridContext()
 	{
-		machineInfoFactory = new GenericMachineInfoFactory();
-		machineInfo = machineInfoFactory.createMachineInfo();
 	}
 	
 	@Override
 	public boolean initialize(GridConfiguration config)
 	{
+        machineInfoFactory = MachineInfoFactory.buildFactory(config);
+        machineInfo = machineInfoFactory.createMachineInfo();
 		clusterName = config.getClusterName();
 		startupTime = System.currentTimeMillis();
 		startupNanoTime = System.nanoTime();

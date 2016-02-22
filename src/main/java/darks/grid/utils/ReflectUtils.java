@@ -85,7 +85,7 @@ public final class ReflectUtils
                     clazz = clazz.getSuperclass();
                 }
             }
-            while (!clazz.equals(Object.class) && field == null);
+            while (clazz != null && !clazz.equals(Object.class) && field == null);
             return field;
         }
         catch (Exception e)
@@ -95,8 +95,22 @@ public final class ReflectUtils
         }
     }
     
+    public static Method getMethod(Class<?> clazz, String methodName, Class<?>... types)
+    {
+        try 
+        {
+            return clazz.getMethod(methodName, types);
+        } 
+        catch (Exception e) 
+        {
+            return null;
+        }
+    }
+    
     public static Method getDeepMethod(Class<?> clazz, String methodName, Class<?>... types)
     {
+        if (clazz.isInterface())
+            return getMethod(clazz, methodName, types);
         try
         {
         	Method method = null;
@@ -111,10 +125,25 @@ public final class ReflectUtils
                 }
                 catch (NoSuchMethodException e)
                 {
-                    clazz = clazz.getSuperclass();
+                    if (!clazz.isInterface())
+                        clazz = clazz.getSuperclass();
+                    else
+                    {
+                        Class<?>[] interfaceClass = clazz.getInterfaces();
+                        if (interfaceClass != null)
+                        {
+                            for (Class<?> c : interfaceClass)
+                            {
+                                method = getMethod(c, methodName, types);
+                                if (method != null)
+                                    break;
+                            }
+                        }
+                        clazz = null;
+                    }
                 }
             }
-            while (!clazz.equals(Object.class) && method == null);
+            while (clazz != null && !clazz.equals(Object.class) && method == null);
             return method;
         }
         catch (Exception e)

@@ -123,6 +123,10 @@ public final class GridConfigFactory
                 {
                     parseComponent(config, el);
                 }
+                else if ("constant".equalsIgnoreCase(el.getNodeName()))
+                {
+                    parseConstant(config.getConstantConfig(), el);
+                }
                 else
                 {
                     parseCustomComponent(config, el);
@@ -171,6 +175,17 @@ public final class GridConfigFactory
 		    }
 		}
 	}
+    
+    private static void parseConstant(ConstantConfig config, Element el)
+    {
+        String name = el.getAttribute("name");
+        String value = el.getAttribute("name");
+        if (name == null || "".equals(name.trim()))
+            throw new GridException("Invalid constant name " + name);
+        if (value == null || "".equals(value.trim()))
+            throw new GridException("Invalid constant value " + value + " for name " + name);
+        config.setConstant(name, value);
+    }
 	
 	private static void parseComponent(GridConfiguration config, Element el)
 	{
