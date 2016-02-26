@@ -13,8 +13,9 @@
 	
 	<task jobs_exec_count="30"/>
 
-	<events default_event_consumer_number="8" system_event_consumer_number="3" 
-		default_block_queue_max_number="1048576" system_block_queue_max_number="1048576">
+	<events>
+		<channel name="system" event_consumer_number="8" block_queue_max_number="1048576"/>
+		<channel name="default" event_consumer_number="8" block_queue_max_number="1048576" channel_type="disruptor"/>
 	</events>
 	
 	<log interval="1min" 

@@ -21,14 +21,6 @@ import java.util.Map;
 
 public class EventsConfig
 {
-
-	private int defaultBlockQueueMaxNumber = Integer.MAX_VALUE;
-	
-	private int defaultEventConsumerNumber = Runtime.getRuntime().availableProcessors();
-
-	private int systemBlockQueueMaxNumber = Integer.MAX_VALUE;
-	
-	private int systemEventConsumerNumber = Runtime.getRuntime().availableProcessors();
 	
 	private Map<String, EventsChannelConfig> channelsConfig = new HashMap<String, EventsChannelConfig>();
 	
@@ -37,62 +29,16 @@ public class EventsConfig
 		
 	}
 
-	public int getDefaultBlockQueueMaxNumber()
-	{
-		return defaultBlockQueueMaxNumber;
-	}
-
-	public void setDefaultBlockQueueMaxNumber(int defaultBlockQueueMaxNumber)
-	{
-		this.defaultBlockQueueMaxNumber = defaultBlockQueueMaxNumber;
-	}
-
-	public int getDefaultEventConsumerNumber()
-	{
-		return defaultEventConsumerNumber;
-	}
-
-	public void setDefaultEventConsumerNumber(int defaultEventConsumerNumber)
-	{
-		this.defaultEventConsumerNumber = defaultEventConsumerNumber;
-	}
-
-	public int getSystemBlockQueueMaxNumber()
-	{
-		return systemBlockQueueMaxNumber;
-	}
-
-	public void setSystemBlockQueueMaxNumber(int systemBlockQueueMaxNumber)
-	{
-		this.systemBlockQueueMaxNumber = systemBlockQueueMaxNumber;
-	}
-
-	public int getSystemEventConsumerNumber()
-	{
-		return systemEventConsumerNumber;
-	}
-
-	public void setSystemEventConsumerNumber(int systemEventConsumerNumber)
-	{
-		this.systemEventConsumerNumber = systemEventConsumerNumber;
-	}
-	
-	
-
-	public Map<String, EventsChannelConfig> getChannelsConfig()
+    public Map<String, EventsChannelConfig> getChannelsConfig()
 	{
 		return channelsConfig;
 	}
+	
 
-
-	@Override
+    @Override
 	public String toString()
 	{
-		return "EventsConfig [defaultBlockQueueMaxNumber=" + defaultBlockQueueMaxNumber
-				+ ", defaultEventConsumerNumber=" + defaultEventConsumerNumber
-				+ ", systemBlockQueueMaxNumber=" + systemBlockQueueMaxNumber
-				+ ", systemEventConsumerNumber=" + systemEventConsumerNumber + ", channelsConfig="
-				+ channelsConfig + "]";
+		return "EventsConfig [" + channelsConfig + "]";
 	}
 
 
@@ -103,6 +49,8 @@ public class EventsConfig
 		int blockQueueMaxNumber = Integer.MAX_VALUE;
 		
 		int eventConsumerNumber = Runtime.getRuntime().availableProcessors();
+		
+		String channelType = EventChannelType.DEFAULT.toString();
 
 		public EventsChannelConfig()
 		{
@@ -144,14 +92,54 @@ public class EventsConfig
 		{
 			this.eventConsumerNumber = eventConsumerNumber;
 		}
+		
 
-		@Override
+		public String getChannelType() 
+		{
+            return channelType;
+        }
+
+        public void setChannelType(String channelType) 
+        {
+            this.channelType = channelType;
+        }
+
+        @Override
 		public String toString()
 		{
 			return "EventsChannelConfig [name=" + name + ", blockQueueMaxNumber="
 					+ blockQueueMaxNumber + ", eventConsumerNumber=" + eventConsumerNumber + "]";
 		}
 		
+	}
+	
+	public static enum EventChannelType
+	{
+	    DEFAULT("default"), 
+	    DISRUPTOR("disruptor");
+	    
+	    String name;
+	    
+	    EventChannelType(String name) 
+	    {
+	        this.name = name;
+	    }
+	    
+	    public static EventChannelType typeOf(String name)
+	    {
+	        name = name.toLowerCase().trim();
+	        if ("disruptor".equals(name))
+	            return DISRUPTOR;
+	        else if ("default".equals(name))
+                return DEFAULT;
+	        else 
+	            return null;
+	    }
+	    
+	    public String toString()
+	    {
+	        return name;
+	    }
 	}
 	
 }

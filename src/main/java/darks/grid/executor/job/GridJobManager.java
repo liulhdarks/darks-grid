@@ -65,7 +65,8 @@ public class GridJobManager implements GridManager
 	public void destroy()
 	{
 		nodesJobsMap.clear();
-		threadPool.shutdownNow();
+		if (threadPool != null)
+		    threadPool.shutdownNow();
 	}
 	
 	public void addExecuteJob(JobExecutor job)

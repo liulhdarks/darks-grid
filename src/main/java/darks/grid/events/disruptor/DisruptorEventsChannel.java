@@ -78,13 +78,14 @@ public class DisruptorEventsChannel extends EventsChannel
         ringBuffer = RingBuffer.createMultiProducer(eventFactory, bufferSize, new BlockingWaitStrategy());  
         SequenceBarrier sequenceBarrier = ringBuffer.newBarrier();  
         ExecutorService executor = Executors.newFixedThreadPool(10);  
+        @SuppressWarnings("unchecked")
         WorkHandler<GridEvent>[] workHandlers = new WorkHandler[threadSize];  
         for (int i = 0; i < threadSize; i++) {  
             WorkHandler<GridEvent> workHandler = new DisruptorEventsWorkHandler(getName());  
             workHandlers[i] = workHandler;  
         }  
   
-        WorkerPool<GridEvent> workerPool = new WorkerPool<GridEvent>(ringBuffer, sequenceBarrier, 
+        workerPool = new WorkerPool<GridEvent>(ringBuffer, sequenceBarrier, 
                 new IgnoreExceptionHandler(), workHandlers);  
         workerPool.start(executor);  
 		return true;
@@ -93,8 +94,10 @@ public class DisruptorEventsChannel extends EventsChannel
     @Override
 	public void destroy()
 	{
-        workerPool.drainAndHalt();
-		threadPool.shutdownNow();
+        if (workerPool != null)
+            workerPool.halt();
+        if (threadPool != null)
+            threadPool.shutdownNow();
 	}
 
     @Override

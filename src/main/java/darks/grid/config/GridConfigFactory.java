@@ -179,7 +179,7 @@ public final class GridConfigFactory
     private static void parseConstant(ConstantConfig config, Element el)
     {
         String name = el.getAttribute("name");
-        String value = el.getAttribute("name");
+        String value = el.getAttribute("value");
         if (name == null || "".equals(name.trim()))
             throw new GridException("Invalid constant name " + name);
         if (value == null || "".equals(value.trim()))

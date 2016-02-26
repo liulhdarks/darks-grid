@@ -70,6 +70,10 @@ public final class GridRuntime
 	
 	public static boolean initialize(GridConfiguration config)
 	{
+	    if (config == null)
+	    {
+            throw new GridException("Invalid grid configuration.");
+	    }
 		GridRuntime.config = config;
 		boolean ret = context.initialize(config);
 		if (!ret)

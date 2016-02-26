@@ -29,6 +29,7 @@ import darks.grid.beans.GridEvent;
 import darks.grid.beans.GridMessage;
 import darks.grid.beans.GridNode;
 import darks.grid.config.EventsConfig;
+import darks.grid.config.EventsConfig.EventChannelType;
 import darks.grid.config.EventsConfig.EventsChannelConfig;
 import darks.grid.config.GridConfiguration;
 import darks.grid.events.disruptor.DisruptorEventsChannel;
@@ -60,15 +61,16 @@ public class GridEventsManager implements GridManager
 		log.info("Start to initialize events manager.");
 		EventsConfig eventsConfig = config.getEventsConfig();
 		Map<String, EventsChannelConfig> map = eventsConfig.getChannelsConfig();
-		EventsChannelConfig defaultConfig = new EventsChannelConfig(EventsChannel.DEFAULT_CHANNEL, 
-				eventsConfig.getDefaultBlockQueueMaxNumber(), eventsConfig.getDefaultEventConsumerNumber());
-		EventsChannelConfig systemConfig = new EventsChannelConfig(EventsChannel.SYSTEM_CHANNEL, 
-				eventsConfig.getSystemBlockQueueMaxNumber(), eventsConfig.getSystemEventConsumerNumber());
-		map.put(EventsChannel.DEFAULT_CHANNEL, defaultConfig);
-		map.put(EventsChannel.SYSTEM_CHANNEL, systemConfig);
+		if (!map.containsKey(EventsChannel.DEFAULT_CHANNEL))
+		    map.put(EventsChannel.DEFAULT_CHANNEL, new EventsChannelConfig());
+        if (!map.containsKey(EventsChannel.SYSTEM_CHANNEL))
+            map.put(EventsChannel.SYSTEM_CHANNEL, new EventsChannelConfig());
 		for (Entry<String, EventsChannelConfig> entry : map.entrySet())
 		{
-			EventsChannel channel = new DisruptorEventsChannel();
+		    EventsChannelConfig channelConfig = entry.getValue();
+		    EventChannelType channelType = EventChannelType.typeOf(channelConfig.getChannelType());
+			EventsChannel channel = channelType == EventChannelType.DISRUPTOR ? 
+			        new DisruptorEventsChannel() : new GenericEventsChannel();
 			channel.initialize(entry.getValue());
 			channels.put(entry.getKey(), channel);
 			if (EventsChannel.DEFAULT_CHANNEL.equals(entry.getKey()))
