@@ -101,6 +101,24 @@
 			<version>3.3.4</version>
 			<optional>true</optional>
 		</dependency>
+		<dependency>
+			<groupId>com.caucho</groupId>
+			<artifactId>hessian</artifactId>
+			<version>4.0.38</version>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>com.esotericsoftware</groupId>
+			<artifactId>kryo</artifactId>
+			<version>3.0.3</version>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>de.ruedigermoeller</groupId>
+			<artifactId>fst</artifactId>
+			<version>1.63</version>
+			<optional>true</optional>
+		</dependency>
 	</dependencies>
 
 	<build>
