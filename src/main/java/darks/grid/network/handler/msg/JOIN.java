@@ -16,7 +16,6 @@
  */
 package darks.grid.network.handler.msg;
 
-import java.net.SocketAddress;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -24,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import darks.grid.GridRuntime;
+import darks.grid.beans.GridAddress;
 import darks.grid.beans.GridMessage;
 import darks.grid.beans.GridNode;
 import darks.grid.beans.meta.JoinMeta;
@@ -98,10 +98,10 @@ public class JOIN implements GridMessageHandler
 	private void handleRepeatChannel(JoinMeta meta, GridMessage msg)
 	{
 		String nodeId = meta.getNodeId();
-		Map<SocketAddress, JoinMeta> nodesMap = GridRuntime.network().getWaitJoin(nodeId);
+		Map<GridAddress, JoinMeta> nodesMap = GridRuntime.network().getWaitJoin(nodeId);
 		long keepJoinTime = 0;
 		JoinMeta keepJoinMeta = null;
-		for (Entry<SocketAddress, JoinMeta> entry : nodesMap.entrySet())
+		for (Entry<GridAddress, JoinMeta> entry : nodesMap.entrySet())
 		{
 			JoinMeta joinMeta = entry.getValue();
 			if (keepJoinMeta == null || joinMeta.getJoinTime() < keepJoinTime)
@@ -133,7 +133,7 @@ public class JOIN implements GridMessageHandler
 			{
 				if (success)
 					GridRuntime.nodes().addRemoteNode(nodeId, meta.getSession(), meta.context());
-				Map<SocketAddress, JoinMeta> nodesMap = GridRuntime.network().getWaitJoin(nodeId);
+				Map<GridAddress, JoinMeta> nodesMap = GridRuntime.network().getWaitJoin(nodeId);
 				nodesMap.clear();
 			}
 		}

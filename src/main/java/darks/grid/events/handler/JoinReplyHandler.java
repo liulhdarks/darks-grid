@@ -16,7 +16,6 @@
  */
 package darks.grid.events.handler;
 
-import java.net.SocketAddress;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -24,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import darks.grid.GridRuntime;
+import darks.grid.beans.GridAddress;
 import darks.grid.beans.GridEvent;
 import darks.grid.beans.meta.JoinMeta;
 import darks.grid.beans.meta.JoinNodeMeta;
@@ -43,8 +43,8 @@ public class JoinReplyHandler implements GridEventHandler
 		String nodeId = meta.getNodeId();
 		synchronized (nodeId.intern())
 		{
-			Map<SocketAddress, JoinMeta> nodesMap = GridRuntime.network().getWaitJoin(nodeId);
-			for (Entry<SocketAddress, JoinMeta> entry : nodesMap.entrySet())
+			Map<GridAddress, JoinMeta> nodesMap = GridRuntime.network().getWaitJoin(nodeId);
+			for (Entry<GridAddress, JoinMeta> entry : nodesMap.entrySet())
 			{
 				try
 				{

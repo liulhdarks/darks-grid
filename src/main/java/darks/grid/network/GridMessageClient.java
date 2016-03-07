@@ -28,8 +28,6 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.serialization.ClassResolvers;
-import io.netty.handler.codec.serialization.ObjectDecoder;
-import io.netty.handler.codec.serialization.ObjectEncoder;
 
 import java.net.ConnectException;
 import java.net.InetSocketAddress;
@@ -41,7 +39,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import darks.grid.GridRuntime;
+import darks.grid.beans.GridAddress;
 import darks.grid.config.NetworkConfig;
+import darks.grid.network.codec.CodecFactory;
 import darks.grid.network.handler.GridClientMessageHandler;
 import darks.grid.utils.ThreadUtils;
 
@@ -102,6 +102,16 @@ public class GridMessageClient extends GridMessageDispatcher
 		return connect(new InetSocketAddress(host, port));
 	}
 
+    public Channel connect(GridAddress address)
+    {
+        return connect(address.getSocketAddress());
+    }
+
+    public Channel connect(GridAddress address, boolean sync)
+    {
+        return connect(address.getSocketAddress(), sync);
+    }
+
 	public Channel connect(SocketAddress address)
 	{
 		return connect(address, true);
@@ -155,8 +165,8 @@ public class GridMessageClient extends GridMessageDispatcher
 			protected void initChannel(SocketChannel ch) throws Exception
 			{
 				ChannelPipeline pipeline = ch.pipeline();
-				pipeline.addLast("decoder", new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers.weakCachingConcurrentResolver(this.getClass().getClassLoader())));
-				pipeline.addLast("encoder", new ObjectEncoder());
+                pipeline.addLast("decoder", CodecFactory.createDecoder(ClassResolvers.weakCachingConcurrentResolver(this.getClass().getClassLoader())));
+                pipeline.addLast("encoder", CodecFactory.createEncoder());
 //				pipeline.addLast("alive", new IdleStateHandler(60, 60, 120));
 				pipeline.addLast("message", new GridClientMessageHandler());
 			}

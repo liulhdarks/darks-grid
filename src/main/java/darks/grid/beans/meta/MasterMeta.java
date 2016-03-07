@@ -17,7 +17,7 @@
 
 package darks.grid.beans.meta;
 
-import java.net.InetSocketAddress;
+import darks.grid.beans.GridAddress;
 
 public class MasterMeta extends BaseMeta
 {
@@ -29,14 +29,14 @@ public class MasterMeta extends BaseMeta
 
 	private String nodeId;
 	
-	private InetSocketAddress address;
+	private GridAddress address;
 	
 	public MasterMeta()
 	{
 		
 	}
 
-	public MasterMeta(String nodeId, InetSocketAddress address)
+	public MasterMeta(String nodeId, GridAddress address)
 	{
 		super();
 		this.nodeId = nodeId;
@@ -53,12 +53,12 @@ public class MasterMeta extends BaseMeta
 		this.nodeId = nodeId;
 	}
 
-	public InetSocketAddress getAddress()
+	public GridAddress getAddress()
 	{
 		return address;
 	}
 
-	public void setAddress(InetSocketAddress address)
+	public void setAddress(GridAddress address)
 	{
 		this.address = address;
 	}

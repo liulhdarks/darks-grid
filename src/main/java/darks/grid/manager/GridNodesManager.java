@@ -16,8 +16,6 @@
  */
 package darks.grid.manager;
 
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -33,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import darks.grid.GridContext;
 import darks.grid.GridRuntime;
+import darks.grid.beans.GridAddress;
 import darks.grid.beans.GridEvent;
 import darks.grid.beans.GridNode;
 import darks.grid.beans.GridNode.GridNodeType;
@@ -52,7 +51,7 @@ public class GridNodesManager implements GridManager
 	
 	private ConcurrentSkipListSet<GridNode> nodesSet = new ConcurrentSkipListSet<GridNode>(new NodeComparator());
 	
-	private Map<SocketAddress, String> addressMap = new ConcurrentHashMap<SocketAddress, String>();
+	private Map<GridAddress, String> addressMap = new ConcurrentHashMap<GridAddress, String>();
 	
 	private Map<String, String> sessionIdMap = new ConcurrentHashMap<String, String>();
 	
@@ -146,7 +145,7 @@ public class GridNodesManager implements GridManager
 		return buf.toString();
 	}
 	
-	public boolean contains(SocketAddress address)
+	public boolean contains(GridAddress address)
 	{
 		return addressMap.containsKey(address);
 	}
@@ -212,7 +211,7 @@ public class GridNodesManager implements GridManager
 		return node;
 	}
 	
-	public GridNode getNode(InetSocketAddress address)
+	public GridNode getNode(GridAddress address)
 	{
 		String nodeId = addressMap.get(address);
 		if (nodeId != null)
@@ -220,7 +219,7 @@ public class GridNodesManager implements GridManager
 		return null;
 	}
 	
-	public String getNodeId(InetSocketAddress address)
+	public String getNodeId(GridAddress address)
 	{
 		return addressMap.get(address);
 	}
@@ -255,7 +254,7 @@ public class GridNodesManager implements GridManager
 		return nodesMap;
 	}
 
-	public Map<SocketAddress, String> getAddressMap()
+	public Map<GridAddress, String> getAddressMap()
 	{
 		return addressMap;
 	}

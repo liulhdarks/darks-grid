@@ -28,8 +28,6 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.serialization.ClassResolvers;
-import io.netty.handler.codec.serialization.ObjectDecoder;
-import io.netty.handler.codec.serialization.ObjectEncoder;
 import io.netty.handler.timeout.IdleStateHandler;
 
 import java.net.BindException;
@@ -41,6 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import darks.grid.GridRuntime;
 import darks.grid.config.NetworkConfig;
+import darks.grid.network.codec.CodecFactory;
 import darks.grid.network.handler.GridServerMessageHandler;
 
 public class GridMessageServer extends GridMessageDispatcher
@@ -153,8 +152,8 @@ public class GridMessageServer extends GridMessageDispatcher
 			protected void initChannel(SocketChannel ch) throws Exception
 			{
 				ChannelPipeline pipeline = ch.pipeline();
-				pipeline.addLast("decoder", new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers.weakCachingConcurrentResolver(this.getClass().getClassLoader())));
-				pipeline.addLast("encoder", new ObjectEncoder());
+                pipeline.addLast("decoder", CodecFactory.createDecoder(ClassResolvers.weakCachingConcurrentResolver(this.getClass().getClassLoader())));
+                pipeline.addLast("encoder", CodecFactory.createEncoder());
 				pipeline.addLast("alive", new IdleStateHandler(60, 60, 120));
 				pipeline.addLast("message", new GridServerMessageHandler());
 			}

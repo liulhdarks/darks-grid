@@ -70,6 +70,8 @@ public class NetworkConfig
     
     private boolean cacheHistoryNodes = true;
     
+    private CodecConfig codecConfig = new CodecConfig();
+    
     public NetworkConfig()
     {
         
@@ -300,8 +302,12 @@ public class NetworkConfig
 	{
 		this.connectFailRetry = connectFailRetry;
 	}
+	
+	public CodecConfig getCodecConfig() {
+        return codecConfig;
+    }
 
-	@Override
+    @Override
 	public String toString()
 	{
 		return "NetworkConfig [bindHost=" + bindHost + ", bindPort=" + bindPort

@@ -14,17 +14,11 @@ public class GridObjectDecoder extends LengthFieldBasedFrameDecoder
 	private final ClassResolver classResolver;
 	
 	private GridCodec codec;
-
-    /**
-     * Creates a new decoder whose maximum object size is {@code 1048576}
-     * bytes.  If the size of the received object is greater than
-     * {@code 1048576} bytes, a {@link StreamCorruptedException} will be
-     * raised.
-     *
-     * @param classResolver  the {@link ClassResolver} to use for this decoder
-     */
-    public GridObjectDecoder(ClassResolver classResolver) {
+    
+    public GridObjectDecoder(ClassResolver classResolver, GridCodec codec)
+    {
         this(Integer.MAX_VALUE, classResolver);
+        this.codec = codec;
     }
 
     /**

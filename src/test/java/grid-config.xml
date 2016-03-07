@@ -38,8 +38,9 @@
 		server_boss_thread_delta="2"
 		client_worker_thread_number="4"
 		nodes_expire_time="10min"
-		cache_history_nodes="false"
-		/>
+		cache_history_nodes="false">
+		<codec type="kryo" stream_factory="default"></codec>
+	</network>
 
 	<alive interval="1min"/>
 

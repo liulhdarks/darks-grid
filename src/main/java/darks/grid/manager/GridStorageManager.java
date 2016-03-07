@@ -18,13 +18,13 @@
 package darks.grid.manager;
 
 import java.io.File;
-import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import darks.grid.beans.GridAddress;
 import darks.grid.config.GridConfiguration;
 import darks.grid.utils.FileUtils;
 import darks.grid.utils.StringUtils;
@@ -57,30 +57,30 @@ public class GridStorageManager implements GridManager
 
 	}
 	
-	public synchronized void cacheHistoryNodes(InetSocketAddress address)
+	public synchronized void cacheHistoryNodes(GridAddress address)
 	{
 		boolean cached = config.getNetworkConfig().isCacheHistoryNodes();
 		if (!cached)
 			return;
-		String addr = StringUtils.stringBuffer(address.getAddress().getHostAddress(), ':', address.getPort());
+		String addr = StringUtils.stringBuffer(address.getHostName(), ':', address.getPort());
 		FileUtils.appendLine(historyNodesFile, addr);
 	}
 	
-	public synchronized Collection<InetSocketAddress> getCacheHistoryNodes()
+	public synchronized Collection<GridAddress> getCacheHistoryNodes()
 	{
 		if (historyNodesFile.exists())
 		{
 			List<String> addresses = FileUtils.readLineToList(historyNodesFile);
-			Set<InetSocketAddress> result = new HashSet<InetSocketAddress>(addresses.size());
+			Set<GridAddress> result = new HashSet<GridAddress>(addresses.size());
 			for (String addr : addresses)
 			{
 				String[] datas = addr.split(":");
-				result.add(new InetSocketAddress(datas[0], Integer.parseInt(datas[1])));
+				result.add(new GridAddress(datas[0], Integer.parseInt(datas[1])));
 			}
 			return result;
 		}
 		else
-			return new ArrayList<InetSocketAddress>(0);
+			return new ArrayList<GridAddress>(0);
 	}
 
 }

@@ -1,6 +1,5 @@
 package darks.grid.utils;
 
-import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import darks.grid.GridException;
+import darks.grid.beans.GridAddress;
 
 public final class ParamsUtils
 {
@@ -47,9 +47,9 @@ public final class ParamsUtils
 	 * @param hosts
 	 * @return
 	 */
-	public static Collection<InetSocketAddress> parseAddress(String hosts)
+	public static Collection<GridAddress> parseAddress(String hosts)
 	{
-		Set<InetSocketAddress> result = new LinkedHashSet<InetSocketAddress>();
+		Set<GridAddress> result = new LinkedHashSet<GridAddress>();
 		String[] ipsArray = hosts.split(",");
 		for (String strIps : ipsArray)
 		{
@@ -76,7 +76,7 @@ public final class ParamsUtils
 			{
 				for (Integer port : portList)
 				{
-					result.add(new InetSocketAddress(ip, port));
+					result.add(new GridAddress(ip, port));
 				}
 			}
 		}

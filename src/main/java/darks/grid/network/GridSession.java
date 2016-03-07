@@ -16,7 +16,7 @@
  */
 package darks.grid.network;
 
-import java.net.InetSocketAddress;
+import darks.grid.beans.GridAddress;
 
 public interface GridSession
 {
@@ -33,9 +33,9 @@ public interface GridSession
 	
 	public boolean isActive();
 	
-	public InetSocketAddress remoteAddress();
+	public GridAddress remoteAddress();
 	
-	public InetSocketAddress localAddress();
+	public GridAddress localAddress();
 	
 	public boolean isLocal();
 }

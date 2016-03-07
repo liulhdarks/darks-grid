@@ -34,6 +34,7 @@ import org.w3c.dom.NodeList;
 import darks.grid.GridException;
 import darks.grid.config.EventsConfig.EventsChannelConfig;
 import darks.grid.config.MasterConfig.MasterTaskConfig;
+import darks.grid.network.codec.GridCodec;
 import darks.grid.utils.IOUtils;
 import darks.grid.utils.ReflectUtils;
 
@@ -97,7 +98,7 @@ public final class GridConfigFactory
 		        Element el = (Element) node;
 		        if ("network".equalsIgnoreCase(el.getNodeName()))
 	            {
-	                parseAttrForObject(el, config.getNetworkConfig());
+		            parseNetwork(config, el);
 	            }
                 else if ("task".equalsIgnoreCase(el.getNodeName()))
                 {
@@ -134,6 +135,55 @@ public final class GridConfigFactory
 		    }
 		}
 		return config;
+	}
+	
+	private static void parseNetwork(GridConfiguration config, Element el)
+	{
+        parseAttrForObject(el, config.getNetworkConfig());
+	    NodeList nodesList = el.getChildNodes();
+        for (int i = 0; i < nodesList.getLength(); i++)
+        {
+            Node node =  nodesList.item(i);
+            if (node instanceof Element)
+            {
+                Element elChild = (Element) node;
+                if ("codec".equalsIgnoreCase(elChild.getNodeName()))
+                {
+                    parseNetworkCodec(config.getNetworkConfig().getCodecConfig(), elChild);
+                }
+            }
+        }
+	}
+	
+	@SuppressWarnings("unchecked")
+    private static void parseNetworkCodec(CodecConfig config, Element el)
+	{
+	    try 
+	    {
+	        NamedNodeMap nameNodes = el.getAttributes();
+	        for (int i = 0; i < nameNodes.getLength(); i++)
+	        {
+	            Node node = nameNodes.item(i);
+	            String attrName = node.getNodeName().trim();
+	            String attrValue = node.getNodeValue().trim();
+	            if ("type".equalsIgnoreCase(attrName))
+	            {
+	                config.setType(attrValue);
+	            }
+	            else if ("class".equalsIgnoreCase(attrName))
+	            {
+	                config.setCodecClass((Class<? extends GridCodec>) Class.forName(attrValue));
+	            }
+                else
+                {
+                    config.addParameter(attrName, attrValue);
+                }
+	        }
+        } 
+	    catch (Exception e) 
+	    {
+            throw new GridException("Fail to parse codec. Cause " + e.getMessage(), e);
+        }
 	}
 	
 	private static void parseEvents(GridConfiguration config, Element el)

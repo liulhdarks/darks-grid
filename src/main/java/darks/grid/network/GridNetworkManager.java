@@ -17,7 +17,6 @@
 package darks.grid.network;
 
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import darks.grid.GridRuntime;
+import darks.grid.beans.GridAddress;
 import darks.grid.beans.GridNode;
 import darks.grid.beans.TimerObject;
 import darks.grid.beans.meta.JoinMeta;
@@ -47,9 +47,9 @@ public class GridNetworkManager implements GridManager
 	
 	private GridMessageClient messageClient;
 	
-	private Map<SocketAddress, TimerObject<GridSession>> waitActive = new ConcurrentHashMap<SocketAddress, TimerObject<GridSession>>();
+	private Map<GridAddress, TimerObject<GridSession>> waitActive = new ConcurrentHashMap<GridAddress, TimerObject<GridSession>>();
 	
-	private Map<String, Map<SocketAddress, JoinMeta>> waitJoin = new ConcurrentHashMap<String, Map<SocketAddress, JoinMeta>>();
+	private Map<String, Map<GridAddress, JoinMeta>> waitJoin = new ConcurrentHashMap<String, Map<GridAddress, JoinMeta>>();
 	
 	private Object mutex = new Object();
 	
@@ -118,13 +118,18 @@ public class GridNetworkManager implements GridManager
 				node.sendSyncMessage(obj);
 		}
 	}
+    
+    public boolean tryJoinAddress(GridAddress address)
+    {
+        return tryJoinAddress(address, true);
+    }
 	
 	public boolean tryJoinAddress(InetSocketAddress address)
 	{
-		return tryJoinAddress(address, true);
+		return tryJoinAddress(new GridAddress(address), true);
 	}
 	
-	public boolean tryJoinAddress(InetSocketAddress address, boolean sync)
+	public boolean tryJoinAddress(GridAddress address, boolean sync)
 	{
 		if (address == null)
 		{
@@ -162,10 +167,10 @@ public class GridNetworkManager implements GridManager
 	{
 		synchronized (mutex)
 		{
-			Map<SocketAddress, JoinMeta> channelMap = waitJoin.get(nodeId);
+			Map<GridAddress, JoinMeta> channelMap = waitJoin.get(nodeId);
 			if (channelMap == null)
 			{
-				channelMap = new ConcurrentHashMap<SocketAddress, JoinMeta>();
+				channelMap = new ConcurrentHashMap<GridAddress, JoinMeta>();
 				waitJoin.put(nodeId, channelMap);
 			}
 			meta.setJoinTime(System.currentTimeMillis());
@@ -184,21 +189,21 @@ public class GridNetworkManager implements GridManager
 		waitActive.remove(session.remoteAddress());
 	}
 	
-	public synchronized Map<SocketAddress, JoinMeta> getWaitJoin(String nodeId)
+	public synchronized Map<GridAddress, JoinMeta> getWaitJoin(String nodeId)
 	{
 		synchronized (mutex)
 		{
-			Map<SocketAddress, JoinMeta> channelMap = waitJoin.get(nodeId);
+			Map<GridAddress, JoinMeta> channelMap = waitJoin.get(nodeId);
 			if (channelMap == null)
 			{
-				channelMap = new ConcurrentHashMap<SocketAddress, JoinMeta>();
+				channelMap = new ConcurrentHashMap<GridAddress, JoinMeta>();
 				waitJoin.put(nodeId, channelMap);
 			}
 			return channelMap;
 		}
 	}
 	
-	public synchronized InetSocketAddress getBindAddress()
+	public synchronized GridAddress getBindAddress()
 	{
 		if (messageServer == null || serverSession == null)
 			return null;

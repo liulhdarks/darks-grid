@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import darks.grid.GridRuntime;
+import darks.grid.beans.GridAddress;
 import darks.grid.utils.ChannelUtils;
 
 public class GridRemoteSession implements GridSession
@@ -132,19 +133,19 @@ public class GridRemoteSession implements GridSession
 	}
 
 	@Override
-	public InetSocketAddress remoteAddress()
+	public GridAddress remoteAddress()
 	{
 		if (channel == null)
 			return null;
-		return (InetSocketAddress)channel.remoteAddress();
+		return GridAddress.wrap((InetSocketAddress)channel.remoteAddress());
 	}
 
 	@Override
-	public InetSocketAddress localAddress()
+	public GridAddress localAddress()
 	{
 		if (channel == null)
 			return null;
-		return (InetSocketAddress)channel.localAddress();
+		return GridAddress.wrap((InetSocketAddress)channel.localAddress());
 	}
 
 	@Override

@@ -27,8 +27,8 @@ public class CodecTest
 	{
 //		final GridCodec codec = new KryoCodec();
 //		final GridCodec codec = new GenericCodec();
-//		final GridCodec codec = new FSTCodec();
-		final GridCodec codec = new HessianCodec();
+		final GridCodec codec = new FSTCodec();
+//		final GridCodec codec = new HessianCodec();
 		final AtomicInteger byteLen = new AtomicInteger(0);
 		final AtomicLong costSum = new AtomicLong(0L);
 		int threadCount = 10;

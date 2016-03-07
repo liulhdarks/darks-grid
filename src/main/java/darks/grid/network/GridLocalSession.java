@@ -21,6 +21,7 @@ import io.netty.channel.Channel;
 import java.net.InetSocketAddress;
 
 import darks.grid.GridRuntime;
+import darks.grid.beans.GridAddress;
 import darks.grid.utils.ChannelUtils;
 import darks.grid.utils.NetworkUtils;
 
@@ -31,7 +32,7 @@ public class GridLocalSession implements GridSession
 	
 	int failRetryCount;
 	
-	InetSocketAddress bindAddress;
+	GridAddress bindAddress;
 	
 	public GridLocalSession(Channel channel)
 	{
@@ -92,13 +93,13 @@ public class GridLocalSession implements GridSession
 	}
 
 	@Override
-	public InetSocketAddress remoteAddress()
+	public GridAddress remoteAddress()
 	{
 		return localAddress();
 	}
 
 	@Override
-	public synchronized InetSocketAddress localAddress()
+	public synchronized GridAddress localAddress()
 	{
 		if (channel == null)
 			return null;
@@ -106,7 +107,7 @@ public class GridLocalSession implements GridSession
 		{
 			String ipHost = NetworkUtils.getIpAddress();
 			InetSocketAddress ipAddr = (InetSocketAddress) channel.localAddress();
-			bindAddress = new InetSocketAddress(ipHost, ipAddr.getPort());
+			bindAddress = new GridAddress(ipHost, ipAddr.getPort());
 		}
 		return bindAddress;
 	}

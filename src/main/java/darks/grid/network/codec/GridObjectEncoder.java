@@ -13,6 +13,11 @@ public class GridObjectEncoder extends MessageToByteEncoder<Serializable>
     private static final byte[] LENGTH_PLACEHOLDER = new byte[4];
     
     GridCodec codec = null;
+    
+    public GridObjectEncoder(GridCodec codec)
+    {
+        this.codec = codec;
+    }
 
 	@Override
 	protected void encode(ChannelHandlerContext ctx, Serializable msg, ByteBuf out) throws Exception

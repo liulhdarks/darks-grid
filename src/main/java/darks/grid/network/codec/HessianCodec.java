@@ -3,6 +3,7 @@ package darks.grid.network.codec;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.Map;
 
 import com.caucho.hessian.io.HessianInput;
 import com.caucho.hessian.io.HessianOutput;
@@ -14,6 +15,12 @@ public class HessianCodec implements GridCodec
 	
 	
 	@Override
+    public void initialize(Map<String, String> params) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
 	public void encode(OutputStream out, Serializable msg) throws Exception
 	{
 		HessianOutput ho = new HessianOutput(out);  

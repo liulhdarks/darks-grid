@@ -3,6 +3,7 @@ package darks.grid.network.codec;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.Map;
 
 import de.ruedigermoeller.serialization.FSTConfiguration;
 import de.ruedigermoeller.serialization.FSTObjectInput;
@@ -14,7 +15,14 @@ public class FSTCodec implements GridCodec
 	
 	static FSTConfiguration conf = FSTConfiguration.createDefaultConfiguration();
 	
+	
 	@Override
+    public void initialize(Map<String, String> params) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
 	public void encode(OutputStream out, Serializable msg) throws Exception
 	{
 		FSTObjectOutput fout = conf.getObjectOutput(out);

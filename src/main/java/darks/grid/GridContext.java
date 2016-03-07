@@ -17,8 +17,8 @@
 package darks.grid;
 
 import java.io.Serializable;
-import java.net.InetSocketAddress;
 
+import darks.grid.beans.GridAddress;
 import darks.grid.beans.MachineInfo;
 import darks.grid.commons.MachineInfoFactory;
 import darks.grid.config.GridConfiguration;
@@ -37,7 +37,7 @@ public class GridContext implements Serializable, GridManager
 	
 	private String clusterName;
 	
-	private InetSocketAddress serverAddress;
+	private GridAddress serverAddress;
 	
 	private transient MachineInfoFactory machineInfoFactory;
 	
@@ -112,12 +112,12 @@ public class GridContext implements Serializable, GridManager
 		this.clusterName = clusterName;
 	}
 
-	public synchronized InetSocketAddress getServerAddress()
+	public synchronized GridAddress getServerAddress()
 	{
 		return serverAddress;
 	}
 
-	public synchronized void setServerAddress(InetSocketAddress serverAddress)
+	public synchronized void setServerAddress(GridAddress serverAddress)
 	{
 		this.serverAddress = serverAddress;
 	}

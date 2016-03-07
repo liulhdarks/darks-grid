@@ -16,7 +16,6 @@
  */
 package darks.grid.network.discovery;
 
-import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -25,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import darks.grid.GridRuntime;
+import darks.grid.beans.GridAddress;
 import darks.grid.beans.GridEvent;
 import darks.grid.beans.GridNode;
 import darks.grid.events.EventsChannel;
@@ -48,7 +48,7 @@ public class MERGE_NODES extends GridDiscovery
 	public void findNodes()
 	{
 		GridNodesManager nodesManager = GridRuntime.nodes();
-		Map<String, InetSocketAddress> nodeAddrMap = new HashMap<String, InetSocketAddress>();
+		Map<String, GridAddress> nodeAddrMap = new HashMap<String, GridAddress>();
 		for (Entry<String, GridNode> entry : nodesManager.getNodesMap().entrySet())
 		{
 			GridNode node = entry.getValue();
