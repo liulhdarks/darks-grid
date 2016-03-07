@@ -38,9 +38,9 @@ public class MergeNodesHandler implements GridEventHandler
 	public void handle(GridEvent event) throws Exception
 	{
 		GridNodesManager nodesManager = GridRuntime.nodes();
-		Map<String, InetSocketAddress> nodeAddrMap = event.getData();
+		Map<String, GridAddress> nodeAddrMap = event.getData();
 		log.info("Recv merge nodes " + nodeAddrMap);
-		for (Entry<String, InetSocketAddress> entry : nodeAddrMap.entrySet())
+		for (Entry<String, GridAddress> entry : nodeAddrMap.entrySet())
 		{
 			GridNode node = nodesManager.getNode(entry.getKey());
 			if (node != null)
