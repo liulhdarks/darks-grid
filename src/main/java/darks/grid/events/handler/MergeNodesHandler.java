@@ -16,7 +16,6 @@
  */
 package darks.grid.events.handler;
 
-import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -24,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import darks.grid.GridRuntime;
+import darks.grid.beans.GridAddress;
 import darks.grid.beans.GridEvent;
 import darks.grid.beans.GridNode;
 import darks.grid.events.GridEventHandler;
