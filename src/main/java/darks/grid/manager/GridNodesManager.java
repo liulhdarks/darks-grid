@@ -25,9 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.concurrent.atomic.AtomicLong;
 
 import darks.grid.GridContext;
 import darks.grid.GridRuntime;
@@ -43,7 +41,9 @@ import darks.grid.network.GridSession;
 public class GridNodesManager implements GridManager
 {
 
-	private static final Logger log = LoggerFactory.getLogger(GridNodesManager.class);
+//	private static final Logger log = LoggerFactory.getLogger(GridNodesManager.class);
+	
+	private static final long SNAPSHOT_EXPIRE_TIME = 1000 * 60 * 10;
     
     private List<GridNode> nodesList = new CopyOnWriteArrayList<GridNode>();
 	
@@ -56,6 +56,8 @@ public class GridNodesManager implements GridManager
 	private Map<String, String> sessionIdMap = new ConcurrentHashMap<String, String>();
 	
 	private AtomicBoolean snapshotChange = new AtomicBoolean(true);
+    
+    private AtomicLong snapshotExpireTime = new AtomicLong(System.currentTimeMillis());
 	
 	private List<GridNode> nodesSnapshotList = null;
 	
@@ -236,7 +238,10 @@ public class GridNodesManager implements GridManager
 
     public synchronized List<GridNode> getSnapshotNodes()
 	{
-    	if (snapshotChange.get() || nodesSnapshotList == null || nodesSnapshotList.isEmpty())
+    	if (snapshotChange.get() 
+    	        || nodesSnapshotList == null 
+    	        || nodesSnapshotList.isEmpty()
+                || (System.currentTimeMillis() - snapshotExpireTime.get()) > SNAPSHOT_EXPIRE_TIME)
     	{
         	nodesSnapshotList = new ArrayList<GridNode>(nodesSet.size());
     	    for (GridNode node : nodesSet)
@@ -245,6 +250,7 @@ public class GridNodesManager implements GridManager
     	        	nodesSnapshotList.add(node);
     	    }
     	    snapshotChange.getAndSet(false);
+            snapshotExpireTime.getAndSet(System.currentTimeMillis());
     	}
 	    return nodesSnapshotList;
 	}

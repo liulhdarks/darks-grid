@@ -28,9 +28,10 @@ import darks.grid.beans.GridAddress;
 import darks.grid.beans.GridEvent;
 import darks.grid.beans.GridNode;
 import darks.grid.events.EventsChannel;
+import darks.grid.events.GridEventHandler;
 import darks.grid.manager.GridNodesManager;
 
-public class MERGE_NODES extends GridDiscovery
+public class MERGE_NODES extends GridDiscovery implements GridEventHandler
 {
 	
 	private static final long serialVersionUID = -8789361878660574408L;
@@ -39,24 +40,58 @@ public class MERGE_NODES extends GridDiscovery
 	
 	private static final int DEFAULT_DELAY = 5000;
 	
+	private boolean joinAutoMerge = true;
+	
 	public MERGE_NODES()
 	{
 		setDelay(DEFAULT_DELAY);
+		GridRuntime.events().addHandler(GridEvent.NODE_JOIN, this);
 	}
 	
 	@Override
 	public void findNodes()
 	{
-		GridNodesManager nodesManager = GridRuntime.nodes();
-		Map<String, GridAddress> nodeAddrMap = new HashMap<String, GridAddress>();
-		for (Entry<String, GridNode> entry : nodesManager.getNodesMap().entrySet())
-		{
-			GridNode node = entry.getValue();
-			nodeAddrMap.put(node.getId(), node.context().getServerAddress());
-		}
+		Map<String, GridAddress> nodeAddrMap = getAddressMap();
 		log.info("Publish merge nodes event with " + nodeAddrMap.size() + " nodes.");
 		GridRuntime.events().publishOthers(EventsChannel.SYSTEM_CHANNEL, GridEvent.MERGE_NODES, nodeAddrMap);
 	}
 
+    @Override
+    public void handle(GridEvent event) throws Exception 
+    {
+        if (joinAutoMerge) 
+        {
+            GridNode node = event.getData();
+            if (node != null)
+            {
+                Map<String, GridAddress> nodeAddrMap = getAddressMap();
+                log.info("Publish merge nodes event to " + node.getId() + " with " + nodeAddrMap.size() + " nodes.");
+                node.publishEvent(EventsChannel.SYSTEM_CHANNEL, GridEvent.MERGE_NODES, nodeAddrMap, false);
+            }
+        }
+    }
 	
+    public Map<String, GridAddress> getAddressMap()
+    {
+        GridNodesManager nodesManager = GridRuntime.nodes();
+        Map<String, GridAddress> nodeAddrMap = new HashMap<String, GridAddress>();
+        for (Entry<String, GridNode> entry : nodesManager.getNodesMap().entrySet())
+        {
+            GridNode node = entry.getValue();
+            nodeAddrMap.put(node.getId(), node.context().getServerAddress());
+        }
+        return nodeAddrMap;
+    }
+
+    public boolean isJoinAutoMerge() 
+    {
+        return joinAutoMerge;
+    }
+
+    public void setJoinAutoMerge(boolean joinAutoMerge) 
+    {
+        this.joinAutoMerge = joinAutoMerge;
+    }
+    
+    
 }

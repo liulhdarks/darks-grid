@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import darks.grid.GridContext;
 import darks.grid.GridException;
 import darks.grid.GridRuntime;
+import darks.grid.events.EventsChannel;
 import darks.grid.network.GridSession;
 import darks.grid.utils.StringUtils;
 
@@ -107,16 +108,22 @@ public class GridNode implements Serializable
 			return false;
 		return session.sendSyncMessage(obj);
 	}
+    
+    public boolean publishEvent(String type, Object data)
+    {
+        return publishEvent(type, data, false);
+    } 
+    
+    public boolean publishEvent(String type, Object data, boolean sync)
+    {
+        return publishEvent(EventsChannel.DEFAULT_CHANNEL, type, data, sync);
+    } 
 	
-	public boolean publishEvent(String type, Object data)
+	public boolean publishEvent(String channel, String type, Object data, boolean sync)
 	{
-		return publishEvent(type, data, false);
-	} 
-	
-	public boolean publishEvent(String type, Object data, boolean sync)
-	{
-		GridEvent event = new GridEvent(data, type);
-		return GridRuntime.events().publish(this, event, sync);
+        GridEvent event = new GridEvent(data, type);
+        event.setChannel(channel);
+        return GridRuntime.events().publish(this, event, sync);
 	} 
 	
 	public String getId()
